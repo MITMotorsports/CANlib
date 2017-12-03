@@ -1,16 +1,16 @@
 """
-Generate MY17_Can_Libary.h file.
-Run this file to write just MY17_Can_Libary.h or main.py to write all files.
+Generate MY18_Can_Libary.h file.
+Run this file to write just MY18_Can_Libary.h or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import can_lib_h_path, spec_path, struct_paths, unused_messages
+from common import can_lib_h_path, spec_path, struct_paths
 
 
-def write(output_path, spec_path, struct_paths, unused_messages):
+def write(output_path, spec_path, struct_paths):
     """
-    Generate MY17_Can_Libary.h file.
+    Generate MY18_Can_Libary.h file.
 
     :param output_path: file to be written to
     :param spec_path: CAN spec path
@@ -20,8 +20,8 @@ def write(output_path, spec_path, struct_paths, unused_messages):
     spec = ParseCAN.spec.can(spec_path)
     with open(output_path, 'w') as f:
         # Setup file
-        f.write("#ifndef _MY17_CAN_LIBRARY_H\n" +
-                "#define _MY17_CAN_LIBRARY_H\n\n" +
+        f.write("#ifndef _MY18_CAN_LIBRARY_H\n" +
+                "#define _MY18_CAN_LIBRARY_H\n\n" +
                 "#include <stdint.h>\n" +
                 "#include <stdbool.h>\n\n")
 
@@ -66,8 +66,6 @@ def write(output_path, spec_path, struct_paths, unused_messages):
 
         # Write DECLARE statements
         for message in spec.messages.values():
-            if message.name in unused_messages:
-                continue
             f.write("DECLARE(Can_" + message.name + ")\n")
 
         # Special cases (motor controller messages)
@@ -81,8 +79,8 @@ def write(output_path, spec_path, struct_paths, unused_messages):
         # Finish up
         f.write(
             "#undef DECLARE\n" +
-            "#endif // _MY17_CAN_LIBRARY_H")
+            "#endif // _MY18_CAN_LIBRARY_H")
 
 
 if __name__ == "__main__":
-    write(can_lib_h_path, spec_path, struct_paths.values(), unused_messages)
+    write(can_lib_h_path, spec_path, struct_paths.values())

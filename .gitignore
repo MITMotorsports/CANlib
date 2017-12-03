@@ -3,10 +3,10 @@ compile_commands.json
 *.pyc
 
 # Files that should be written from CAN spec
-can_validator/fsae_can_spec.h
-MY17_CAN_Library.c
-MY17_CAN_Library.h
-ids.h
+generator/fsae_can_spec.h
+MY18_CAN_Library.c
+MY18_CAN_Library.h
+enum_segments.h
 bms.h
 can_node.h
 current_sensor.h

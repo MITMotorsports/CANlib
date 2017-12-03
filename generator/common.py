@@ -1,24 +1,11 @@
-spec_path = "ParseCAN/fsae_can_spec.yml"
+spec_path = "can_spec_my18.yml"
 
-fsae_can_spec_path = "fsae_can_spec.h"
-can_lib_c_path = "../MY17_Can_Library.c"
-can_lib_h_path = "../MY17_Can_Library.h"
-ids_path = "../ids.h"
+constants_path = "../constants.h"
+can_lib_c_path = "../MY18_Can_Library.c"
+can_lib_h_path = "../MY18_Can_Library.h"
+enum_segments_path = "../enum_segments.h"
 
-can_lib_c_base_path = "templates/MY17_Can_Library_BASE.txt"
-can_lib_c_special_cases_path = "templates/special_cases.txt"
-
-unused_messages = [
-    "Lv_Battery_Voltage",
-    "Accelerometer_Horizontal",
-    "Accelerometer_Vertical",
-    "Gyro_Vertical",
-    "Gyro_Horizontal",
-    "Magnetometer_Horizontal",
-    "Magnetometer_Vertical",
-    "Mc_Response",
-    "Vcu_Mc_Message"
-]
+can_lib_c_base_path = "templates/MY18_Can_Library_BASE.txt"
 
 struct_paths = {
     "bms": "../bms.h",
