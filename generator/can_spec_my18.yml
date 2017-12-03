@@ -224,6 +224,7 @@ VcuToDash:
       unit: null
     lv_warning_on:
       position: 6
+      length: 1
       c_type: bool
       unit: null
     active_aero_on:
@@ -237,8 +238,8 @@ VcuToDash:
       c_type: bool
       unit: null
     shutdown_esd_drain_open:
-      position:
-        length: 1
+      position: 0
+      length: 1
       c_type: bool
       unit: null
     shutdown_bms_open:
@@ -303,6 +304,7 @@ VcuToDash:
       unit: null
     heartbeat_mc_dead:
       position: 29
+      length: 1
       c_type: bool
       unit: null
     heartbeat_current_sensor_dead:
@@ -315,7 +317,7 @@ VcuToDash:
       length: 1
       c_type: bool
       unit: null
-      values:
+      enum:
         ON: 0x0
         OFF: 0x1
     reset_latch_open:
@@ -338,7 +340,7 @@ VcuToDash:
       length: 1
       c_type: bool
       unit: null
-    unused:
+    unused2:
       position: 36
       length: 4
       c_type: null
@@ -354,7 +356,7 @@ VcuToDash:
       length: 3
       c_type: enum
       unit: null
-      values:
+      enum:
         LIMP_NORMAL: 0x0
         LIMP_50: 0x1
         LIMP_33: 0x2
@@ -455,7 +457,7 @@ CurrentSensor_Power:
       unit: W
 MC_Command:
   can_id: 0x0C0 # From manual
-  frequncy: 2.5Hz # MC needs a message at 2 Hz or higher
+  frequency: 2.5Hz # MC needs a message at 2 Hz or higher
   is_big_endian: true
   segments:
     torque:
