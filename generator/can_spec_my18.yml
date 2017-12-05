@@ -215,7 +215,7 @@ VcuToDash:
       length: 1
       c_type: bool
     shutdown_esd_drain_open:
-      position: 0
+      position: 9
       length: 1
       c_type: bool
     shutdown_bms_open:
