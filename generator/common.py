@@ -7,7 +7,7 @@ enum_segments_path = "../enum_segments.h"
 
 can_lib_c_base_path = "templates/MY18_Can_Library_BASE.txt"
 
-struct_paths = {
+boards_paths = {
     "bms": "../bms.h",
     "cannode": "../can_node.h",
     "currentsensor": "../current_sensor.h",

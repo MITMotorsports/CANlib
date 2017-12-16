@@ -1,11 +1,11 @@
 """
-Generate header files that set up structs (bms.h, can_node.h, etc.).
+Generate header files that set up structs for each board).
 Run this file to write just these files or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import struct_paths, spec_path
+from common import boards_paths, spec_path
 
 expected_keys = ["bms", "cannode", "currentsensor", "dash", "vcu"]
 
@@ -34,8 +34,6 @@ def write(output_paths, spec_path):
                         for segment_name, segment in message.segments.items():
                             if segment.c_type != "enum":
                                 field_name = segment_name
-                                if field_name == 'unused':
-                                    continue
                                 f.write("  " + segment.c_type + " " + field_name + ";\n")
                             else:
                                 enum_name = "Can_" + message.name
@@ -49,4 +47,4 @@ def write(output_paths, spec_path):
 
 
 if __name__ == "__main__":
-    write(struct_paths, spec_path)
+    write(boards_paths, spec_path)

@@ -44,7 +44,7 @@ BMSCellTemps:
       length: 15
       c_type: int16_t
       signed: false
-      unit: C # Double check w/ Skanda
+      unit: C
     min_cell_temp:
       position: 15
       length: 15
@@ -274,9 +274,6 @@ VcuToDash:
       position: 31
       length: 1
       c_type: bool
-      enum:
-        ON: 0x0
-        OFF: 0x1
     reset_latch_open:
       position: 32
       length: 1

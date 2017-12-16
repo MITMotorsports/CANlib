@@ -5,10 +5,10 @@ Run this file to write just MY18_Can_Libary.h or main.py to write all files.
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import can_lib_h_path, spec_path, struct_paths
+from common import can_lib_h_path, spec_path, boards_paths
 
 
-def write(output_path, spec_path, struct_paths):
+def write(output_path, spec_path, boards_paths):
     """
     Generate MY18_Can_Libary.h file.
 
@@ -21,9 +21,10 @@ def write(output_path, spec_path, struct_paths):
     with open(output_path, 'w') as f:
         # Setup file
         f.write("#ifndef _MY18_CAN_LIBRARY_H\n" +
-                "#define _MY18_CAN_LIBRARY_H\n\n" +
-                "#include <stdint.h>\n" +
-                "#include <stdbool.h>\n\n")
+                "#define _MY18_CAN_LIBRARY_H\n\n")
+
+        # Include static stuff
+        f.write('#include "static_can.h"\n\n')
 
         # Create enum
         f.write("typedef enum {\n" +
@@ -32,49 +33,14 @@ def write(output_path, spec_path, struct_paths):
                 "  Can_Error_Msg,\n")
         for message in spec.messages.values():
             f.write("  Can_" + message.name + "_Msg,\n")
-        # Add motor controller special cases
-        f.write(
-            "  Can_MC_ErrorAndWarning_Msg,\n" +
-            "  Can_MC_DataReading_Msg,\n" +
-            "  Can_MC_State_Msg,\n" +
-            "  Can_Vcu_MCRequest_Msg,\n" +
-            "  Can_Vcu_MCTorque_Msg,\n")
-        f.write("} Can_MsgID_T;\n\n")
 
-        # Finish initial setup
-        f.write(
-            'Can_MsgID_T Can_MsgType(void);\n\n'
-            '#include "can_raw.h"\n\n' +
-            '#define TO_CAN(name) \\\n' +
-            '  void name ## _ToCan(name ## _T *type_in, Frame *can_out)\n\n' +
-            '#define FROM_CAN(name) \\\n' +
-            '  void name ## _FromCan(Frame *can_in, name ## _T *type_out)\n\n' +
-            '#define DECLARE(name) \\\n' +
-            '  Can_ErrorID_T name ##_Read(name ## _T *type); \\\n' +
-            '  Can_ErrorID_T name ##_Write(name ## _T *type); \\\n' +
-            '  TO_CAN(name); \\\n' +
-            '  FROM_CAN(name);\n\n' +
-            'Can_ErrorID_T Can_Unknown_Read(Frame *frame);\n' +
-            'Can_ErrorID_T Can_Error_Read(void);\n\n' +
-            'void to_bitstring(uint8_t in[], uint64_t *out);\n' +
-            'void from_bitstring(uint64_t *in, uint8_t out[]);\n\n')
-
-        # Add structs includes
-        for path in struct_paths:
+        # Add board includes
+        for path in boards_paths:
             f.write('#include "' + path.replace("..", "").replace("/", "") + '"\n')
-        f.write('#include "mc.h"\n\n')
 
         # Write DECLARE statements
         for message in spec.messages.values():
             f.write("DECLARE(Can_" + message.name + ")\n")
-
-        # Special cases (motor controller messages)
-        f.write(
-            "DECLARE(Can_Vcu_MCRequest)\n" +
-            "DECLARE(Can_Vcu_MCTorque)\n" +
-            "DECLARE(Can_MC_DataReading)\n" +
-            "DECLARE(Can_MC_ErrorAndWarning)\n" +
-            "DECLARE(Can_MC_State)\n\n")
 
         # Finish up
         f.write(
@@ -83,4 +49,4 @@ def write(output_path, spec_path, struct_paths):
 
 
 if __name__ == "__main__":
-    write(can_lib_h_path, spec_path, struct_paths.values())
+    write(can_lib_h_path, spec_path, boards_paths.values())

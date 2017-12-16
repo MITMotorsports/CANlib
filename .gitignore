@@ -3,7 +3,7 @@ compile_commands.json
 *.pyc
 
 # Files that should be written from CAN spec
-generator/fsae_can_spec.h
+constants.h
 MY18_CAN_Library.c
 MY18_CAN_Library.h
 enum_segments.h

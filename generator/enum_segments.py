@@ -1,5 +1,5 @@
 """
-Generate ids.h file.
+Generate enum_segments.h file.
 Run this file to write just ids.h or main.py to write all files.
 """
 import sys
@@ -31,7 +31,7 @@ def write(output_path, spec_path):
                             "  " + message_name + "_" + value_name.upper() + " = " +
                             '____' + message.name.upper() + '__' + segment_name.upper() + '__' + value_name +
                             ",\n")
-                    f.write("} Can_" + message.name.replace('Heartbeat', 'State') + "ID_T;\n\n")
+                    f.write("} Can_" + message.name + "ID_T;\n\n")
         f.write('#endif // _MY18_CAN_LIBRARY_IDS_H')
 
 
