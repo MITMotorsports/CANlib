@@ -99,7 +99,7 @@ def write(output_path, spec_path, base_path):
                         str(segment.length) + ");\n")
                 else:
                     if not message.is_big_endian:
-                        if segment.c_type.startswith("int"):  # Check if signed int
+                        if segment.signed:
                             f.write(
                                 "  " + segment.c_type + " " + field_name + "_swap_value=(swap_" + segment.c_type[:-2] +
                                 "(EXTRACT(bitstring, " + str(segment.position) + ", " + str(segment.length) + ")));\n")
@@ -110,7 +110,7 @@ def write(output_path, spec_path, base_path):
                                 str(segment.length) + ")));\n")
                         f.write("  type_out->" + field_name + " = " + field_name + "_swap_value;\n")
                     else:
-                        if segment.c_type.startswith("int"):  # Check if signed int
+                        if segment.signed:
                             f.write(
                                 "  type_out->" + field_name + " = SIGN(EXTRACT(bitstring, " + str(segment.position) +
                                 ", " + str(segment.length) + "), " +
