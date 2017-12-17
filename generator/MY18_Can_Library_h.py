@@ -5,10 +5,10 @@ Run this file to write just MY18_Can_Libary.h or main.py to write all files.
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import can_lib_h_path, spec_path, boards_paths
+from common import can_lib_h_path, spec_path
 
 
-def write(output_path, spec_path, boards_paths):
+def write(output_path, spec_path):
     """
     Generate MY18_Can_Libary.h file.
 
@@ -36,8 +36,8 @@ def write(output_path, spec_path, boards_paths):
                 f.write("  Can_" + message.name + "_Msg,\n")
 
         # Add board includes
-        for path in boards_paths:
-            f.write('#include "' + path.replace("..", "").replace("/", "") + '"\n')
+        for board in car.boards.keys():
+            f.write('#include "' + board + '.h"\n')
 
         # Write DECLARE statements
         for bus in car.buses.values():
@@ -49,4 +49,4 @@ def write(output_path, spec_path, boards_paths):
 
 
 if __name__ == "__main__":
-    write(can_lib_h_path, spec_path, boards_paths.values())
+    write(can_lib_h_path, spec_path)

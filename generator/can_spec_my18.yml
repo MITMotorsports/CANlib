@@ -6,9 +6,9 @@ boards:
         - FrontCanNodeOutput
     subscribe:
       can0:
-        - can0/RearCanNodeWheelSpeed
-        - can0/VcuToDash
-        - can0/BMS_SOC
+        - RearCanNodeWheelSpeed
+        - VcuToDash
+        - BMS_SOC
   rear_can_node:
     publish:
       can0:
@@ -21,12 +21,12 @@ boards:
         - BMS_VCU_Switch
     subscribe:
       can0:
-        - can0/FrontCanNodeOutput
-        - can0/Dash_Request
+        - FrontCanNodeOutput
+        - Dash_Request
   dash:
     publish:
       can0:
-        - can0/Dash_Request
+        - Dash_Request
     subscribe:
       can0:
         - VcuToDash
