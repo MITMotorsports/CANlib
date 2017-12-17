@@ -16,18 +16,20 @@ def write(output_path, spec_path):
     :param output_path: file to be written to
     :param spec_path: CAN spec path
     """
-    spec = ParseCAN.spec.can(spec_path)
+    car = ParseCAN.spec.car(spec_path)
     with open(output_path, 'w') as f:
         clean_output_path = re.sub('[^A-Za-z0-9_]+', '_', output_path).upper()
         f.write('#ifndef ____' + clean_output_path + '\n')
         f.write('#define ____' + clean_output_path + '\n\n')
-        for id, message in spec.messages.items():
-            f.write('#define ' + message.name.upper() + '__id ' + str(id) + '\n')
-            for segment_name, segment in message.segments.items():
-                if len(segment.values) > 0:   # Segment is type enum
-                    for value_name, value in segment.values.items():
-                        f.write('#define ____' + message.name.upper() + '__' + segment_name.upper() + '__' + value_name
-                                + ' ' + str(value.value) + '\n')
+        for bus in car.buses.values():
+            for message in bus.messages:
+                f.write('#define ' + message.name.upper() + '__id ' + str(message.can_id) + '\n')
+                for segment in message.segments:
+                    if len(segment.values) > 0:   # Segment is type enum
+                        for value in segment.values:
+                            f.write('#define ____' + message.name.upper() + '__' +
+                                    segment.name.upper() + '__' + value.name
+                                    + ' ' + str(value.value) + '\n')
 
             f.write('\n')
         f.write('#endif // ____' + clean_output_path + '\n')

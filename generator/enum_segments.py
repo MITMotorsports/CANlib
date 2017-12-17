@@ -15,23 +15,24 @@ def write(output_path, spec_path):
     :param output_path: file to be written to
     :param spec_path: CAN spec path
     """
-    spec = ParseCAN.spec.can(spec_path)
+    car = ParseCAN.spec.car(spec_path)
     with open(output_path, 'w') as f:
         f.write('#ifndef _MY18_CAN_LIBRARY_IDS_H\n')
         f.write('#define _MY18_CAN_LIBRARY_IDS_H\n\n')
-        f.write('#include "can_validator/fsae_can_spec.h"\n\n')
+        f.write('#include "constants.h"\n\n')
 
-        for message in spec.messages.values():
-            for segment_name, segment in message.segments.items():
-                if segment.c_type == 'enum':
-                    f.write('typedef enum {\n')
-                    for value_name, value in segment.values.items():
-                        message_name = "CAN_" + message.name.upper()
-                        f.write(
-                            "  " + message_name + "_" + value_name.upper() + " = " +
-                            '____' + message.name.upper() + '__' + segment_name.upper() + '__' + value_name +
-                            ",\n")
-                    f.write("} Can_" + message.name + "ID_T;\n\n")
+        for bus in car.buses.values():
+            for message in bus.messages:
+                for segment in message.segments:
+                    if segment.c_type == 'enum':
+                        f.write('typedef enum {\n')
+                        for value in segment.values:
+                            message_name = "CAN_" + message.name.upper()
+                            f.write(
+                                "  " + message_name + "_" + value.name.upper() + " = " +
+                                '____' + message.name.upper() + '__' + segment.name.upper() + '__' + value.name +
+                                ",\n")
+                        f.write("} Can_" + message.name + "ID_T;\n\n")
         f.write('#endif // _MY18_CAN_LIBRARY_IDS_H')
 
 
