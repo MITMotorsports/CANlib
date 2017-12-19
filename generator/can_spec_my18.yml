@@ -64,7 +64,6 @@ boards:
         - BmsPackStatus
         - ElconHeartbeat
   mc:
-    publish:
     subscribe:
       can0:
         - MC_Command
@@ -107,7 +106,7 @@ buses:
             c_type: bool
       FrontCanNodeWheelSpeed:
         can_id: 0x0F0
-        frequency: 1Hz # Filler
+        frequency: 10Hz
         is_big_endian: true
         segments:
           front_right_wheel_speed:
@@ -124,7 +123,7 @@ buses:
             unit: mRPM
       BMSCellTemps:
         can_id: 0x0F1
-        frequency: 1Hz # Filler
+        frequency: 10Hz
         is_big_endian: true
         segments:
           avg_cell_temp:
@@ -157,7 +156,7 @@ buses:
             signed: false
       BmsPackStatus:
         can_id: 0x0F2
-        frequency: 1Hz # Filler
+        frequency: 10Hz
         is_big_endian: true
         segments:
           pack_voltage:
@@ -198,7 +197,7 @@ buses:
             signed: false
       BMSErrors:
         can_id: 0x0D4
-        frequency: 1Hz # Filler
+        frequency: 50Hz
         is_big_endian: true
         segments:
           type:
@@ -223,7 +222,7 @@ buses:
               OTHER: 0xE
       BMS_SOC:
         can_id: 0x0D5
-        frequency: 1Hz # Filler
+        frequency: 10Hz
         is_big_endian: true
         segments:
           soc_percentage:
@@ -233,7 +232,7 @@ buses:
             signed: false
       Dash_Request:
         can_id: 0x0D2
-        frequency: 1Hz # Filler
+        frequency: 50Hz
         is_big_endian: true
         segments:
           type:
@@ -252,9 +251,9 @@ buses:
               ACTIVE_AERO_DISABLE: 0x8
               FAN_ENABLE: 0x9
               FAN_DISABLE: 0xA
-      BMSState: # Sent by VCU
+      BMSState:
         can_id: 0x0D3
-        frequency: 1Hz # Filler
+        frequency: 1Hz
         is_big_endian: true
         segments:
           state:
@@ -263,7 +262,7 @@ buses:
             c_type: bool
       VcuToDash:
         can_id: 0x0F3
-        frequency: 1Hz # Filler
+        frequency: 10Hz
         is_big_endian: true
         segments:
           rtd_light_on:
@@ -394,7 +393,7 @@ buses:
               LIMP_25: 0x3
       RearCanNodeWheelSpeed:
         can_id: 0x0D1
-        frequency: 1Hz # Filler
+        frequency: 50Hz
         is_big_endian: true
         segments:
           rear_right_wheel_speed:
@@ -411,7 +410,7 @@ buses:
             unit: mRPM
       BMS_VCU_Switch: # Switch CAN bus and baudrate
         can_id: 0x0F4
-        frequency: 1Hz # Filler
+        frequency: 1Hz
         is_big_endian: true
         segments:
           always_true:
@@ -490,7 +489,7 @@ buses:
     messages:
       BMS_CSB_Switch: # Switch CAN bus and baudrate
         can_id: 0x10
-        frequency: 1Hz # Filler
+        frequency: 0.1Hz # Just picked this to be less than the Elcon stuff
         is_big_endian: true
         segments:
           always_true:
@@ -568,7 +567,7 @@ buses:
             c_type: bool
       BmsPackStatus:
         can_id: 0x12
-        frequency: 1Hz # Filler
+        frequency: 10Hz
         is_big_endian: true
         segments:
           pack_voltage:
