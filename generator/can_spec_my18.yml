@@ -1,6 +1,10 @@
 name: MY18
+archs:
+  - avr
+  - arm
 boards:
   can_node:
+    arch: arm
     publish:
       can0:
         - FrontCanNodeOutput
@@ -10,10 +14,12 @@ boards:
         - VcuToDash
         - BMS_SOC
   rear_can_node:
+    arch: arm
     publish:
       can0:
         - RearCanNodeWheelSpeed
   vcu:
+    arch: avr
     publish:
       can0:
         - VcuToDash
@@ -24,6 +30,7 @@ boards:
         - FrontCanNodeOutput
         - Dash_Request
   dash:
+    arch: avr
     publish:
       can0:
         - Dash_Request
@@ -34,6 +41,7 @@ boards:
         - FrontCanNodeOutput
         - RearCanNodeWheelSpeed
   bms:
+    arch: arm
     publish:
       can0:
         - BMSErrors
@@ -47,6 +55,7 @@ boards:
       can1:
         - BMS_CSB_Switch
   csb:
+    arch: arm
     publish:
       can1:
         - BMS_CSB_Switch
