@@ -1,5 +1,5 @@
-#ifndef _MY17_CAN_LIBRARY_EVIL_MACROS_H
-#define _MY17_CAN_LIBRARY_EVIL_MACROS_H
+#ifndef _MY18_CAN_LIBRARY_EVIL_MACROS_H
+#define _MY18_CAN_LIBRARY_EVIL_MACROS_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -39,4 +39,4 @@
 #define EXTRACT(input, start, len) \
   (((input) >> START_IDX(start, len)) & ONES(len))
 
-#endif // _MY17_CAN_LIBRARY_EVIL_MACROS_H
+#endif // _MY18_CAN_LIBRARY_EVIL_MACROS_H

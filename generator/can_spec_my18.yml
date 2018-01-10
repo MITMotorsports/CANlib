@@ -8,6 +8,7 @@ boards:
     publish:
       can0:
         - FrontCanNodeOutput
+        - FrontCanNodeWheelSpeed
     subscribe:
       can0:
         - RearCanNodeWheelSpeed
@@ -25,6 +26,7 @@ boards:
         - VcuToDash
         - BMSState
         - BMS_VCU_Switch
+        - MC_Command
     subscribe:
       can0:
         - FrontCanNodeOutput
@@ -45,9 +47,11 @@ boards:
     publish:
       can0:
         - BMSErrors
-        - BmsPackStatus
+        - BmsPackStatus0
+        - BMS_SOC
+        - BMSCellTemps
       can1:
-        - BmsPackStatus
+        - BmsPackStatus1
     subscribe:
       can0:
         - BMSState
@@ -59,9 +63,11 @@ boards:
     publish:
       can1:
         - BMS_CSB_Switch
+        - BMS_Mode
+        - ElconCommand
     subscribe:
       can1:
-        - BmsPackStatus
+        - BmsPackStatus1
         - ElconHeartbeat
   mc:
     subscribe:
@@ -154,7 +160,7 @@ buses:
             length: 9
             c_type: uint16_t
             signed: false
-      BmsPackStatus:
+      BmsPackStatus0:
         can_id: 0x0F2
         frequency: 10Hz
         is_big_endian: true
@@ -458,13 +464,13 @@ buses:
           torque:
             position: 0
             length: 16
-            c_type: unint16_t
+            c_type: uint16_t
             signed: false
             unit: daJ # 10 joules
           speed:
             position: 16
             length: 16
-            c_type: unint16_t
+            c_type: uint16_t
             signed: false
             unit: RPM
           direction_is_counterclockwise: # when viewed from shaft end of motor
@@ -482,7 +488,7 @@ buses:
           torque_limit:
             position: 48
             length: 16
-            c_type: unint_16
+            c_type: uint16_t
             unit: daJ # 10 joules
   can1:
     is_extended: true
@@ -565,7 +571,7 @@ buses:
             position: 35
             length: 1
             c_type: bool
-      BmsPackStatus:
+      BmsPackStatus1:
         can_id: 0x12
         frequency: 10Hz
         is_big_endian: true

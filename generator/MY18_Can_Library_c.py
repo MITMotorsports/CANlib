@@ -85,7 +85,7 @@ def write(output_path, spec_path, base_path):
                     "  to_bitstring(can_in->data, &bitstring);\n")
                 for segment in message.segments:
                     if segment.c_type == "enum":
-                        enum_name = "Can_" + message.name
+                        enum_name = "Can_" + message.name + "ID_T"
 
                         f.write(
                             "  type_out->" + segment.name + " = (" + enum_name + ")EXTRACT(bitstring, " +

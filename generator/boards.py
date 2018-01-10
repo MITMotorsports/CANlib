@@ -5,6 +5,7 @@ Run this file to write just these files or main.py to write all files.
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
+import os
 from common import spec_path
 
 expected_keys = ["bms", "cannode", "currentsensor", "dash", "vcu"]
@@ -18,6 +19,10 @@ def write(spec_path):
     :param spec_path: path to the CAN spec
     """
     car = ParseCAN.spec.car(spec_path)
+    try:
+        os.mkdir("../boards")
+    except FileExistsError:
+        pass
     for board in car.boards.values():
         with open("../boards/" + board.name + ".h", 'w') as f:
             f.write("#ifndef _MY18_CAN_LIBRARY_" + board.name.upper() + "_H\n")

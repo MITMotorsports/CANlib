@@ -23,8 +23,9 @@ def write(output_path, spec_path):
         f.write("#ifndef _MY18_CAN_LIBRARY_H\n" +
                 "#define _MY18_CAN_LIBRARY_H\n\n")
 
-        # Include static stuff
-        f.write('#include "static_can.h"\n\n')
+        # Includes
+        f.write("#include <stdint.h>\n" +
+                "#include <stdbool.h>\n\n")
 
         # Create enum
         f.write("typedef enum {\n" +
@@ -34,10 +35,17 @@ def write(output_path, spec_path):
         for bus in car.buses.values():
             for message in bus.messages:
                 f.write("  Can_" + message.name + "_Msg,\n")
+        f.write("} Can_MsgID_T;\n\n")
+
+        f.write("Can_MsgID_T Can_MsgType(void);\n\n")
+
+        # Include static stuff
+        f.write('#include "static_can.h"\n\n')
 
         # Add board includes
         for board in car.boards.keys():
-            f.write('#include "' + board + '.h"\n')
+            f.write('#include "boards/' + board + '.h"\n')
+        f.write("\n")
 
         # Write DECLARE statements
         for bus in car.buses.values():
