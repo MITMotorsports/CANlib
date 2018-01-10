@@ -34,8 +34,7 @@ def write(output_path, spec_path, base_path):
     return Can_Error_Msg;
   }
 
-  uint16_t id = lastMessage.id;
-  uint16_t first_byte = lastMessage.data[0];
+  uint32_t id = lastMessage.id;
 
   switch(id) {
 """)

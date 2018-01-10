@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 typedef struct {
-  uint16_t id;
+  uint32_t id;
   uint8_t len;
   uint8_t data[8];
 } Frame;
