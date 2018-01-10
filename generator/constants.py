@@ -1,11 +1,12 @@
 """
 Generate constants.h file.
-Run this file to write just constants.h or main.py to write all files.
+Run this file (with the spec path as a command line argument) to write just
+constants.h or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import constants_path, spec_path
+from common import constants_path
 import re
 
 
@@ -36,4 +37,5 @@ def write(output_path, spec_path):
 
 
 if __name__ == "__main__":
+    spec_path = sys.argv[1]
     write(constants_path, spec_path)

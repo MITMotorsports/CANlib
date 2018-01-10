@@ -1,12 +1,12 @@
 """
 Generate header files that set up structs for each board).
-Run this file to write just these files or main.py to write all files.
+Run this file (with the spec path as a command line argument) to write just
+these files or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
 import os
-from common import spec_path
 
 expected_keys = ["bms", "cannode", "currentsensor", "dash", "vcu"]
 
@@ -47,4 +47,5 @@ def write(spec_path):
 
 
 if __name__ == "__main__":
+    spec_path = sys.argv[1]
     write(spec_path)

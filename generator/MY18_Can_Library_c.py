@@ -1,12 +1,13 @@
 """
 Generate MY18_Can_Libary.c file.
-Run this file to write just MY18_Can_Libary.c or main.py to write all files.
+Run this file (with the spec path as a command line argument) to write just
+MY18_Can_Libary.c or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
 from math import ceil
-from common import can_lib_c_path, spec_path, can_lib_c_base_path
+from common import can_lib_c_path, can_lib_c_base_path
 
 
 def write(output_path, spec_path, base_path):
@@ -126,4 +127,5 @@ def write(output_path, spec_path, base_path):
 
 
 if __name__ == "__main__":
+    spec_path = sys.argv[1]
     write(can_lib_c_path, spec_path, can_lib_c_base_path)

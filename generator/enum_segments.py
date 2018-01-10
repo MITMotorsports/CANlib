@@ -1,11 +1,12 @@
 """
 Generate enum_segments.h file.
-Run this file to write just ids.h or main.py to write all files.
+Run this file (with the spec path as a command line argument) to write just
+ids.h or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import enum_segments_path, spec_path
+from common import enum_segments_path
 
 
 def write(output_path, spec_path):
@@ -37,4 +38,5 @@ def write(output_path, spec_path):
 
 
 if __name__ == "__main__":
+    spec_path = sys.argv[1]
     write(enum_segments_path, spec_path)

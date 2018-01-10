@@ -1,5 +1,3 @@
-spec_path = "can_spec_my18.yml"
-
 constants_path = "../constants.h"
 can_lib_c_path = "../MY18_Can_Library.c"
 can_lib_h_path = "../MY18_Can_Library.h"
