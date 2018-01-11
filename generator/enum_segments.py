@@ -18,8 +18,8 @@ def write(output_path, spec_path):
     """
     car = ParseCAN.spec.car(spec_path)
     with open(output_path, 'w') as f:
-        f.write('#ifndef _MY18_CAN_LIBRARY_IDS_H\n')
-        f.write('#define _MY18_CAN_LIBRARY_IDS_H\n\n')
+        f.write('#ifndef _CAN_LIBRARY_ENUM_SEGMENTS_H\n')
+        f.write('#define _CAN_LIBRARY_ENUM_SEGMENTS_H\n\n')
         f.write('#include "constants.h"\n\n')
 
         for bus in car.buses.values():
@@ -34,7 +34,7 @@ def write(output_path, spec_path):
                                 '____' + message.name.upper() + '__' + segment.name.upper() + '__' + value.name +
                                 ",\n")
                         f.write("} Can_" + message.name + "ID_T;\n\n")
-        f.write('#endif // _MY18_CAN_LIBRARY_IDS_H')
+        f.write('#endif // _CAN_LIBRARY_ENUM_SEGMENTS_H')
 
 
 if __name__ == "__main__":

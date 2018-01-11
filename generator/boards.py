@@ -25,8 +25,8 @@ def write(spec_path):
         pass
     for board in car.boards.values():
         with open("../boards/" + board.name + ".h", 'w') as f:
-            f.write("#ifndef _MY18_CAN_LIBRARY_" + board.name.upper() + "_H\n")
-            f.write("#define _MY18_CAN_LIBRARY_" + board.name.upper() + "_H\n\n")
+            f.write("#ifndef _CAN_LIBRARY_" + board.name.upper() + "_H\n")
+            f.write("#define _CAN_LIBRARY_" + board.name.upper() + "_H\n\n")
             f.write('#include "constants.h"\n\n')
             f.write("#include <stdint.h>\n")
             f.write("#include <stdbool.h>\n\n")
@@ -43,7 +43,7 @@ def write(spec_path):
                             enum_name += "ID_T"
                             f.write("  " + enum_name + " " + segment.name + ";\n")
                     f.write("} Can_" + message.name + "_T;\n\n")
-            f.write("#endif // _MY18_CAN_LIBRARY_" + board.name.upper() + "_H")
+            f.write("#endif // _CAN_LIBRARY_" + board.name.upper() + "_H")
 
 
 if __name__ == "__main__":

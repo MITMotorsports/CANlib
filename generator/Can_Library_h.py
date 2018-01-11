@@ -1,7 +1,7 @@
 """
-Generate MY18_Can_Libary.h file.
+Generate Can_Libary.h file.
 Run this file (with the spec path as a command line argument) to write just
-MY18_Can_Libary.h or main.py to write all files.
+Can_Libary.h or main.py to write all files.
 """
 import sys
 sys.path.append("ParseCAN")
@@ -11,7 +11,7 @@ from common import can_lib_h_path
 
 def write(output_path, spec_path):
     """
-    Generate MY18_Can_Libary.h file.
+    Generate Can_Libary.h file.
 
     :param output_path: file to be written to
     :param spec_path: CAN spec path
@@ -21,8 +21,8 @@ def write(output_path, spec_path):
     car = ParseCAN.spec.car(spec_path)
     with open(output_path, 'w') as f:
         # Setup file
-        f.write("#ifndef _MY18_CAN_LIBRARY_H\n" +
-                "#define _MY18_CAN_LIBRARY_H\n\n")
+        f.write("#ifndef _CAN_LIBRARY_H\n" +
+                "#define _CAN_LIBRARY_H\n\n")
 
         # Includes
         f.write("#include <stdint.h>\n" +
@@ -54,7 +54,7 @@ def write(output_path, spec_path):
                 f.write("DECLARE(Can_" + message.name + ")\n")
 
         # Finish up
-        f.write("#endif // _MY18_CAN_LIBRARY_H")
+        f.write("#endif // _CAN_LIBRARY_H")
 
 
 if __name__ == "__main__":

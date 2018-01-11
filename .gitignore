@@ -4,8 +4,8 @@ compile_commands.json
 
 # Files that should be written from CAN spec
 constants.h
-MY18_Can_Library.c
-MY18_Can_Library.h
+Can_Library.c
+Can_Library.h
 enum_segments.h
 boards/
 

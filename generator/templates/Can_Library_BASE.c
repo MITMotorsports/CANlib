@@ -1,4 +1,3 @@
-#include "MY18_Can_Library.h"
 #include "evil_macros.h"
 
 static Frame lastMessage;

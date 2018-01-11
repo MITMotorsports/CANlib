@@ -24,13 +24,21 @@ def write(output_path, spec_path):
         f.write('#define ____' + clean_output_path + '\n\n')
         for bus in car.buses.values():
             for message in bus.messages:
+                # Write IDs
                 f.write('#define ' + message.name.upper() + '__id ' + str(message.can_id) + '\n')
+
+                # Write enum fields
                 for segment in message.segments:
                     if len(segment.values) > 0:   # Segment is type enum
                         for value in segment.values:
                             f.write('#define ____' + message.name.upper() + '__' +
                                     segment.name.upper() + '__' + value.name
                                     + ' ' + str(value.value) + '\n')
+
+                # Write frequencies
+                if message.frequency:
+                    f.write('#define ' + message.name.upper() + '__freq ' +
+                            str(int(message.frequency)) + '\n')
 
             f.write('\n')
         f.write('#endif // ____' + clean_output_path + '\n')
