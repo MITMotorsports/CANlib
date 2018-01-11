@@ -12,7 +12,7 @@ from common import can_lib_c_path, can_lib_c_base_path
 
 def write(output_path, spec_path, base_path):
     """
-    Generate Can_Libary.c file, where CAR_NAME is the name of .
+    Generate Can_Libary.c file.
 
     :param output_path: file to be written to
     :param spec_path: CAN spec path
