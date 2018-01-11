@@ -20,7 +20,7 @@ def write(output_path, spec_path, base_path):
     """
     car = ParseCAN.spec.car(spec_path)
     with open(output_path, 'w') as f:
-        f.write('#include "Can_Library.h"')
+        f.write('#include "Can_Library.h"\n')
 
         # Copy over base
         with open(base_path) as base:
