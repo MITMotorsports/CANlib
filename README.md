@@ -23,7 +23,7 @@ boards: # All boards on the car, along with CAN messages they publish and subscr
     subscribe: # All messages on : bus "can_bus0" board1 subscribes to
       can_bus0:
         - Msg2
-  board2: # Note that this board has no architecture specified, which makes sense for boards we don't program ourselves
+  board2: # Note that this board has no architecture specified (good for boards we don't program ourselves)
     publish:
       can_bus0:
         - Msg2
@@ -58,7 +58,7 @@ buses: # List of CAN buses on the car
             position: 0
             length: 2
             c_type: enum
-            enum: # Make sure to add the enum field for segments of type enum to map each segment value to its meaning
+            enum: # Make sure to add this for segments of type enum
               ENUM_A: 0x0
               ENUM_B: 0x1
               ENUM_C: 0x2
