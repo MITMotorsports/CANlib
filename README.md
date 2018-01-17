@@ -81,7 +81,7 @@ The above spec has fewer boards and messages than a real spec likely would, but 
 
 
 ## Using the library
-Include `Can_Library.h` and define your architecture by defining either `CAN_ARCHITECTURE_ARM` or `CAN_ARCHITECTURE_AVR` (usually in your Makefile). Once you do this, the following functions, variables and structs are available and are what you'll want to be using:
+Include `Can_Library.h` and define your architecture by defining either `CAN_ARCHITECTURE_ARM` or `CAN_ARCHITECTURE_AVR` (usually in your Makefile). Once you do this, the following functions, variables, and structs are available and are what you'll want to be using:
 
 ### `void Can_Init(uint32_t baudrate)`
 Call this before you use CAN at all.
