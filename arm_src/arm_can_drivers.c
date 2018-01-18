@@ -10,6 +10,11 @@ void Can_Init(uint32_t baudrate) {
   CAN_Init(baudrate);
 }
 
+void Can_SetFilter(uint32_t mask, uint32_t match_id) {
+  CAN_SetMask1(mask, match_id);
+  CAN_SetMask2(mask, match_id);
+}
+
 Can_ErrorID_T Can_RawWrite(Frame *frame) {
   const uint32_t can_out_id = (uint32_t) (frame->id);
   const uint8_t can_out_bytes = frame->len;

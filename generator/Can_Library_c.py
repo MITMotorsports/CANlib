@@ -6,7 +6,7 @@ Can_Libary.c or main.py to write all files.
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from math import ceil
+from math import ceil, floor, log2
 from common import can_lib_c_path, can_lib_c_base_path
 
 
@@ -26,6 +26,46 @@ def write(output_path, spec_path, base_path):
         with open(base_path) as base:
             lines = base.readlines()
             f.writelines(lines)
+        f.write("\n")
+
+        # Write init functions
+        for board in car.boards.values():
+            if board.arch:  # Means it's a board we program
+                for bus_name, bus in board.subscribe.items():
+                    f.write("void " + bus_name.title() + "_" + board.name.title() +
+                            "_Init(uint32_t baudrate) {\n")
+                    f.write("  Can_Init(baudrate);\n")
+
+                    max_id = max(message.can_id for message in bus.messages)
+
+                    # Find mask
+                    # The way hardware filtering works is that incoming IDs are
+                    # ANDed with the mask and then compared with a preset ID
+                    # The goal of this mask is to throw away most higher ID (i.e.,
+                    # lower priority) messages
+                    mask = 2**(floor(log2(max_id)) + 1) - 1
+                    # On a standard bus, IDs are 11 bit
+                    max_possible_id = 2**11-1
+                    if car.buses[bus_name].is_extended:
+                        # On an extended bus, IDs are 29 bit
+                        max_possible_id = 2**29-1
+                    mask = mask ^ max_possible_id
+
+                    # Set mask (pass in binary to make file more readable)
+                    f.write("  Can_SetFilter(" + bin(mask) + ", 0);\n")
+
+                    # Finish up
+                    f.write("}\n\n")
+
+                # We still need to create init functions for boards that publish
+                # on a bus but don't subscribe
+                # Filtering doesn't matter here
+                for bus_name, bus in board.publish.items():
+                    if bus_name not in board.subscribe.keys():
+                        f.write("void " + bus_name.title() + "_" + board.name.title() +
+                                "_Init(uint32_t baudrate) {\n")
+                        f.write("  Can_Init(baudrate);\n")
+                        f.write("}\n\n")
 
         # Write switch statement
         f.write("""Can_MsgID_T Can_MsgType(void) {

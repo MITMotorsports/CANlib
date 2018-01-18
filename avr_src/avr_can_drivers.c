@@ -17,6 +17,8 @@ void Can_Init(uint32_t baudrate) {
   }
 }
 
+void Can_SetFilter(uint32_t mask, uint32_t match_id) {} // TODO
+
 Can_ErrorID_T Can_RawWrite(Frame *frame) {
   uint8_t response = delegate.sendMsgBuf(frame->id, 0, frame->len, frame->data);
   if (response != CAN_OK) {

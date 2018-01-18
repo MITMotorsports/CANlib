@@ -52,6 +52,19 @@ def write(output_path, spec_path):
         for bus in car.buses.values():
             for message in bus.messages:
                 f.write("DECLARE(Can_" + message.name + ")\n")
+        f.write("\n")
+
+        # Declare inits
+        for board in car.boards.values():
+            if board.arch:  # Means it's a board we program
+                for bus_name, bus in board.subscribe.items():
+                    f.write("void " + bus_name.title() + "_" + board.name.title() +
+                            "_Init(uint32_t baudrate);\n")
+                for bus_name, bus in board.publish.items():
+                    if bus_name not in board.subscribe.keys():
+                        f.write("void " + bus_name.title() + "_" + board.name.title() +
+                                "_Init(uint32_t baudrate);\n")
+        f.write("\n")
 
         # Finish up
         f.write("#endif // _CAN_LIBRARY_H")

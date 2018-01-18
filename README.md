@@ -83,8 +83,10 @@ The above spec has fewer boards and messages than a real spec likely would, but 
 ## Using the library
 Include `Can_Library.h` and define your architecture by defining either `CAN_ARCHITECTURE_ARM` or `CAN_ARCHITECTURE_AVR` (usually in your Makefile). Once you do this, the following functions, variables, and structs are available and are what you'll want to be using:
 
-### `void Can_Init(uint32_t baudrate)`
-Call this before you use CAN at all.
+### `void YourBusName_YourBoardName_Init(uint32_t baudrate)`
+Call this before you use CAN at all. It initializes CAN and configures the message filtering for your particular board on the specified bus. (Note that `YourBusName` and `YourBoardName` are the names of your bus and your board converted to title case, so if youre bus is "can0" and your board is called "dash," you would call `Can0_Dash_Init` with the right baudrate.)
+
+*Note:* The vanilla `CAN_Init` is still available and is fine for small tests, but you should generally use the CAN init function for your board so you can filter messages properly.
 
 ### `Can_MsgID_T`
 This is an enum that can take on values `Can_No_Msg`, `Can_Unknown_Msg`, and `Can_Error_Msg` as well as `Can_YourMessageName_Msg` for each message in the spec. (So for example, if you have a message named `FrontCanNodeOutput`, one of the values will be `Can_FrontCanNodeOutput_Msg`.)

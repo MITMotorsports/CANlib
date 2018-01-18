@@ -30,6 +30,7 @@ typedef enum {
 } Can_ErrorID_T;
 
 void Can_Init(uint32_t baudrate);
+void Can_SetFilter(uint32_t mask, uint32_t match_id);
 Can_ErrorID_T Can_RawWrite(Frame *frame);
 Can_ErrorID_T Can_RawRead(Frame *frame);
 
