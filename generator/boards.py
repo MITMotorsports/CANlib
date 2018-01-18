@@ -8,9 +8,6 @@ sys.path.append("ParseCAN")
 import ParseCAN
 import os
 
-expected_keys = ["bms", "cannode", "currentsensor", "dash", "vcu"]
-
-
 def write(spec_path):
     """
     Write the header files for the main structs in the library.
