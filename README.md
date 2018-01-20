@@ -23,7 +23,9 @@ boards: # All boards on the car, along with CAN messages they publish and subscr
     subscribe: # All messages on : bus "can_bus0" board1 subscribes to
       can_bus0:
         - Msg2
-  board2: # Note that this board has no architecture specified (good for boards we don't program ourselves)
+  # Note that the next board has no architecture specified
+  # (Good for boards we don't program ourselves)
+  board2:
     publish:
       can_bus0:
         - Msg2
