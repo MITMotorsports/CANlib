@@ -22,7 +22,7 @@ def write(output_path, spec_path):
         clean_output_path = re.sub('[^A-Za-z0-9_]+', '_', output_path).upper()
         f.write('#ifndef ____' + clean_output_path + '\n')
         f.write('#define ____' + clean_output_path + '\n\n')
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
                 # Write IDs
                 f.write('#define ' + message.name.upper() + '__id ' + str(message.can_id) + '\n')

@@ -20,7 +20,7 @@ def write(spec_path):
         os.mkdir("../boards")
     except FileExistsError:
         pass
-    for board in car.boards.values():
+    for board in car.boards:
         with open("../boards/" + board.name + ".h", 'w') as f:
             f.write("#ifndef _CAN_LIBRARY_" + board.name.upper() + "_H\n")
             f.write("#define _CAN_LIBRARY_" + board.name.upper() + "_H\n\n")
@@ -29,7 +29,7 @@ def write(spec_path):
             f.write("#include <stdbool.h>\n\n")
             f.write('#include "enum_segments.h"\n\n')
 
-            for bus in board.publish.values():
+            for bus in board.publish:
                 for message in bus.messages:
                     f.write("typedef struct {\n")
                     for segment in message.segments:

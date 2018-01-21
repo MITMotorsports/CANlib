@@ -22,7 +22,7 @@ def write(output_path, spec_path):
         f.write('#define _CAN_LIBRARY_ENUM_SEGMENTS_H\n\n')
         f.write('#include "constants.h"\n\n')
 
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
                 for segment in message.segments:
                     if segment.c_type == 'enum':

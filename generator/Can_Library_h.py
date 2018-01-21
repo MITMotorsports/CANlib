@@ -33,7 +33,7 @@ def write(output_path, spec_path):
                 "  Can_No_Msg,\n" +
                 "  Can_Unknown_Msg,\n" +
                 "  Can_Error_Msg,\n")
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
                 f.write("  Can_" + message.name + "_Msg,\n")
         f.write("} Can_MsgID_T;\n\n")
@@ -44,25 +44,25 @@ def write(output_path, spec_path):
         f.write('#include "static_can.h"\n\n')
 
         # Add board includes
-        for board in car.boards.keys():
-            f.write('#include "boards/' + board + '.h"\n')
+        for board in car.boards:
+            f.write('#include "boards/' + board.name + '.h"\n')
         f.write("\n")
 
         # Write DECLARE statements
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
                 f.write("DECLARE(Can_" + message.name + ")\n")
         f.write("\n")
 
         # Declare inits
-        for board in car.boards.values():
+        for board in car.boards:
             if board.arch:  # Means it's a board we program
-                for bus_name, bus in board.subscribe.items():
-                    f.write("void " + bus_name.title() + "_" + board.name.title() +
+                for bus in board.subscribe:
+                    f.write("void " + bus.name.title() + "_" + board.name.title() +
                             "_Init(uint32_t baudrate);\n")
-                for bus_name, bus in board.publish.items():
-                    if bus_name not in board.subscribe.keys():
-                        f.write("void " + bus_name.title() + "_" + board.name.title() +
+                for bus in board.publish:
+                    if bus.name not in board.subscribe.name:
+                        f.write("void " + bus.name.title() + "_" + board.name.title() +
                                 "_Init(uint32_t baudrate);\n")
         f.write("\n")
 

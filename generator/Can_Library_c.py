@@ -29,10 +29,10 @@ def write(output_path, spec_path, base_path):
         f.write("\n")
 
         # Write init functions
-        for board in car.boards.values():
+        for board in car.boards:
             if board.arch:  # Means it's a board we program
-                for bus_name, bus in board.subscribe.items():
-                    f.write("void " + bus_name.title() + "_" + board.name.title() +
+                for bus in board.subscribe:
+                    f.write("void " + bus.name.title() + "_" + board.name.title() +
                             "_Init(uint32_t baudrate) {\n")
                     f.write("  Can_Init(baudrate);\n")
 
@@ -46,7 +46,7 @@ def write(output_path, spec_path, base_path):
                     mask = 2**(floor(log2(max_id)) + 1) - 1
                     # On a standard bus, IDs are 11 bit
                     max_possible_id = 2**11-1
-                    if car.buses[bus_name].is_extended:
+                    if bus.is_extended:
                         # On an extended bus, IDs are 29 bit
                         max_possible_id = 2**29-1
                     mask = mask ^ max_possible_id
@@ -60,9 +60,9 @@ def write(output_path, spec_path, base_path):
                 # We still need to create init functions for boards that publish
                 # on a bus but don't subscribe
                 # Filtering doesn't matter here
-                for bus_name, bus in board.publish.items():
-                    if bus_name not in board.subscribe.keys():
-                        f.write("void " + bus_name.title() + "_" + board.name.title() +
+                for bus in board.publish:
+                    if bus.name not in board.subscribe.name:
+                        f.write("void " + bus.name.title() + "_" + board.name.title() +
                                 "_Init(uint32_t baudrate) {\n")
                         f.write("  Can_Init(baudrate);\n")
                         f.write("}\n\n")
@@ -80,7 +80,7 @@ def write(output_path, spec_path, base_path):
 
   switch(id) {
 """)
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
                 f.write(
                     "    case " + message.name.upper() + "__id:\n" +
@@ -92,7 +92,7 @@ def write(output_path, spec_path, base_path):
             "   }\n" +
             "}\n\n")
 
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
 
                 # Write TO_CAN
@@ -162,7 +162,7 @@ def write(output_path, spec_path, base_path):
                 f.write("}\n\n")
 
         # Write DEFINE statements
-        for bus in car.buses.values():
+        for bus in car.buses:
             for message in bus.messages:
                 f.write("DEFINE(Can_" + message.name + ")\n")
 
