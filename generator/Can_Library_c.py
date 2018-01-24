@@ -100,7 +100,6 @@ def write(output_path, spec_path, base_path):
                     "TO_CAN(Can_" + message.name + ") {\n" +
                     "  uint64_t bitstring = 0;\n")
 
-                length = 0
                 for segment in message.segments:
                     if not message.is_big_endian and (segment.c_type.startswith("int") or
                                                       segment.c_type.startswith("uint")):
@@ -113,7 +112,8 @@ def write(output_path, spec_path, base_path):
                             "  bitstring = INSERT(type_in->" + segment.name + ", bitstring, " + str(segment.position) +
                             ", " + str(segment.length) + ");\n")
 
-                    length += segment.length
+                length = max(seg.position + seg.length for seg in message.segments)
+
                 f.write(
                     "  from_bitstring(&bitstring, can_out->data);\n" +
                     "  can_out->id = " + message.name.upper() + "__id;\n" +
