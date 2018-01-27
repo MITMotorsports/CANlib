@@ -29,7 +29,7 @@ def write(output_path, spec_path):
 
                 # Write enum fields
                 for segment in message.segments:
-                    if len(segment.values) > 0:   # Segment is type enum
+                    if segment.c_type == 'enum':   # Segment is type enum
                         for value in segment.values:
                             f.write('#define ____' + message.name.upper() + '__' +
                                     segment.name.upper() + '__' + value.name
