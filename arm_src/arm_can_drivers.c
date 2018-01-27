@@ -6,17 +6,23 @@
 #include "can.h"
 #include "ccand_11xx.h"
 
+// Note: We're using one mask for actual hardware filtering and another mask for
+// configuring extended messages
+// This way, we can accept extended messages w/o changing the lpc library itself
 void Can_Init(uint32_t baudrate) {
   CAN_Init(baudrate);
+  CAN_SetMask2(0, CAN_MSGOBJ_EXT);
 }
 
 void Can_SetFilter(uint32_t mask, uint32_t match_id) {
   CAN_SetMask1(mask, match_id);
-  CAN_SetMask2(mask, match_id);
 }
 
 Can_ErrorID_T Can_RawWrite(Frame *frame) {
-  const uint32_t can_out_id = (uint32_t) (frame->id);
+  uint32_t can_out_id = (uint32_t) (frame->id);
+  if (can_out_id > 2047) { // i.e. is an extended message
+    can_out_id |= CAN_MSGOBJ_EXT;
+  }
   const uint8_t can_out_bytes = frame->len;
 
   // TODO actually convert this later, for now just hackily cast it
@@ -31,7 +37,8 @@ Can_ErrorID_T Can_RawRead(Frame *frame) {
   Can_ErrorID_T err = (Can_ErrorID_T) CAN_Receive(&rx_msg);
 
   if (err == Can_Error_NONE) {
-    frame->id = rx_msg.mode_id;
+    // Take first 29 bits -- others are for config, even for extended
+    frame->id = rx_msg.mode_id & 0x1fffffff;
     frame->len = rx_msg.dlc;
 
     uint8_t i;
