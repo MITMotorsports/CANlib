@@ -68,6 +68,8 @@ int32_t swap_int32( int32_t val ) {
 #include "arm_src/arm_can_drivers.c"
 #elif CAN_ARCHITECTURE_AVR
 #include "avr_src/avr_can_drivers.c"
+#elif CAN_ARCHITECTURE_STM32F2XX
+#include "stm32f2xx_src/stm32f2xx_can_drivers.c"
 #elif CAN_ARCHITECTURE_TEST
 
 void Can_Init(uint32_t baudrate) {
