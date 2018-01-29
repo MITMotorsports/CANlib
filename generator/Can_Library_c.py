@@ -82,8 +82,8 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
             for msg in bus.messages:
                 fw(
-                    '\t' 'case {}_can_id:\n'.format(coord(bus.name, msg.name)) +
-                    '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name))
+                    '\t' '\t' 'case {}_can_id:\n'.format(coord(bus.name, msg.name)) +
+                    '\t' '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name))
                 )
 
             fw(
