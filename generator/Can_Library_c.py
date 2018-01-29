@@ -27,6 +27,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         with open(base_path) as base:
             lines = base.readlines()
             f.writelines(lines)
+
         fw('\n')
 
         # Write init functions
@@ -55,7 +56,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                     mask = mask ^ max_possible_id
 
                     # Set mask (pass in binary to make file more readable)
-                    fw('\t' 'Can_SetFilter(' + bin(mask) + ', 0);' '\n')
+                    fw('\t' 'Can_SetFilter(' + hex(mask) + ', 0);' '\n')
 
                     # Finish up
                     fw('}' '\n\n')
@@ -72,24 +73,25 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                         fw('\t' 'Can_Init(baudrate);' '\n')
                         fw('}' '\n\n')
 
-        # # Write switch statement
-        # fw(
-        #     'Can_MsgID_T Can_MsgType(void) {' '\n'
-        #     '\t' 'switch(id) {' '\n'
-        # )
-        # for bus in car.buses:
-        #     for msg in bus.messages:
-        #         fw(
-        #             '\t' 'case {}_ID:\n'.format('asd') +  # FIX
-        #             '\t' '\t' 'return Can_' + msg.name + '_Msg;\n'
-        #         )
-        #
-        # fw(
-        #     '\t' 'default:' '\n'
-        #     '\t' '\t' 'return Can_Unknown_Msg;' '\n'
-        #     '\t' '}' '\n'
-        #     '}' '\n\n'
-        # )
+        for bus in car.buses:
+            # Write switch statement
+            fw((
+                '{0}_T {0}_IDENTIFY(Frame* frame)'.format(coord(bus.name)) + '{' '\n'
+                '\t' 'switch(frame->id) {' '\n'
+            ))
+
+            for msg in bus.messages:
+                fw(
+                    '\t' 'case {}_can_id:\n'.format(coord(bus.name, msg.name)) +
+                    '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name))
+                )
+
+            fw(
+                '\t' 'default:' '\n'
+                '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
+                '\t' '}' '\n'
+                '}' '\n\n'
+            )
 
         for bus in car.buses:
             for msg in bus.messages:
@@ -124,7 +126,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
                 # Write CAN_UNPACK
                 fw(
-                    'CAN_UNPACK(Can_' + msg.name + ') {' '\n'
+                    'CAN_UNPACK(' + coord(bus.name, msg.name) + ') {' '\n'
                     '\t' 'uint64_t bitstring = 0;' '\n'
                     '\t' 'to_bitstring(can_in->data, &bitstring);\n'
                 )

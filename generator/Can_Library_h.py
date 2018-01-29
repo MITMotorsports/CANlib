@@ -6,7 +6,7 @@ Can_Libary.h or main.py to write all files.
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
-from common import can_lib_h_path, coord, ifndef, endif
+from common import can_lib_h_path, templ, coord, ifndef, endif
 
 
 def write(car, output_path=can_lib_h_path):
@@ -25,25 +25,36 @@ def write(car, output_path=can_lib_h_path):
         fw(ifndef(header_name))
 
         # Includes
-        fw('#include <stdint.h>' '\n'
-           '#include <stdbool.h>' '\n\n')
+        fw(
+            '#include <stdint.h>' '\n'
+            '#include <stdbool.h>' '\n\n'
+            '#include "static_can.h"' '\n\n'
+        )
 
-        # Create enum
+        # Universal message forms (independent of bus)
+        uni = ['CAN_ERROR_MSG', 'CAN_UNKNOWN_MSG']
+
+        # Begin enumerating from the universal forms onward
+        # Every time we assign to an enum, we'll increment beg
+        # so as to avoid return value equalities between different buses
+        idx = 0
+        for msgt in uni:
+            fw(templ['define'].format(msgt, idx))
+            idx += 1
+
+        fw('\n')
+
+        # Create forms enum for each bus
         for bus in car.buses:
             fw('typedef enum {\n')
 
-            for msgt in ['CAN_UNKNOWN_MSG', 'CAN_ERROR_MSG']:
-                fw('\t' '{},\n'.format(msgt))
-
             for msg in bus.messages:
-                fw('\t' '{},\n'.format(coord(bus.name, msg.name)))
+                fw(templ['enum'].format(coord(bus.name, msg.name), idx))
+                idx += 1
 
             fw('} ' + '{}_T;\n\n'.format(coord(bus.name)))
 
-        # fw('Can_MsgID_T Can_MsgType(void);' '\n\n')
-
-        # Include static stuff
-        fw('#include "static_can.h"' '\n\n')
+            fw('{0}_T {0}_IDENTIFY(Frame* frame)'.format(coord(bus.name)) + '\n')
 
         # Write DECLARE statements
         for bus in car.buses:
@@ -52,7 +63,6 @@ def write(car, output_path=can_lib_h_path):
 
         fw('\n')
 
-        # Finish up
         fw(endif(header_name))
 
 
