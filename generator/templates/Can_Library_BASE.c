@@ -4,18 +4,9 @@ static Frame lastMessage;
 static Can_ErrorID_T lastError = Can_Error_NO_RX;
 
 #define DEFINE(name) \
-  Can_ErrorID_T name ##_Read(name ## _T *type) { \
-    if (lastError == Can_Error_NONE) { \
-      name ## _FromCan(&lastMessage, type); \
-      lastError = Can_Error_NO_RX; \
-      return Can_Error_NONE; \
-    } else { \
-      return lastError; \
-    } \
-  } \
   Can_ErrorID_T name ##_Write(name ## _T *type) { \
     Frame frame; \
-    name ## _ToCan(type, &frame); \
+    name ## _pack(type, &frame); \
     return Can_RawWrite(&frame); \
   }
 
@@ -46,22 +37,22 @@ void from_bitstring(uint64_t *in, uint8_t out[]) {
 
 // Shameless copypasta-ing from Stack Overflow for trivial endian swap.
 // https://stackoverflow.com/a/2637138
-uint16_t swap_uint16( uint16_t val ) {
-    return (val << 8) | (val >> 8 );
+uint16_t swap_uint16(uint16_t val) {
+  return (val << 8) | (val >> 8 );
 }
 
-int16_t swap_int16( int16_t val ) {
-    return (val << 8) | ((val >> 8) & 0xFF);
+int16_t swap_int16(int16_t val) {
+  return (val << 8) | ((val >> 8) & 0xFF);
 }
 
-uint32_t swap_uint32( uint32_t val ) {
-    val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
-    return (val << 16) | (val >> 16);
+uint32_t swap_uint32(uint32_t val) {
+  val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
+  return (val << 16) | (val >> 16);
 }
 
-int32_t swap_int32( int32_t val ) {
-    val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF );
-    return (val << 16) | ((val >> 16) & 0xFFFF);
+int32_t swap_int32(int32_t val) {
+  val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF );
+  return (val << 16) | ((val >> 16) & 0xFFFF);
 }
 
 #ifdef CAN_ARCHITECTURE_ARM
@@ -110,14 +101,3 @@ Can_ErrorID_T Can_Error_Read(void) {
   lastError = Can_Error_NO_RX;
   return cachedError;
 }
-
-#define BIT_SET(input, bit_value, bit_idx) \
-  if ((bit_value)) { \
-    ((input) |= (1UL << (bit_idx))); \
-  } \
-  else { \
-    ((input) &= ~(1UL << (bit_idx))); \
-  }
-
-#define BIT_GET(input, bit_idx) \
-  (bool)((input) & (1UL << (bit_idx)))

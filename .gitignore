@@ -7,6 +7,7 @@ constants.h
 Can_Library.c
 Can_Library.h
 enum_segments.h
+structs.h
 boards/
 
 # Byte-compiled / optimized / DLL files

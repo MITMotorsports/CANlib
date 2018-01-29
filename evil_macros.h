@@ -1,5 +1,5 @@
-#ifndef _MY18_CAN_LIBRARY_EVIL_MACROS_H
-#define _MY18_CAN_LIBRARY_EVIL_MACROS_H
+#ifndef _CAN_LIBRARY_EVIL_MACROS_H
+#define _CAN_LIBRARY_EVIL_MACROS_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -39,4 +39,15 @@
 #define EXTRACT(input, start, len) \
   (((input) >> START_IDX(start, len)) & ONES(len))
 
-#endif // _MY18_CAN_LIBRARY_EVIL_MACROS_H
+#define BIT_SET(input, bit_value, bit_idx) \
+  if ((bit_value)) { \
+    ((input) |= (1UL << (bit_idx))); \
+  } \
+  else { \
+    ((input) &= ~(1UL << (bit_idx))); \
+  }
+
+#define BIT_GET(input, bit_idx) \
+  (bool)((input) & (1UL << (bit_idx)))
+
+#endif // _CAN_LIBRARY_EVIL_MACROS_H
