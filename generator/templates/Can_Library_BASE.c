@@ -55,10 +55,12 @@ int32_t swap_int32(int32_t val) {
   return (val << 16) | ((val >> 16) & 0xFFFF);
 }
 
-#ifdef CAN_ARCHITECTURE_ARM
-#include "arm_src/arm_can_drivers.c"
+#ifdef CAN_ARCHITECTURE_LPC11CX4
+#include "drivers/lpc11cx4.c"
 #elif CAN_ARCHITECTURE_AVR
-#include "avr_src/avr_can_drivers.c"
+#include "drivers/avr.c"
+#elif CAN_ARCHITECTURE_STM32F2XX
+#include "drivers/stm32f2xx.c"
 #elif CAN_ARCHITECTURE_TEST
 
 void Can_Init(uint32_t baudrate) {
