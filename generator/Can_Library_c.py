@@ -34,7 +34,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         for board in car.boards:
             if board.arch:  # Means it's a board we program
                 for bus in board.subscribe:
-                    fw('void {}_INIT(uint32_t baudrate) '.format(coord(bus.name, board.name)))
+                    fw('void init_{}(uint32_t baudrate) '.format(coord(bus.name, board.name)))
                     fw(
                         '{' '\n'
                         '\t' 'Can_Init(baudrate);' '\n'
@@ -76,7 +76,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         for bus in car.buses:
             # Write switch statement
             fw((
-                '{0}_T {0}_IDENTIFY(Frame* frame)'.format(coord(bus.name)) + '{' '\n'
+                '{0}_T identify_{0}(Frame* frame)'.format(coord(bus.name)) + '{' '\n'
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
