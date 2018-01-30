@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-Can_MsgID_T Can_MsgType(void);
-
 #define CAN_PACK(name) \
   void name ## _pack(name ## _T *type_in, Frame *can_out)
 

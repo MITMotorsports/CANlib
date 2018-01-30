@@ -119,7 +119,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
                 fw(
                     '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
-                    '\t' 'can_out->id = ' + msg.name.upper() + '__id;' '\n'
+                    '\t' 'can_out->id = {}_can_id;'.format(coord(bus.name, msg.name)) + '\n'
                     '\t' 'can_out->len = ' + str(ceil(length / 8)) + ';' '\n'
                     '}' '\n\n'
                 )
@@ -133,7 +133,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
                 for seg in msg.segments:
                     if seg.c_type == 'enum':
-                        enum_name = 'Can_' + msg.name + 'ID_T'
+                        enum_name = coord(bus.name, msg.name, seg.name) + '_T'
 
                         fw(
                             '\t' 'type_out->' + seg.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +

@@ -28,6 +28,7 @@ def write(car, output_path=can_lib_h_path):
         fw(
             '#include <stdint.h>' '\n'
             '#include <stdbool.h>' '\n\n'
+            '#include "structs.h"' '\n'
             '#include "static_can.h"' '\n\n'
         )
 
@@ -54,7 +55,7 @@ def write(car, output_path=can_lib_h_path):
 
             fw('} ' + '{}_T;\n\n'.format(coord(bus.name)))
 
-            fw('{0}_T {0}_IDENTIFY(Frame* frame)'.format(coord(bus.name)) + '\n')
+            fw('{0}_T {0}_IDENTIFY(Frame* frame);'.format(coord(bus.name)) + '\n')
 
         # Write DECLARE statements
         for bus in car.buses:

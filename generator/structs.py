@@ -32,7 +32,7 @@ def write(car, output_path=structs_path):
 
                 for seg in msg.segments:
                     if seg.c_type == 'enum':
-                        enum_name = coord(bus.name, msg.name, seg.name)
+                        enum_name = coord(bus.name, msg.name, seg.name) + '_T'
                         fw('\t{} {};\n'.format(enum_name, seg.name))
                     else:
                         fw('\t{} {};\n'.format(seg.c_type, seg.name))
