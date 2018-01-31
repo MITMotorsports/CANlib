@@ -67,8 +67,8 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 for bus in board.publish:
                     if bus.name not in board.subscribe.name:
                         fw(
-                            'void ' + coord(bus.name, board.name) +
-                            '_INIT(uint32_t baudrate) {' '\n'
+                            'void init_' + coord(bus.name, board.name) +
+                            '(uint32_t baudrate) {' '\n'
                         )
                         fw('\t' 'Can_Init(baudrate);' '\n')
                         fw('}' '\n\n')
