@@ -121,6 +121,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                     '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
                     '\t' 'can_out->id = {}_can_id;'.format(coord(bus.name, msg.name)) + '\n'
                     '\t' 'can_out->len = ' + str(ceil(length / 8)) + ';' '\n'
+                    '\t' 'can_out->extended = ' + str(bus.is_extended).lower() + ';' '\n'
                     '}' '\n\n'
                 )
 

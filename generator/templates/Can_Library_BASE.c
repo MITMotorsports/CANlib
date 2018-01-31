@@ -78,7 +78,7 @@ Can_ErrorID_T Can_RawRead(Frame *frame) {
 }
 
 #else
-  // Define nothing so that there is a linker error!
+#error You need to define a driver architecture!
 #endif
 
 // TODO this is a bit of a hack...unknown reads should follow same as regular reads
