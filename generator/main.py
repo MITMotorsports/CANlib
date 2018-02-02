@@ -2,19 +2,23 @@
 Generate all necessary files.
 Pass the spec_path as a command line argument.
 """
+import sys
+sys.path.append('ParseCAN')
+import ParseCAN
+
 import constants
 import Can_Library_c
 import Can_Library_h
 import enum_segments
-import boards
+import structs
 import sys
-from common import *  # All method arguments come from here
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     spec_path = sys.argv[1]
+    car = ParseCAN.spec.car(spec_path)
 
-    constants.write(constants_path, spec_path)
-    Can_Library_c.write(can_lib_c_path, spec_path, can_lib_c_base_path)
-    Can_Library_h.write(can_lib_h_path, spec_path)
-    enum_segments.write(enum_segments_path, spec_path)
-    boards.write(spec_path)
+    constants.write(car)
+    Can_Library_c.write(car)
+    Can_Library_h.write(car)
+    enum_segments.write(car)
+    structs.write(car)

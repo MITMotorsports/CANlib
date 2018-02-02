@@ -1,5 +1,5 @@
-#ifndef _MY18_CAN_LIBRARY_CAN_RAW_H
-#define _MY18_CAN_LIBRARY_CAN_RAW_H
+#ifndef _CAN_LIBRARY_CAN_RAW_H
+#define _CAN_LIBRARY_CAN_RAW_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -8,6 +8,7 @@ typedef struct {
   uint32_t id;
   uint8_t len;
   uint8_t data[8];
+  bool extended;
 } Frame;
 
 typedef enum {
@@ -34,4 +35,4 @@ void Can_SetFilter(uint32_t mask, uint32_t match_id);
 Can_ErrorID_T Can_RawWrite(Frame *frame);
 Can_ErrorID_T Can_RawRead(Frame *frame);
 
-#endif // _MY18_CAN_LIBRARY_CAN_RAW_H
+#endif // _CAN_LIBRARY_CAN_RAW_H

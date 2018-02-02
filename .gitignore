@@ -6,7 +6,10 @@ compile_commands.json
 constants.h
 Can_Library.c
 Can_Library.h
+CANlib.c
+CANlib.h
 enum_segments.h
+structs.h
 boards/
 
 # Byte-compiled / optimized / DLL files

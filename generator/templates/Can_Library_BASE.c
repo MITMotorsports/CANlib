@@ -4,18 +4,9 @@ static Frame lastMessage;
 static Can_ErrorID_T lastError = Can_Error_NO_RX;
 
 #define DEFINE(name) \
-  Can_ErrorID_T name ##_Read(name ## _T *type) { \
-    if (lastError == Can_Error_NONE) { \
-      name ## _FromCan(&lastMessage, type); \
-      lastError = Can_Error_NO_RX; \
-      return Can_Error_NONE; \
-    } else { \
-      return lastError; \
-    } \
-  } \
   Can_ErrorID_T name ##_Write(name ## _T *type) { \
     Frame frame; \
-    name ## _ToCan(type, &frame); \
+    pack_ ## name(type, &frame); \
     return Can_RawWrite(&frame); \
   }
 
@@ -46,30 +37,30 @@ void from_bitstring(uint64_t *in, uint8_t out[]) {
 
 // Shameless copypasta-ing from Stack Overflow for trivial endian swap.
 // https://stackoverflow.com/a/2637138
-uint16_t swap_uint16( uint16_t val ) {
-    return (val << 8) | (val >> 8 );
+uint16_t swap_uint16(uint16_t val) {
+  return (val << 8) | (val >> 8 );
 }
 
-int16_t swap_int16( int16_t val ) {
-    return (val << 8) | ((val >> 8) & 0xFF);
+int16_t swap_int16(int16_t val) {
+  return (val << 8) | ((val >> 8) & 0xFF);
 }
 
-uint32_t swap_uint32( uint32_t val ) {
-    val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
-    return (val << 16) | (val >> 16);
+uint32_t swap_uint32(uint32_t val) {
+  val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
+  return (val << 16) | (val >> 16);
 }
 
-int32_t swap_int32( int32_t val ) {
-    val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF );
-    return (val << 16) | ((val >> 16) & 0xFFFF);
+int32_t swap_int32(int32_t val) {
+  val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF );
+  return (val << 16) | ((val >> 16) & 0xFFFF);
 }
 
-#ifdef CAN_ARCHITECTURE_ARM
-#include "arm_src/arm_can_drivers.c"
+#ifdef CAN_ARCHITECTURE_LPC11CX4
+#include "drivers/lpc11cx4.c"
 #elif CAN_ARCHITECTURE_AVR
-#include "avr_src/avr_can_drivers.c"
+#include "drivers/avr.c"
 #elif CAN_ARCHITECTURE_STM32F2XX
-#include "stm32f2xx_src/stm32f2xx_can_drivers.c"
+#include "drivers/stm32f2xx.c"
 #elif CAN_ARCHITECTURE_TEST
 
 void Can_Init(uint32_t baudrate) {
@@ -87,7 +78,7 @@ Can_ErrorID_T Can_RawRead(Frame *frame) {
 }
 
 #else
-  // Define nothing so that there is a linker error!
+#error "You need to define a driver architecture!"
 #endif
 
 // TODO this is a bit of a hack...unknown reads should follow same as regular reads
@@ -112,14 +103,3 @@ Can_ErrorID_T Can_Error_Read(void) {
   lastError = Can_Error_NO_RX;
   return cachedError;
 }
-
-#define BIT_SET(input, bit_value, bit_idx) \
-  if ((bit_value)) { \
-    ((input) |= (1UL << (bit_idx))); \
-  } \
-  else { \
-    ((input) &= ~(1UL << (bit_idx))); \
-  }
-
-#define BIT_GET(input, bit_idx) \
-  (bool)((input) & (1UL << (bit_idx)))
