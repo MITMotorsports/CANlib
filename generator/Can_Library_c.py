@@ -34,11 +34,8 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         for board in car.boards:
             if board.arch:  # Means it's a board we program
                 for bus in board.subscribe:
-                    fw('void init_{}(uint32_t baudrate) '.format(coord(bus.name, board.name)))
-                    fw(
-                        '{' '\n'
-                        '\t' 'Can_Init(baudrate);' '\n'
-                    )
+                    fw('void init_{}(void) '.format(coord(bus.name, board.name)) + '{' '\n')
+                    fw('\t' 'Can_Init({});\n'.format(bus.baudrate))
 
                     max_id = max(msg.can_id for msg in bus.messages)
 
@@ -68,9 +65,9 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                     if bus.name not in board.subscribe.name:
                         fw(
                             'void init_' + coord(bus.name, board.name) +
-                            '(uint32_t baudrate) {' '\n'
+                            '(void) {' '\n'
                         )
-                        fw('\t' 'Can_Init(baudrate);' '\n')
+                        fw('\t' 'Can_Init({});\n'.format(bus.baudrate))
                         fw('}' '\n\n')
 
         for bus in car.buses:

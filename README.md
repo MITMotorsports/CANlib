@@ -34,6 +34,8 @@ boards: # All boards on the car, along with CAN messages they publish and subscr
         - Msg0
 buses: # List of CAN buses on the car
   can_bus0: # All messages on can_bus0
+    baudrate: 500000
+    is_extended: false
     messages:
       Msg0:
         can_id: 0x001 # Note that lower CAN IDs have higher priority
@@ -78,32 +80,53 @@ buses: # List of CAN buses on the car
             c_type: bool
 ```
 The above spec has fewer boards and messages than a real spec likely would, but it demonstrates all of the functionality that CANlib supports. The basic idea is that once your spec is set up, to add a new message you need to do each of the following:
-* **Add the message to the list of messages.** Using the format like the messages above, specify `can_id`, `is_big_endian`, `frequency` (if necessary), and `segments`. For each segment, add `position`, `length`, `c_type`, as well as any optional fields you need (`signed`, `enum`, and `unit`).
-* **Update the publish and subscribe fields for the relevant boards.** Add the name of your message to the publish list of your board, and then optionally whichever boards subscribes to it. (You'll get errors for if you don't have a board publish your message, but it's okay to have no subscribers for it.)
+- **Add the message to the list of messages.** Using the format like the messages above, specify `can_id`, `is_big_endian`, `frequency` (if necessary), and `segments`. For each segment, add `position`, `length`, `c_type`, as well as any optional fields you need (`signed`, `enum`, and `unit`).
+- **Update the publish and subscribe fields for the relevant boards.** Add the name of your message to the publish list of your board, and then optionally whichever boards subscribes to it.
 
+## Learning the library
+Frames represent the low level CAN messages sent and received from a CAN bus.
+```c
+typedef struct {
+  bool extended; // Whether or not the bus used is extended
+  uint32_t id; // (11 bit if extended else 29 bit) CAN id
+  uint8_t len; // The data length code = number of bytes of data
+  uint8_t data[8]; // Your bytes of data truncated to len_th object
+} Frame;
+```
 
 ## Using the library
-Include `Can_Library.h` and define your architecture by defining either `CAN_ARCHITECTURE_ARM` or `CAN_ARCHITECTURE_AVR` (usually in your Makefile). Once you do this, the following functions, variables, and structs are available and are what you'll want to be using:
+Include `CANlib.h` and define your architecture by defining either `CAN_ARCHITECTURE_LPC11CX4`, `CAN_ARCHITECTURE_STM32F2XX` or `CAN_ARCHITECTURE_AVR` (usually in your Makefile).
 
-### `void YourBusName_YourBoardName_Init(uint32_t baudrate)`
-Call this before you use CAN at all. It initializes CAN and configures the message filtering for your particular board on the specified bus. (Note that `YourBusName` and `YourBoardName` are the names of your bus and your board converted to title case, so if youre bus is "can0" and your board is called "dash," you would call `Can0_Dash_Init` with the right baudrate.)
+Once you do this, the following functions, variables, and structs are available and are what you'll want to be using:
 
-*Note:* The vanilla `CAN_Init` is still available and is fine for small tests, but you should generally use the CAN init function for your board so you can filter messages properly.
+The following names are maintained exactly as found in the spec.
 
-### `Can_MsgID_T`
-This is an enum that can take on values `Can_No_Msg`, `Can_Unknown_Msg`, and `Can_Error_Msg` as well as `Can_YourMessageName_Msg` for each message in the spec. (So for example, if you have a message named `FrontCanNodeOutput`, one of the values will be `Can_FrontCanNodeOutput_Msg`.)
+### `void init_<bus.name>_<board.name>(void)`
+Call this before you use CAN at all. It initializes CAN and configures the message filtering for your particular board on the specified bus.
 
-### `Can_MsgID_T Can_MsgType(void)`
-This reads the latest message from the CAN bus and returns which CAN message it is. Typically what you'll want to do is call this function and add a switch statement on what this returns, handling each type of message you care about.
+*Note:* The vanilla `Can_Init` is NOT fine for production code.
 
-### `Can_YourMessageName_T`
-This is a struct generated for each message in the spec. It will have fields corresponding to each of the segments in the message. (So if your message `FrontCanNodeOutput` has segments `requested_torque`, `is_throttle_implausible`, and `has_brake_throttle_conflict`, these will all be fields in the struct.)
+### `<bus.name>_T`
+This is an enum that includes values of the form `<bus.name>_<message.name>` forall `message` in `bus.messages`.
 
-### `Can_ErrorID_T Can_YourMessageName_Read(Can_YourMessageName_T *type)`
-When you pass in a pointer to a message struct (the one described in the previous bullet), this function will populate it with the message from the CAN bus. (`Can_ErrorID_T` describes the various errors that might be returned when you read from the CAN bus. See [can_raw.h](can_raw.h) for more.)
+### `<bus.name>_T identify_<bus.name>(Frame* frame)`
+Given a **pointer** to a Frame, returns the appropriate value from `<bus.name>_T`. It currently identifies
+messages based on their `can_id`. If a message is unknown w.r.t. the spec, it returns `CAN_UNKNOWN_MSG`.
 
-### `Can_ErrorID_T Can_YourMessageName_Write(Can_YourMessageName_T *type)`
-Once you have a message struct populated with all the information you want to write, call this function and pass in a pointer to your struct. It will be written to the CAN bus.
+### `<bus.name>_<message.name>_T`
+This is a struct that contains members of the form `<bus.name>_<message.name>_<segment.name>` forall `segment` in `message.segments` each with their appropriate type (`segment.c_type` unless that is equal to `enum` in which case it gets replaces with the formatted ).
 
-### `YOURMESSAGENAME__freq`
-This variable is created if if you defined the frequency for your message in the CAN spec. (Note that the name of the variable starts with you message name, but in all caps.)
+### `<bus.name>_<message.name>_<segment.name>_T`
+This is an enum that includes values of the form `<bus.name>_<message.name>_<segment.name>_<value.name>` forall `value` in `segment.value`.
+
+### `void pack_<bus.name>_<message.name>(<bus.name>_<message.name>_T* type_in, Frame* can_out)`
+Given **pointers** to a message struct and a Frame respectively, unpacks the message contents into the Frame.
+
+### `void unpack_<bus.name>_<message.name>(Frame *can_in, <bus.name>_<message.name>_T *type_out)`
+Given **pointers** to a Frame and message struct respectively, unpacks the Frame contents into the message object.
+
+### `Can_ErrorID_T <bus.name>_<message.name>_Write(<bus.name>_<message.name>_T *type)`
+Given a **pointer** to a message struct, unpack it into a CAN frame and transmit it over `bus` using `Can_RawRead`.
+
+### `<bus.name>_<message.name>_<property>` forall `property` in `["can_id", "frequency"]`
+The CANlib exposes certain properties for each message defined in the spec. Use them in your code with the above expression. There is no guarantee as to whether you learn about it as part of an enum or though a #define.

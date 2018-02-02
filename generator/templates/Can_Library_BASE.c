@@ -6,7 +6,7 @@ static Can_ErrorID_T lastError = Can_Error_NO_RX;
 #define DEFINE(name) \
   Can_ErrorID_T name ##_Write(name ## _T *type) { \
     Frame frame; \
-    name ## _pack(type, &frame); \
+    pack_ ## name(type, &frame); \
     return Can_RawWrite(&frame); \
   }
 

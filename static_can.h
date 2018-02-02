@@ -6,10 +6,10 @@
 #include <stdbool.h>
 
 #define CAN_PACK(name) \
-  void name ## _pack(name ## _T *type_in, Frame *can_out)
+  void pack_ ## name(name ## _T *type_in, Frame *can_out)
 
 #define CAN_UNPACK(name) \
-  void name ## _unpack(Frame *can_in, name ## _T *type_out)
+  void unpack_ ## name(Frame *can_in, name ## _T *type_out)
 
 #define DECLARE(name) \
   Can_ErrorID_T name ##_Write(name ## _T *type); \
