@@ -3,7 +3,7 @@
 #include "stm32f2xx_hal_can.h"
 #include <stdint.h>
 
-static CAN_HandleTypeDef CanHandle;
+CAN_HandleTypeDef CanHandle;
 
 void Can_Init(uint32_t baudrate) {
 
@@ -56,26 +56,51 @@ void Can_Init(uint32_t baudrate) {
 	    /* Filter configuration Error */
 	    // Error_Handler();
     }
+
+    if(HAL_CAN_Receive_IT(&CanHandle, CAN_FIFO0) != HAL_OK)
+    {
+       // Error_Handler();
+    }
 }
 
 Can_ErrorID_T Can_RawWrite(Frame *frame) {
 
-	CanHandle.pTxMsg->StdId = frame->id;		// MSG ID
-	CanHandle.pTxMsg->IDE = CAN_ID_STD;			// *STANDARD* OR EXTENDED CAN?
-	CanHandle.pTxMsg->RTR = CAN_RTR_DATA;		// *DATA* OR REMOTE FRAME?
-	CanHandle.pTxMsg->DLC = frame->len;			// LENGTH OF DATA
-	// CanHandle.pTxMsg->Data = frame->data;		// DATA ITSELF uint8[8]
-	uint8_t i;
-	for (i=0; i < 8; i++) {
-		CanHandle.pTxMsg->Data[i] = frame->data[i];
-	}
+    if (frame->extended) {
+        CanHandle.pTxMsg->ExtId = frame->id;
+        CanHandle.pTxMsg->IDE = CAN_ID_EXT;
+    } else {
+        CanHandle.pTxMsg->StdId = frame->id;
+        CanHandle.pTxMsg->IDE = CAN_ID_STD;
+    }
+
+    CanHandle.pTxMsg->DLC = frame->len;
+    CanHandle.pTxMsg->RTR = CAN_RTR_DATA;
+
+    memcpy(CanHandle.pTxMsg->Data, frame->data, sizeof(uint8_t) * 8);
 
 	if (HAL_CAN_Transmit(&CanHandle, 10) != HAL_OK) {
 		// TODO handle error
 		return Can_Error_UNRECOGNIZED_ERROR;
-	} else {
-		return Can_Error_NONE;
 	}
+    HAL_Delay(10);
+
+    return Can_Error_NONE;
+}
+
+void lastRxMsgToFrame(Frame *frame) {
+    if (CanHandle.pRxMsg->RTR == CAN_RTR_DATA) {
+        if (CanHandle.pRxMsg->IDE == CAN_ID_STD) {
+            frame->id = CanHandle.pRxMsg->StdId;
+            frame->extended = 0;
+        } else if (CanHandle.pRxMsg->IDE == CAN_ID_EXT) {
+            frame->id = CanHandle.pRxMsg->ExtId;
+            frame->extended = 1;
+        }
+
+        frame->len = CanHandle.pRxMsg->DLC;
+
+        memcpy(frame->data, CanHandle.pRxMsg->Data, sizeof(uint8_t) * 8);
+    }
 }
 
 Can_ErrorID_T Can_RawRead(Frame *frame) {
@@ -85,19 +110,7 @@ Can_ErrorID_T Can_RawRead(Frame *frame) {
 		return Can_Error_UNRECOGNIZED_ERROR;
 	} 
 
-	uint32_t recvMsgLen = CanHandle.pRxMsg->DLC;
-	if (recvMsgLen < 1 || CanHandle.pRxMsg->IDE == CAN_ID_EXT) {
-		return Can_Error_UNRECOGNIZED_ERROR;	
-	}
-
-	frame->id = CanHandle.pRxMsg->StdId;
-	frame->len = CanHandle.pRxMsg->DLC;
-	// frame->data = CanHandle.pRxMsg->Data;
-
-	uint8_t i;
-	for (i=0; i < 8; i++) {
-		frame->data[i] = CanHandle.pRxMsg->Data[i];
-	}
+	lastRxMsgToFrame(frame);
 
 	return Can_Error_NONE;
 }
