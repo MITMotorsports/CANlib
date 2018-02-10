@@ -64,6 +64,22 @@ def write(car, output_path=can_lib_h_path):
 
         fw('\n')
 
+        # Declare init functions
+        # Write init functions
+        for board in car.boards:
+            if board.arch:  # Means it's a board we program
+                for bus in board.subscribe:
+                    fw('void init_{}(void);\n'.format(coord(bus.name, board.name)))
+
+                # We still need to create init functions for boards that publish
+                # on a bus but don't subscribe
+                for bus in board.publish:
+                    if bus.name not in board.subscribe.name:
+                        fw(
+                            'void init_' + coord(bus.name, board.name) +
+                            '(void);\n'
+                        )
+
         fw(endif(header_name))
 
 
