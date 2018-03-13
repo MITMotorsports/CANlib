@@ -24,18 +24,18 @@ def write(car, output_path=constants_path):
         fw(ifndef(header_name))
 
         props = (
-            ('can_id', 'enum'),
-            ('frequency', 'define'),
+            ('can_id', 'define', int),
+            ('period', 'define', lambda x: int(1000 * x)),
         )
 
         for bus in car.buses:
-            for attrnm, form in props:
+            for attrnm, form, transform in props:
                 if form == 'enum':
                     fw('typedef enum {\n')
 
                 for msg in bus.messages:
                     try:
-                        attr = getattr(msg, attrnm)
+                        attr = transform(getattr(msg, attrnm))
                         fw(templ[form].format(coord(bus.name, msg.name, attrnm), attr))
                     except AttributeError:
                         pass
