@@ -6,6 +6,12 @@
 #include "can.h"
 #include "ccand_11xx.h"
 
+#if SAVAGE_MODE
+  #define TRANSMIT_METHOD CAN_Transmit_SAVAGE
+#else
+  #define TRANSMIT_METHOD CAN_Transmit
+#endif
+
 // Note: We're using one mask for actual hardware filtering and another mask for
 // configuring extended messages
 // This way, we can accept extended messages w/o changing the lpc library itself
@@ -26,7 +32,7 @@ Can_ErrorID_T Can_RawWrite(Frame *frame) {
   const uint8_t can_out_bytes = frame->len;
 
   // TODO actually convert this later, for now just hackily cast it
-  Can_ErrorID_T err =  (Can_ErrorID_T) CAN_Transmit(can_out_id, frame->data, can_out_bytes);
+  Can_ErrorID_T err =  (Can_ErrorID_T) TRANSMIT_METHOD(can_out_id, frame->data, can_out_bytes);
   return err;
 }
 
