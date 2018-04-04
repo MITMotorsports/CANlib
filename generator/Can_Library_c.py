@@ -146,15 +146,15 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                         if not msg.is_big_endian:
                             if seg.signed:
                                 fw(
-                                    '\t' + seg.c_type + ' ' + seg.name + '_swap_value=(swap_' +
+                                    '\t' + seg.c_type + ' ' + seg.name + '_swap_value=swap_' +
                                     seg.c_type[:-2] + '(EXTRACT(bitstring, ' + str(seg.position) + ', ' +
-                                    str(seg.length) + ')));' '\n'
+                                    str(seg.length) + '));' '\n'
                                 )
                             else:
                                 fw(
                                     '\t' + seg.c_type + ' ' + seg.name + '_swap_value=swap_u' +
                                     seg.c_type[:-2] + '(EXTRACT(bitstring, ' + str(seg.position) + ', ' +
-                                    str(seg.length) + ')));' '\n'
+                                    str(seg.length) + '));' '\n'
                                 )
 
                             fw('\t' 'type_out->' + seg.name + ' = ' + seg.name + '_swap_value;' '\n')
