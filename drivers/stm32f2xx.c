@@ -78,10 +78,15 @@ Can_ErrorID_T Can_RawWrite(Frame *frame) {
 
   memcpy(CanHandle.pTxMsg->Data, frame->data, sizeof(frame->data));
 
+  __disable_irq();
   if (HAL_CAN_Transmit_IT(&CanHandle) != HAL_OK) {
     // TODO handle error
     return Can_Error_UNRECOGNIZED_ERROR;
   }
+  __enable_irq();
+
+  // ~HACK~
+  HAL_CAN_Receive_IT(&CanHandle, CAN_FIFO0);
 
   return Can_Error_NONE;
 }
@@ -101,6 +106,24 @@ void lastRxMsgToFrame(Frame *frame) {
     memcpy(frame->data, CanHandle.pRxMsg->Data, sizeof(frame->data));
   }
 }
+
+
+// TODO: Make this the main usage.
+// void hcanToFrame(CAN_HandleTypeDef *hcan, Frame *frame) {
+//   if (hcan->pRxMsg->RTR == CAN_RTR_DATA) {
+//     if (hcan->pRxMsg->IDE == CAN_ID_STD) {
+//       frame->id       = hcan->pRxMsg->StdId;
+//       frame->extended = false;
+//     } else if (hcan->pRxMsg->IDE == CAN_ID_EXT) {
+//       frame->id       = hcan->pRxMsg->ExtId;
+//       frame->extended = true;
+//     }
+//
+//     frame->len = hcan->pRxMsg->DLC;
+//
+//     memcpy(frame->data, hcan->pRxMsg->Data, sizeof(frame->data));
+//   }
+// }
 
 Can_ErrorID_T Can_RawRead(Frame *frame) {
   if (HAL_CAN_Receive(&CanHandle, CAN_FIFO0, 10) != HAL_OK) {
