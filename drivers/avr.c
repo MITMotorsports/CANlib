@@ -12,15 +12,17 @@ void Can_Init(uint32_t baudrate) {
     // TODO handle error
   }
   uint8_t response = delegate.begin(CAN_500KBPS);
+
   if (response != CAN_OK) {
     // TODO handle error
   }
 }
 
-void Can_SetFilter(uint32_t mask, uint32_t match_id) {} // TODO
+void          Can_SetFilter(uint32_t mask, uint32_t match_id) {} // TODO
 
 Can_ErrorID_T Can_RawWrite(Frame *frame) {
   uint8_t response = delegate.sendMsgBuf(frame->id, 0, frame->len, frame->data);
+
   if (response != CAN_OK) {
     // TODO handle error
     return Can_Error_UNRECOGNIZED_ERROR;
@@ -33,7 +35,8 @@ Can_ErrorID_T Can_RawRead(Frame *frame) {
     return Can_Error_NO_RX;
   }
   uint8_t response = delegate.readMsgBuf(&(frame->len), frame->data);
-  if (frame->len == 0 || response != CAN_OK) {
+
+  if ((frame->len == 0) || (response != CAN_OK)) {
     // TODO handle error
     return Can_Error_UNRECOGNIZED_ERROR;
   }
