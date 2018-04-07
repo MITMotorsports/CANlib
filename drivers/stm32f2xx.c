@@ -76,13 +76,12 @@ Can_ErrorID_T Can_RawWrite(Frame *frame) {
   CanHandle.pTxMsg->DLC = frame->len;
   CanHandle.pTxMsg->RTR = CAN_RTR_DATA;
 
-  memcpy(CanHandle.pTxMsg->Data, frame->data, sizeof(uint8_t) * 8);
+  memcpy(CanHandle.pTxMsg->Data, frame->data, sizeof(frame->data));
 
-  if (HAL_CAN_Transmit(&CanHandle, 10) != HAL_OK) {
+  if (HAL_CAN_Transmit_IT(&CanHandle) != HAL_OK) {
     // TODO handle error
     return Can_Error_UNRECOGNIZED_ERROR;
   }
-  HAL_Delay(10);
 
   return Can_Error_NONE;
 }
@@ -99,7 +98,7 @@ void lastRxMsgToFrame(Frame *frame) {
 
     frame->len = CanHandle.pRxMsg->DLC;
 
-    memcpy(frame->data, CanHandle.pRxMsg->Data, sizeof(uint8_t) * 8);
+    memcpy(frame->data, CanHandle.pRxMsg->Data, sizeof(frame->data));
   }
 }
 
