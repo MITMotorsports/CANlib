@@ -25,7 +25,7 @@ def write(car, output_path=constants_path):
 
         props = (
             ('can_id', 'define', int),
-            ('period', 'define', lambda x: int(1000 * x)),
+            ('period', 'define', lambda x: int(ParseCAN.parse.number_in('ms')(x))),
         )
 
         for bus in car.buses:
