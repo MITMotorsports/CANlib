@@ -152,7 +152,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                                 )
                             else:
                                 fw(
-                                    '\t' + seg.c_type + ' ' + seg.name + '_swap_value=swap_u' +
+                                    '\t' + seg.c_type + ' ' + seg.name + '_swap_value=swap_' +
                                     seg.c_type[:-2] + '(EXTRACT(bitstring, ' + str(seg.position) + ', ' +
                                     str(seg.length) + '));' '\n'
                                 )
