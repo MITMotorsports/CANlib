@@ -35,6 +35,8 @@ void Can_Init(uint32_t baudrate) {
   {
     /* Initialization Error */
 
+    printf("[CAN INIT] ERROR\r\n");
+
     // Error_Handler();
   }
 
@@ -79,11 +81,17 @@ Can_ErrorID_T Can_RawWrite(Frame *frame) {
   memcpy(CanHandle.pTxMsg->Data, frame->data, sizeof(frame->data));
 
   __disable_irq();
-  if (HAL_CAN_Transmit_IT(&CanHandle) != HAL_OK) {
+  HAL_StatusTypeDef CAN_TX_STATUS = HAL_CAN_Transmit_IT(&CanHandle);
+  __enable_irq();
+
+  if (CAN_TX_STATUS != HAL_OK) {
     // TODO handle error
+    printf("[CAN TX] ERROR: HAL_StatusTypeDef is %d\r\n",    (int)CAN_TX_STATUS);
+    printf("[CAN TX] ERROR: HAL_CAN_StateTypeDef is %d\r\n", CanHandle.State);
+    printf("[CAN TX] ERROR: ErrorCode is %d\r\n",            CanHandle.ErrorCode);
+
     return Can_Error_UNRECOGNIZED_ERROR;
   }
-  __enable_irq();
 
   // ~HACK~
   HAL_CAN_Receive_IT(&CanHandle, CAN_FIFO0);
