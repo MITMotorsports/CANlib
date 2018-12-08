@@ -49,7 +49,7 @@ def write(car, output_path=can_lib_h_path):
         for bus in car.buses:
             fw('typedef enum {\n')
 
-            for msg in bus.messages:
+            for msg in bus.frames:
                 fw(templ['enum'].format(coord(bus.name, msg.name), idx))
                 idx += 1
 
@@ -59,7 +59,7 @@ def write(car, output_path=can_lib_h_path):
 
         # Write DECLARE statements
         for bus in car.buses:
-            for msg in bus.messages:
+            for msg in bus.frames:
                 fw('DECLARE({})\n'.format(coord(bus.name, msg.name)))
 
         fw('\n')
@@ -81,9 +81,3 @@ def write(car, output_path=can_lib_h_path):
                         )
 
         fw(endif(header_name))
-
-
-if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
-    write(spec_path)

@@ -14,8 +14,9 @@ import structs
 import sys
 
 if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
+    specpath = sys.argv[1]
+    specfile = open(specpath, 'r')
+    car = ParseCAN.spec.Car.from_yaml(specfile)
 
     constants.write(car)
     Can_Library_c.write(car)

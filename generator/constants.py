@@ -24,8 +24,9 @@ def write(car, output_path=constants_path):
         fw(ifndef(header_name))
 
         props = (
-            ('can_id', 'define', int),
-            ('period', 'define', lambda x: int(ParseCAN.parse.number_in('ms')(x))),
+            ('id', 'define', int),
+            # TODO(nistath): Add this back.
+            # ('period', 'define', lambda x: int(ParseCAN.parse.number_in('ms')(x))),
         )
 
         for bus in car.buses:
@@ -33,7 +34,7 @@ def write(car, output_path=constants_path):
                 if form == 'enum':
                     fw('typedef enum {\n')
 
-                for msg in bus.messages:
+                for msg in bus.frames:
                     try:
                         attr = transform(getattr(msg, attrnm))
                         fw(templ[form].format(coord(bus.name, msg.name, attrnm), attr))
@@ -47,7 +48,3 @@ def write(car, output_path=constants_path):
 
         fw(endif(header_name))
 
-if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
-    write(car)

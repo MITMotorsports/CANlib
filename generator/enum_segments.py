@@ -26,9 +26,9 @@ def write(car, output_path=enum_segments_path):
         fw('#include "constants.h"\n\n')
 
         for bus in car.buses:
-            for msg in bus.messages:
+            for msg in bus.frames:
                 for seg in msg.segments:
-                    if seg.c_type == 'enum':
+                    if seg.type == 'enum':
                         fw('typedef enum {\n')
 
                         for val in seg.values:
@@ -40,9 +40,3 @@ def write(car, output_path=enum_segments_path):
                         fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name, seg.name)))
 
         fw(endif(header_name))
-
-
-if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
-    write(car)
