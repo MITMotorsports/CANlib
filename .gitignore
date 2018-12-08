@@ -3,14 +3,14 @@ compile_commands.json
 *.pyc
 
 # Files that should be written from CAN spec
-constants.h
-Can_Library.c
-Can_Library.h
-CANlib.c
-CANlib.h
-enum_segments.h
-structs.h
-boards/
+src/constants.h
+src/Can_Library.c
+src/Can_Library.h
+src/CANlib.c
+src/CANlib.h
+src/enum_segments.h
+src/structs.h
+src/boards/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
