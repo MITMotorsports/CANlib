@@ -31,7 +31,7 @@ def write(car, output_path=structs_path):
                 fw('typedef struct {\n')
 
                 for seg in msg.segments:
-                    if seg.type == 'enum':
+                    if seg.type.isenum():
                         enum_name = coord(bus.name, msg.name, seg.name) + '_T'
                         fw('\t{} {};\n'.format(enum_name, seg.name))
                     else:
