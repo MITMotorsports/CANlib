@@ -5,7 +5,7 @@
 
 CAN_HandleTypeDef CanHandle;
 
-void Can_Init(uint32_t baudrate) {
+HAL_StatusTypeDef CANlib_Init(uint32_t baudrate) {
   // TODO calculate baudrate and set stuff accordingly
   // Right now the baudrate is hard-coded to 500kbaud
   // Can change prescaler to change this
@@ -31,13 +31,14 @@ void Can_Init(uint32_t baudrate) {
   CanHandle.Init.BS2       = CAN_BS2_8TQ;
   CanHandle.Init.Prescaler = 4;
 
-  if (HAL_CAN_Init(&CanHandle) != HAL_OK)
-  {
+
+  HAL_StatusTypeDef status;
+
+  if ((status = HAL_CAN_Init(&CanHandle)) != HAL_OK) {
     /* Initialization Error */
 
     printf("[CAN INIT] ERROR\r\n");
-
-    // Error_Handler();
+    return status;
   }
 
 
@@ -53,20 +54,18 @@ void Can_Init(uint32_t baudrate) {
   sFilterConfig.FilterActivation     = ENABLE;
   sFilterConfig.BankNumber           = 14;
 
-  if (HAL_CAN_ConfigFilter(&CanHandle, &sFilterConfig) != HAL_OK)
-  {
-    /* Filter configuration Error */
-
-    // Error_Handler();
+  if ((status = HAL_CAN_ConfigFilter(&CanHandle, &sFilterConfig)) != HAL_OK) {
+    return status;
   }
 
-  if (HAL_CAN_Receive_IT(&CanHandle, CAN_FIFO0) != HAL_OK)
-  {
-    // Error_Handler();
+  if ((status = HAL_CAN_Receive_IT(&CanHandle, CAN_FIFO0)) != HAL_OK) {
+    return status;
   }
+
+  return HAL_OK;
 }
 
-Can_ErrorID_T Can_RawWrite(Frame *frame) {
+HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame) {
   if (frame->extended) {
     CanHandle.pTxMsg->ExtId = frame->id;
     CanHandle.pTxMsg->IDE   = CAN_ID_EXT;
@@ -86,60 +85,15 @@ Can_ErrorID_T Can_RawWrite(Frame *frame) {
 
   if (CAN_TX_STATUS != HAL_OK) {
     // TODO handle error
-    printf("[CAN TX] ERROR: HAL_StatusTypeDef is %d\r\n",    (int)CAN_TX_STATUS);
+    printf("[CAN TX] ERROR: HAL_StatusTypeDef is %d\r\n",    (int) CAN_TX_STATUS);
     printf("[CAN TX] ERROR: HAL_CAN_StateTypeDef is %d\r\n", CanHandle.State);
     printf("[CAN TX] ERROR: ErrorCode is %d\r\n",            CanHandle.ErrorCode);
 
-    return Can_Error_UNRECOGNIZED_ERROR;
+    return CAN_TX_STATUS;
   }
 
   // ~HACK~
   HAL_CAN_Receive_IT(&CanHandle, CAN_FIFO0);
 
-  return Can_Error_NONE;
-}
-
-void lastRxMsgToFrame(Frame *frame) {
-  if (CanHandle.pRxMsg->RTR == CAN_RTR_DATA) {
-    if (CanHandle.pRxMsg->IDE == CAN_ID_STD) {
-      frame->id       = CanHandle.pRxMsg->StdId;
-      frame->extended = 0;
-    } else if (CanHandle.pRxMsg->IDE == CAN_ID_EXT) {
-      frame->id       = CanHandle.pRxMsg->ExtId;
-      frame->extended = 1;
-    }
-
-    frame->len = CanHandle.pRxMsg->DLC;
-
-    memcpy(frame->data, CanHandle.pRxMsg->Data, sizeof(frame->data));
-  }
-}
-
-
-// TODO: Make this the main usage.
-// void hcanToFrame(CAN_HandleTypeDef *hcan, Frame *frame) {
-//   if (hcan->pRxMsg->RTR == CAN_RTR_DATA) {
-//     if (hcan->pRxMsg->IDE == CAN_ID_STD) {
-//       frame->id       = hcan->pRxMsg->StdId;
-//       frame->extended = false;
-//     } else if (hcan->pRxMsg->IDE == CAN_ID_EXT) {
-//       frame->id       = hcan->pRxMsg->ExtId;
-//       frame->extended = true;
-//     }
-//
-//     frame->len = hcan->pRxMsg->DLC;
-//
-//     memcpy(frame->data, hcan->pRxMsg->Data, sizeof(frame->data));
-//   }
-// }
-
-Can_ErrorID_T Can_RawRead(Frame *frame) {
-  if (HAL_CAN_Receive(&CanHandle, CAN_FIFO0, 10) != HAL_OK) {
-    // TODO handle error
-    return Can_Error_UNRECOGNIZED_ERROR;
-  }
-
-  lastRxMsgToFrame(frame);
-
-  return Can_Error_NONE;
+  return HAL_OK;
 }

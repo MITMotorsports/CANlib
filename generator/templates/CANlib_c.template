@@ -1,0 +1,46 @@
+#include "evil_macros.h"
+
+typedef enum {
+  LITTLE,
+  BIG,
+} ENDIAN_T;
+
+typedef union {
+  uint8_t byte[8];
+  uint64_t bitstring;
+} DATA_T;
+
+void data_transfer(DATA_T *in, DATA_T *out) {
+  uint8_t i;
+  for (i = 0; i < 8; i++) {
+    (*out).byte[7 - i] = (*in).byte[i];
+  }
+}
+
+void to_bitstring(uint8_t in[], uint64_t *out) {
+  data_transfer((DATA_T*)in, (DATA_T*)out);
+}
+
+void from_bitstring(uint64_t *in, uint8_t out[]) {
+  data_transfer((DATA_T*)in, (DATA_T*)out);
+}
+
+// Shameless copypasta-ing from Stack Overflow for trivial endian swap.
+// https://stackoverflow.com/a/2637138
+uint16_t swap_uint16(uint16_t val) {
+  return (val << 8) | (val >> 8);
+}
+
+int16_t swap_int16(int16_t val) {
+  return (val << 8) | ((val >> 8) & 0xFF);
+}
+
+uint32_t swap_uint32(uint32_t val) {
+  val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+  return (val << 16) | (val >> 16);
+}
+
+int32_t swap_int32(int32_t val) {
+  val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+  return (val << 16) | ((val >> 16) & 0xFFFF);
+}

@@ -36,8 +36,8 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         for board in car.boards:
             if board.arch:  # Means it's a board we program
                 for bus in board.subscribe:
-                    fw('void init_{}(void) '.format(coord(bus.name, board.name)) + '{' '\n')
-                    fw('\t' 'Can_Init({});\n'.format(bus.baudrate))
+                    fw('CANlib_Init_Error_T CANlib_Init_{}(void) '.format(coord(bus.name, board.name, prefix=False)) + '{' '\n')
+                    fw('\t' 'CANlib_Init({});\n'.format(coord(bus.baudrate, prefix=False)))
 
                     max_id = max(msg.id for msg in bus.frames)
 
@@ -55,7 +55,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                     mask = mask ^ max_possible_id
 
                     # Set mask (pass in binary to make file more readable)
-                    fw('\t' 'Can_SetFilter(' + hex(mask) + ', 0);' '\n')
+                    fw('\t' 'CANlib_SetFilter(' + hex(mask) + ', 0);' '\n')
 
                     # Finish up
                     fw('}' '\n\n')
@@ -66,16 +66,16 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 for bus in board.publish:
                     if bus.name not in board.subscribe.name:
                         fw(
-                            'void init_' + coord(bus.name, board.name) +
+                            'void CANlib_Init_' + coord(bus.name, board.name) +
                             '(void) {' '\n'
                         )
-                        fw('\t' 'Can_Init({});\n'.format(bus.baudrate))
+                        fw('\t' 'CANlib_Init({});\n'.format(bus.baudrate))
                         fw('}' '\n\n')
 
         for bus in car.buses:
             # Write switch statement
             fw((
-                '{0}_T identify_{0}(Frame* frame)'.format(coord(bus.name)) + '{' '\n'
+                '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name), coord(bus.name, prefix=False)) + '{' '\n'
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
@@ -97,7 +97,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
                 # Write CAN_PACK
                 fw(
-                    'CAN_PACK(' + coord(bus.name, msg.name) + ') {' '\n'
+                    'CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
                     '\t' 'uint64_t bitstring = 0;' '\n'
                 )
 
@@ -118,14 +118,14 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 fw(
                     '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
                     '\t' 'can_out->id = {}_id;'.format(coord(bus.name, msg.name)) + '\n'
-                    '\t' 'can_out->len = ' + str(ceil(length / 8)) + ';' '\n'
+                    '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
                     '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
                     '}' '\n\n'
                 )
 
                 # Write CAN_UNPACK
                 fw(
-                    'CAN_UNPACK(' + coord(bus.name, msg.name) + ') {' '\n'
+                    'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
                     '\t' 'uint64_t bitstring = 0;' '\n'
                     '\t' 'to_bitstring(can_in->data, &bitstring);\n'
                 )
@@ -177,4 +177,4 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         # Write DEFINE statements
         for bus in car.buses:
             for msg in bus.frames:
-                fw('DEFINE(' + coord(bus.name, msg.name) + ')\n')
+                fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')
