@@ -28,13 +28,13 @@ def write(car, output_path=enum_segments_path):
         for bus in car.buses:
             for msg in bus.frames:
                 for seg in msg.segments:
-                    if seg.type == 'enum':
+                    if seg.type.isenum():
                         fw('typedef enum {\n')
 
-                        for val in seg.values:
+                        for enum in seg.enumerations:
                             fw(templ['enum'].format(
-                                coord(bus.name, msg.name, seg.name, val.name),
-                                val.value
+                                coord(bus.name, msg.name, seg.name, enum.name),
+                                enum.value
                             ))
 
                         fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name, seg.name)))
