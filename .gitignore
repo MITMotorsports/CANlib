@@ -11,7 +11,7 @@ src/CANlib.h
 src/enum_segments.h
 src/structs.h
 src/boards/
-src/**/*.o
+**/*.o
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
