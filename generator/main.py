@@ -7,18 +7,19 @@ sys.path.append('ParseCAN')
 import ParseCAN
 
 import constants
-import Can_Library_c
-import Can_Library_h
+import CANlib_c
+import CANlib_h
 import enum_segments
 import structs
 import sys
 
 if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
+    specpath = sys.argv[1]
+    specfile = open(specpath, 'r')
+    car = ParseCAN.spec.Car.from_yaml(specfile)
 
     constants.write(car)
-    Can_Library_c.write(car)
-    Can_Library_h.write(car)
+    CANlib_c.write(car)
+    CANlib_h.write(car)
     enum_segments.write(car)
     structs.write(car)

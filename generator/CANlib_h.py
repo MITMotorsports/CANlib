@@ -49,18 +49,18 @@ def write(car, output_path=can_lib_h_path):
         for bus in car.buses:
             fw('typedef enum {\n')
 
-            for msg in bus.messages:
+            for msg in bus.frames:
                 fw(templ['enum'].format(coord(bus.name, msg.name), idx))
                 idx += 1
 
             fw('} ' + '{}_T;\n\n'.format(coord(bus.name)))
 
-            fw('{0}_T identify_{0}(Frame* frame);'.format(coord(bus.name)) + '\n')
+            fw('{}_T CANlib_Identify_{}(Frame* frame);'.format(coord(bus.name), coord(bus.name, prefix=False)) + '\n')
 
         # Write DECLARE statements
         for bus in car.buses:
-            for msg in bus.messages:
-                fw('DECLARE({})\n'.format(coord(bus.name, msg.name)))
+            for msg in bus.frames:
+                fw('DECLARE({})\n'.format(coord(bus.name, msg.name, prefix=False)))
 
         fw('\n')
 
@@ -69,21 +69,15 @@ def write(car, output_path=can_lib_h_path):
         for board in car.boards:
             if board.arch:  # Means it's a board we program
                 for bus in board.subscribe:
-                    fw('void init_{}(void);\n'.format(coord(bus.name, board.name)))
+                    fw('CANlib_Init_Error_T CANlib_Init_{}(void);\n'.format(coord(bus.name, board.name)))
 
                 # We still need to create init functions for boards that publish
                 # on a bus but don't subscribe
                 for bus in board.publish:
                     if bus.name not in board.subscribe.name:
                         fw(
-                            'void init_' + coord(bus.name, board.name) +
+                            'CANlib_Init_Error_T CANlib_Init_' + coord(bus.name, board.name) +
                             '(void);\n'
                         )
 
         fw(endif(header_name))
-
-
-if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
-    write(spec_path)

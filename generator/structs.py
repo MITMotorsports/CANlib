@@ -27,22 +27,16 @@ def write(car, output_path=structs_path):
         fw('#include "enum_segments.h"\n\n')
 
         for bus in car.buses:
-            for msg in bus.messages:
+            for msg in bus.frames:
                 fw('typedef struct {\n')
 
                 for seg in msg.segments:
-                    if seg.c_type == 'enum':
+                    if seg.type.isenum():
                         enum_name = coord(bus.name, msg.name, seg.name) + '_T'
                         fw('\t{} {};\n'.format(enum_name, seg.name))
                     else:
-                        fw('\t{} {};\n'.format(seg.c_type, seg.name))
+                        fw('\t{} {};\n'.format(seg.type.ctype(), seg.name))
 
                 fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name)))
 
         fw(endif(header_name))
-
-
-if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
-    write(car)

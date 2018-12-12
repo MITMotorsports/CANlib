@@ -6,6 +6,8 @@ Can_Libary.c or main.py to write all files.
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
+
+Endianness = ParseCAN.spec.Endianness
 from math import ceil, floor, log2
 from common import can_lib_c_path, can_lib_c_base_path, coord
 
@@ -34,16 +36,16 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         for board in car.boards:
             if board.arch:  # Means it's a board we program
                 for bus in board.subscribe:
-                    fw('void init_{}(void) '.format(coord(bus.name, board.name)) + '{' '\n')
-                    fw('\t' 'Can_Init({});\n'.format(bus.baudrate))
+                    fw('CANlib_Init_Error_T CANlib_Init_{}(void) '.format(coord(bus.name, board.name, prefix=False)) + '{' '\n')
+                    fw('\t' 'CANlib_Init({});\n'.format(coord(bus.baudrate, prefix=False)))
 
-                    max_id = max(msg.can_id for msg in bus.messages)
+                    max_id = max(msg.id for msg in bus.frames)
 
                     # Find mask
                     # The way hardware filtering works is that incoming IDs are
                     # ANDed with the mask and then compared with a preset ID
                     # The goal of this mask is to throw away most higher ID (i.e.,
-                    # lower priority) messages
+                    # lower priority) frames
                     mask = 2**(floor(log2(max_id)) + 1) - 1
                     # On a standard bus, IDs are 11 bit
                     max_possible_id = 2**11-1
@@ -53,7 +55,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                     mask = mask ^ max_possible_id
 
                     # Set mask (pass in binary to make file more readable)
-                    fw('\t' 'Can_SetFilter(' + hex(mask) + ', 0);' '\n')
+                    fw('\t' 'CANlib_SetFilter(' + hex(mask) + ', 0);' '\n')
 
                     # Finish up
                     fw('}' '\n\n')
@@ -64,22 +66,22 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 for bus in board.publish:
                     if bus.name not in board.subscribe.name:
                         fw(
-                            'void init_' + coord(bus.name, board.name) +
+                            'void CANlib_Init_' + coord(bus.name, board.name) +
                             '(void) {' '\n'
                         )
-                        fw('\t' 'Can_Init({});\n'.format(bus.baudrate))
+                        fw('\t' 'CANlib_Init({});\n'.format(bus.baudrate))
                         fw('}' '\n\n')
 
         for bus in car.buses:
             # Write switch statement
             fw((
-                '{0}_T identify_{0}(Frame* frame)'.format(coord(bus.name)) + '{' '\n'
+                '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name), coord(bus.name, prefix=False)) + '{' '\n'
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
-            for msg in bus.messages:
+            for msg in bus.frames:
                 fw(
-                    '\t' '\t' 'case {}_can_id:\n'.format(coord(bus.name, msg.name)) +
+                    '\t' '\t' 'case {}_id:\n'.format(coord(bus.name, msg.name)) +
                     '\t' '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name))
                 )
 
@@ -91,95 +93,88 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             )
 
         for bus in car.buses:
-            for msg in bus.messages:
+            for msg in bus.frames:
 
                 # Write CAN_PACK
                 fw(
-                    'CAN_PACK(' + coord(bus.name, msg.name) + ') {' '\n'
+                    'CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
                     '\t' 'uint64_t bitstring = 0;' '\n'
                 )
 
                 for seg in msg.segments:
-                    if not msg.is_big_endian and (seg.c_type.startswith('int') or
-                                                  seg.c_type.startswith('uint')):
+                    if seg.type.endianness == Endianness.LITTLE and seg.type.integer:
                         fw(
-                            '\t' + seg.c_type + ' ' + seg.name + '_swap_value = swap_' + seg.c_type[:-2] + '(type_in->' + seg.name + ');' '\n'
-                            '\t' 'bitstring = INSERT(' + seg.name + '_swap_value, bitstring, ' + str(seg.position) + ', ' + str(seg.length) + ');' '\n\n'
+                            '\t' + seg.type.c_type + ' ' + seg.name + '_swap_value = swap_' + seg.type.c_type[:-2] + '(type_in->' + seg.name + ');' '\n'
+                            '\t' 'bitstring = INSERT(' + seg.name + '_swap_value, bitstring, ' + str(seg.slice.start) + ', ' + str(seg.slice.length) + ');' '\n\n'
                         )
                     else:
                         fw(
-                            '\t' 'bitstring = INSERT(type_in->' + seg.name + ', bitstring, ' + str(seg.position) +
-                            ', ' + str(seg.length) + ');' '\n'
+                            '\t' 'bitstring = INSERT(type_in->' + seg.name + ', bitstring, ' + str(seg.slice.start) +
+                            ', ' + str(seg.slice.length) + ');' '\n'
                         )
 
-                length = max(seg.position + seg.length for seg in msg.segments)
+                length = max(seg.slice.start + seg.slice.length for seg in msg.segments)
 
                 fw(
                     '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
-                    '\t' 'can_out->id = {}_can_id;'.format(coord(bus.name, msg.name)) + '\n'
-                    '\t' 'can_out->len = ' + str(ceil(length / 8)) + ';' '\n'
-                    '\t' 'can_out->extended = ' + str(bus.is_extended).lower() + ';' '\n'
+                    '\t' 'can_out->id = {}_id;'.format(coord(bus.name, msg.name)) + '\n'
+                    '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
+                    '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
                     '}' '\n\n'
                 )
 
                 # Write CAN_UNPACK
                 fw(
-                    'CAN_UNPACK(' + coord(bus.name, msg.name) + ') {' '\n'
+                    'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
                     '\t' 'uint64_t bitstring = 0;' '\n'
                     '\t' 'to_bitstring(can_in->data, &bitstring);\n'
                 )
 
                 for seg in msg.segments:
-                    if seg.c_type == 'enum':
+                    if seg.type == 'enum':
                         enum_name = coord(bus.name, msg.name, seg.name) + '_T'
 
                         fw(
                             '\t' 'type_out->' + seg.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
-                            str(seg.position) + ', ' + str(seg.length) + ');' '\n'
+                            str(seg.slice.start) + ', ' + str(seg.slice.length) + ');' '\n'
                         )
-                    elif seg.c_type == 'bool':
+                    elif seg.type == 'bool':
                         fw(
-                            '\t' 'type_out->' + seg.name + ' = EXTRACT(bitstring, ' + str(seg.position) + ', ' +
-                            str(seg.length) + ');' '\n'
+                            '\t' 'type_out->' + seg.name + ' = EXTRACT(bitstring, ' + str(seg.slice.start) + ', ' +
+                            str(seg.slice.length) + ');' '\n'
                         )
                     else:
-                        if not msg.is_big_endian:
-                            if seg.signed:
+                        if seg.type.endianness == Endianness.LITTLE:
+                            if seg.type.issigned():
                                 fw(
-                                    '\t' + seg.c_type + ' ' + seg.name + '_swap_value=swap_' +
-                                    seg.c_type[:-2] + '(EXTRACT(bitstring, ' + str(seg.position) + ', ' +
-                                    str(seg.length) + '));' '\n'
+                                    '\t' + seg.type + ' ' + seg.name + '_swap_value=swap_' +
+                                    seg.type[:-2] + '(EXTRACT(bitstring, ' + str(seg.slice.start) + ', ' +
+                                    str(seg.slice.length) + '));' '\n'
                                 )
                             else:
                                 fw(
-                                    '\t' + seg.c_type + ' ' + seg.name + '_swap_value=swap_' +
-                                    seg.c_type[:-2] + '(EXTRACT(bitstring, ' + str(seg.position) + ', ' +
-                                    str(seg.length) + '));' '\n'
+                                    '\t' + seg.type + ' ' + seg.name + '_swap_value=swap_' +
+                                    seg.type[:-2] + '(EXTRACT(bitstring, ' + str(seg.slice.start) + ', ' +
+                                    str(seg.slice.length) + '));' '\n'
                                 )
 
                             fw('\t' 'type_out->' + seg.name + ' = ' + seg.name + '_swap_value;' '\n')
                         else:
-                            if seg.signed:
+                            if seg.type.issigned():
                                 fw(
                                     '\t' 'type_out->' + seg.name + ' = SIGN(EXTRACT(bitstring, ' +
-                                    str(seg.position) + ', ' + str(seg.length) + '), ' +
-                                    str(seg.length) + ');' '\n'
+                                    str(seg.slice.start) + ', ' + str(seg.slice.length) + '), ' +
+                                    str(seg.slice.length) + ');' '\n'
                                 )
                             else:
                                 fw(
                                     '\t' 'type_out->' + seg.name + ' = EXTRACT(bitstring, ' +
-                                    str(seg.position) + ', ' + str(seg.length) + ');' '\n'
+                                    str(seg.slice.start) + ', ' + str(seg.slice.length) + ');' '\n'
                                 )
 
                 fw('}' '\n\n')
 
         # Write DEFINE statements
         for bus in car.buses:
-            for msg in bus.messages:
-                fw('DEFINE(' + coord(bus.name, msg.name) + ')\n')
-
-
-if __name__ == '__main__':
-    spec_path = sys.argv[1]
-    car = ParseCAN.spec.car(spec_path)
-    write(car)
+            for msg in bus.frames:
+                fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')
