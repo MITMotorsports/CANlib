@@ -34,7 +34,7 @@ def write(car, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
         # Write init functions
         for board in car.boards:
-            if board.arch:  # Means it's a board we program
+            if board.architecture:  # Means it's a board we program
                 for bus in board.subscribe:
                     fw('CANlib_Init_Error_T CANlib_Init_{}(void) '.format(coord(bus.name, board.name, prefix=False)) + '{' '\n')
                     fw('\t' 'CANlib_Init({});\n'.format(coord(bus.baudrate, prefix=False)))
