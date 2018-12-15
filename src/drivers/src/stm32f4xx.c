@@ -3,7 +3,7 @@
 #include "stm32f4xx_hal.h"
 #include <stdint.h>
 
-#define USING_CAN1
+#define USING_CAN2
 
 static CAN_HandleTypeDef can1;
 static CAN_HandleTypeDef can2;
