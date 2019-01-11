@@ -9,12 +9,12 @@ import ParseCAN
 from common import can_lib_h_path, templ, coord, ifndef, endif
 
 
-def write(car, output_path=can_lib_h_path):
+def write(can, output_path=can_lib_h_path):
     '''
     Generate Can_Libary.h file.
 
     :param output_path: file to be written to
-    :param car: CAN spec
+    :param can: CAN spec
     '''
     header_name = '_CAN_LIBRARY_H'
 
@@ -37,7 +37,7 @@ def write(car, output_path=can_lib_h_path):
 
         # Begin enumerating from the universal forms onward
         # Every time we assign to an enum, we'll increment beg
-        # so as to avoid return value equalities between different buses
+        # so as to avoid return value equalities between different bus
         idx = 0
         for msgt in uni:
             fw(templ['define'].format(msgt, idx))
@@ -46,10 +46,10 @@ def write(car, output_path=can_lib_h_path):
         fw('\n')
 
         # Create forms enum for each bus
-        for bus in car.buses:
+        for bus in can.bus:
             fw('typedef enum {\n')
 
-            for msg in bus.frames:
+            for msg in bus.frame:
                 fw(templ['enum'].format(coord(bus.name, msg.name), idx))
                 idx += 1
 
@@ -58,26 +58,27 @@ def write(car, output_path=can_lib_h_path):
             fw('{}_T CANlib_Identify_{}(Frame* frame);'.format(coord(bus.name), coord(bus.name, prefix=False)) + '\n')
 
         # Write DECLARE statements
-        for bus in car.buses:
-            for msg in bus.frames:
+        for bus in can.bus:
+            for msg in bus.frame:
                 fw('DECLARE({})\n'.format(coord(bus.name, msg.name, prefix=False)))
 
         fw('\n')
 
         # Declare init functions
         # Write init functions
-        for board in car.boards:
-            if board.arch:  # Means it's a board we program
-                for bus in board.subscribe:
-                    fw('CANlib_Init_Error_T CANlib_Init_{}(void);\n'.format(coord(bus.name, board.name)))
+        if False:
+            for board in can.board:
+                if board.arch:  # Means it's a board we program
+                    for bus in board.subscribe:
+                        fw('CANlib_Init_Error_T CANlib_Init_{}(void);\n'.format(coord(bus.name, board.name)))
 
-                # We still need to create init functions for boards that publish
-                # on a bus but don't subscribe
-                for bus in board.publish:
-                    if bus.name not in board.subscribe.name:
-                        fw(
-                            'CANlib_Init_Error_T CANlib_Init_' + coord(bus.name, board.name) +
-                            '(void);\n'
-                        )
+                    # We still need to create init functions for board that publish
+                    # on a bus but don't subscribe
+                    for bus in board.publish:
+                        if bus.name not in board.subscribe.name:
+                            fw(
+                                'CANlib_Init_Error_T CANlib_Init_' + coord(bus.name, board.name) +
+                                '(void);\n'
+                            )
 
         fw(endif(header_name))

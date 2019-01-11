@@ -9,17 +9,18 @@ import ParseCAN
 import constants
 import CANlib_c
 import CANlib_h
-import enum_segments
+import enum_atom
 import structs
 import sys
 
 if __name__ == '__main__':
     specpath = sys.argv[1]
     specfile = open(specpath, 'r')
-    car = ParseCAN.spec.Car.from_yaml(specfile)
+    system = ParseCAN.spec.System.from_yaml(specfile)
+    can = system.protocol['name']['can']
 
-    constants.write(car)
-    CANlib_c.write(car)
-    CANlib_h.write(car)
-    enum_segments.write(car)
-    structs.write(car)
+    constants.write(can)
+    CANlib_c.write(can)
+    CANlib_h.write(can)
+    enum_atom.write(can)
+    structs.write(can)
