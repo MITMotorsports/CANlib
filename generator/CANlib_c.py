@@ -88,14 +88,29 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             ))
 
             for msg in bus.frame:
-                fw(
-                    '\t' '\t' 'case {}_id:\n'.format(coord(bus.name, msg.name)) +
-                    '\t' '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name))
-                )
+                fw('\t' '\t' 'case {}_key:\n'.format(coord(bus.name, msg.name)))
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    key_size = ceil(msg.slice.length / 8) * 8
+                    fw(
+                        '\t' '\t' '\t' 'uint64_t bistring = 0;' '\n'
+                        '\t' '\t' '\t' 'to_bitstring(frame->data, &bitstring);' '\n'
+                    )
 
+                    fw(
+                        '\t' '\t' '\t' 'uint{}_t key = EXTRACT(bitstring, {}, {});\n'.format(key_size, msg.slice.start, msg.slice.length) +
+                        '\t' '\t' '\t' 'switch(key) {' '\n'
+                    )
+                    for frame in msg.frame:
+                        fw(
+                            '\t' '\t' '\t' '\t' 'case ' + coord(bus.name, msg.name, frame.name, 'key') + ':\n'
+                           '\t' '\t' '\t' '\t' '\t' 'return ' + coord(bus.name, msg.name, frame.name) + ';\n'
+                        )
+                    fw('\t' '\t' '\t' '}' '\n' )
+                else:
+                    fw('\t' '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name)))
             fw(
-                '\t' 'default:' '\n'
-                '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
+                '\t' '\t' 'default:' '\n'
+                '\t' '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
                 '\t' '}' '\n'
                 '}' '\n\n'
             )
@@ -128,7 +143,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
                     fw(
                         '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
-                        '\t' 'can_out->id = {}_id;'.format(coord(bus.name, msg.name)) + '\n'
+                        '\t' 'can_out->id = {}_key;'.format(coord(bus.name, msg.name)) + '\n'
                         '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
                         '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
                         '}' '\n\n'

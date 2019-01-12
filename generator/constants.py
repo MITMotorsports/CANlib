@@ -24,7 +24,7 @@ def write(can, output_path=constants_path):
         fw(ifndef(header_name))
 
         props = (
-            (('key', 'id'), 'define', int),
+            ('key', 'define', int),
             # TODO(nistath): Add this back.
             # ('period', 'define', lambda x: int(ParseCAN.parse.number_in('ms')(x))),
         )
@@ -32,23 +32,21 @@ def write(can, output_path=constants_path):
         for bus in can.bus:
             for attrnm, form, transform in props:
                 finalnm = attrnm
-                if isinstance(attrnm, tuple):
-                    attrnm, finalnm = attrnm
 
-                if form == 'enum':
-                    fw('typedef enum {\n')
-
-                for frame in bus.frame:
-                    try:
-                        attr = transform(getattr(frame, attrnm))
-                        fw(templ[form].format(coord(bus.name, frame.name, finalnm), attr))
-                    except AttributeError:
-                        pass
-
-                if form == 'enum':
-                    fw('} ' + '{}_T;'.format(coord(bus.name, attrnm)))
-
-                f.write('\n\n')
+                for msg in bus.frame:
+                    if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                        for frame in msg.frame:
+                            try:
+                                attr = transform(getattr(frame, attrnm))
+                                fw(templ[form].format(coord(bus.name, msg.name, frame.name, finalnm), attr))
+                            except AttributeError:
+                                pass
+                    else:
+                        try:
+                            attr = transform(getattr(msg, attrnm))
+                            fw(templ[form].format(coord(bus.name, msg.name, finalnm), attr))
+                        except AttributeError:
+                            pass
 
         fw(endif(header_name))
 
