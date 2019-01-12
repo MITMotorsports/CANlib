@@ -138,7 +138,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                             '\t' 'uint64_t bitstring = 0;' '\n'
                         )
                         fw(
-                            '\t' 'bitstring = INSERT(type_in->' + 'key' + ', bitstring, ' + str(msg.slice.start) +
+                            '\t' 'bitstring = INSERT(' + coord(bus.name, msg.name, frame.name) + '_key, bitstring, ' + str(msg.slice.start) +
                             ', ' + str(msg.slice.length) + ');' '\n'
                         )
                         
@@ -170,14 +170,8 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                         '}' '\n\n'
                     )
 
-                    # Write CAN_UNPACK
-                    fw(
-                        'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
-                        '\t' 'uint64_t bitstring = 0;' '\n'
-                        '\t' 'to_bitstring(can_in->data, &bitstring);\n'
-                    )
-
-                    for atom in msg.atom:
+                def write_atoms_pack(atoms):
+                    for atom in atoms:
                         if atom.type.isenum():
                             enum_name = coord(bus.name, msg.name, atom.name) + '_T'
 
@@ -209,6 +203,27 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                                         '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
                                         str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
                                     )
+
+                # Write CAN_UNPACK
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                        fw(
+                            'CAN_UNPACK(' + coord(bus.name, msg.name, frame.name, prefix=False) + ') {' '\n'
+                            '\t' 'uint64_t bitstring = 0;' '\n'
+                            '\t' 'to_bitstring(can_in->data, &bitstring);\n'
+                        )
+
+                        write_atoms_pack(frame.atom)
+
+                        fw('}' '\n\n')
+                else:
+                    fw(
+                        'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
+                        '\t' 'uint64_t bitstring = 0;' '\n'
+                        '\t' 'to_bitstring(can_in->data, &bitstring);\n'
+                    )
+
+                    write_atoms_pack(msg.atom)
 
                     fw('}' '\n\n')
 
