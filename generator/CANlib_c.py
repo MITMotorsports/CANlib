@@ -69,34 +69,6 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                         fw('}' '\n\n')
 
                 # We still need to create init functions for board that publish
-        for board in car.boards:
-            if board.architecture:  # Means it's a board we program
-                for bus in board.subscribe:
-                    fw('CANlib_Init_Error_T CANlib_Init_{}(void) '.format(coord(bus.name, board.name, prefix=False)) + '{' '\n')
-                    fw('\t' 'CANlib_Init({});\n'.format(coord(bus.baudrate, prefix=False)))
-
-                    max_id = max(msg.id for msg in bus.frames)
-
-                    # Find mask
-                    # The way hardware filtering works is that incoming IDs are
-                    # ANDed with the mask and then compared with a preset ID
-                    # The goal of this mask is to throw away most higher ID (i.e.,
-                    # lower priority) frames
-                    mask = 2**(floor(log2(max_id)) + 1) - 1
-                    # On a standard bus, IDs are 11 bit
-                    max_possible_id = 2**11-1
-                    if bus.is_extended:
-                        # On an extended bus, IDs are 29 bit
-                        max_possible_id = 2**29-1
-                    mask = mask ^ max_possible_id
-
-                    # Set mask (pass in binary to make file more readable)
-                    fw('\t' 'CANlib_SetFilter(' + hex(mask) + ', 0);' '\n')
-
-                    # Finish up
-                    fw('}' '\n\n')
-
-                # We still need to create init functions for boards that publish
                 # on a bus but don't subscribe
                 # Filtering doesn't matter here
                 for bus in board.publish:
