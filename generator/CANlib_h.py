@@ -60,7 +60,11 @@ def write(can, output_path=can_lib_h_path):
         # Write DECLARE statements
         for bus in can.bus:
             for msg in bus.frame:
-                fw('DECLARE({})\n'.format(coord(bus.name, msg.name, prefix=False)))
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                        fw('DECLARE({})\n'.format(coord(bus.name, msg.name, frame.name, prefix=False)))
+                else:
+                    fw('DECLARE({})\n'.format(coord(bus.name, msg.name, prefix=False)))
 
         fw('\n')
 
