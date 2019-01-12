@@ -30,13 +30,16 @@ def write(can, output_path=structs_path):
             for msg in bus.frame:
                 fw('typedef struct {\n')
 
-                for atom in msg.atom:
-                    if atom.type.isenum():
-                        enum_name = coord(bus.name, msg.name, atom.name) + '_T'
-                        fw('\t{} {};\n'.format(enum_name, atom.name))
-                    else:
-                        fw('\t{} {};\n'.format(atom.type.ctype(), atom.name))
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    print("Multiplexed frame, skipping!")
+                else:
+                    for atom in msg.atom:
+                        if atom.type.isenum():
+                            enum_name = coord(bus.name, msg.name, atom.name) + '_T'
+                            fw('\t{} {};\n'.format(enum_name, atom.name))
+                        else:
+                            fw('\t{} {};\n'.format(atom.type.ctype(), atom.name))
 
-                fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name)))
+                    fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name)))
 
         fw(endif(header_name))

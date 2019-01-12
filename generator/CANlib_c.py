@@ -102,77 +102,79 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
         for bus in can.bus:
             for msg in bus.frame:
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    print("Multiplexed frame, skipping!")
+                else:
+                    # Write CAN_PACK
+                    fw(
+                        'CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
+                        '\t' 'uint64_t bitstring = 0;' '\n'
+                    )
 
-                # Write CAN_PACK
-                fw(
-                    'CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
-                    '\t' 'uint64_t bitstring = 0;' '\n'
-                )
-
-                for atom in msg.atom:
-                    # HACK/TODO: This is assuming big endian systems that run CANlib
-                    if atom.type.endianness == Endianness.LITTLE:
-                        fw(
-                            '\t' 'bitstring = INSERT(' + swap_endianness_fn(atom.type) + '(type_in->' + atom.name + '), bitstring, ' +
-                            str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n\n'
-                        )
-                    else:
-                        fw(
-                            '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
-                            ', ' + str(atom.slice.length) + ');' '\n'
-                        )
-
-                length = max(atom.slice.start + atom.slice.length for atom in msg.atom)
-
-                fw(
-                    '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
-                    '\t' 'can_out->id = {}_id;'.format(coord(bus.name, msg.name)) + '\n'
-                    '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
-                    '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
-                    '}' '\n\n'
-                )
-
-                # Write CAN_UNPACK
-                fw(
-                    'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
-                    '\t' 'uint64_t bitstring = 0;' '\n'
-                    '\t' 'to_bitstring(can_in->data, &bitstring);\n'
-                )
-
-                for atom in msg.atom:
-                    if atom.type.isenum():
-                        enum_name = coord(bus.name, msg.name, atom.name) + '_T'
-
-                        fw(
-                            '\t' 'type_out->' + atom.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
-                            str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
-                        )
-                    elif atom.type.type == 'bool':
-                        fw(
-                            '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
-                            str(atom.slice.length) + ');' '\n'
-                        )
-                    else:
+                    for atom in msg.atom:
+                        # HACK/TODO: This is assuming big endian systems that run CANlib
                         if atom.type.endianness == Endianness.LITTLE:
                             fw(
-                                '\t' 'type_out->' + atom.name + ' = ' + swap_endianness_fn(atom.type) +
-                                '(EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
-                                str(atom.slice.length) + '));' '\n'
+                                '\t' 'bitstring = INSERT(' + swap_endianness_fn(atom.type) + '(type_in->' + atom.name + '), bitstring, ' +
+                                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n\n'
                             )
                         else:
-                            if atom.type.issigned():
+                            fw(
+                                '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
+                                ', ' + str(atom.slice.length) + ');' '\n'
+                            )
+
+                    length = max(atom.slice.start + atom.slice.length for atom in msg.atom)
+
+                    fw(
+                        '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
+                        '\t' 'can_out->id = {}_id;'.format(coord(bus.name, msg.name)) + '\n'
+                        '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
+                        '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
+                        '}' '\n\n'
+                    )
+
+                    # Write CAN_UNPACK
+                    fw(
+                        'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
+                        '\t' 'uint64_t bitstring = 0;' '\n'
+                        '\t' 'to_bitstring(can_in->data, &bitstring);\n'
+                    )
+
+                    for atom in msg.atom:
+                        if atom.type.isenum():
+                            enum_name = coord(bus.name, msg.name, atom.name) + '_T'
+
+                            fw(
+                                '\t' 'type_out->' + atom.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
+                                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
+                            )
+                        elif atom.type.type == 'bool':
+                            fw(
+                                '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
+                                str(atom.slice.length) + ');' '\n'
+                            )
+                        else:
+                            if atom.type.endianness == Endianness.LITTLE:
                                 fw(
-                                    '\t' 'type_out->' + atom.name + ' = SIGN(EXTRACT(bitstring, ' +
-                                    str(atom.slice.start) + ', ' + str(atom.slice.length) + '), ' +
-                                    str(atom.slice.length) + ');' '\n'
+                                    '\t' 'type_out->' + atom.name + ' = ' + swap_endianness_fn(atom.type) +
+                                    '(EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
+                                    str(atom.slice.length) + '));' '\n'
                                 )
                             else:
-                                fw(
-                                    '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
-                                    str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
-                                )
+                                if atom.type.issigned():
+                                    fw(
+                                        '\t' 'type_out->' + atom.name + ' = SIGN(EXTRACT(bitstring, ' +
+                                        str(atom.slice.start) + ', ' + str(atom.slice.length) + '), ' +
+                                        str(atom.slice.length) + ');' '\n'
+                                    )
+                                else:
+                                    fw(
+                                        '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
+                                        str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
+                                    )
 
-                fw('}' '\n\n')
+                    fw('}' '\n\n')
 
         # Write DEFINE statements
         for bus in can.bus:

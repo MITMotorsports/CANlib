@@ -27,19 +27,22 @@ def write(can, output_path=enum_atom_path):
 
         for bus in can.bus:
             for msg in bus.frame:
-                for atom in msg.atom:
-                    if atom.type.isenum():
-                        # Only C++11 feature
-                        # fw('typedef enum ' + (atom.type.type + ' ' if atom.type.type else '') + '{\n')
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    print("Multiplexed frame, skipping!")
+                else:
+                    for atom in msg.atom:
+                        if atom.type.isenum():
+                            # Only C++11 feature
+                            # fw('typedef enum ' + (atom.type.type + ' ' if atom.type.type else '') + '{\n')
 
-                        fw('typedef enum {\n')
+                            fw('typedef enum {\n')
 
-                        for enum in atom.type.enum:
-                            fw(templ['enum'].format(
-                                coord(bus.name, msg.name, atom.name, enum.name),
-                                enum.value
-                            ))
+                            for enum in atom.type.enum:
+                                fw(templ['enum'].format(
+                                    coord(bus.name, msg.name, atom.name, enum.name),
+                                    enum.value
+                                ))
 
-                        fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name, atom.name)))
+                            fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name, atom.name)))
 
         fw(endif(header_name))
