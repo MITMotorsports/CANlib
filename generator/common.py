@@ -2,7 +2,7 @@ src_dir = '../src/'
 constants_path = f'{src_dir}constants.h'
 can_lib_c_path = f'{src_dir}CANlib.c'
 can_lib_h_path = f'{src_dir}CANlib.h'
-enum_segments_path = f'{src_dir}enum_segments.h'
+enum_atom_path = f'{src_dir}enum_atom.h'
 structs_path = f'{src_dir}structs.h'
 can_lib_c_base_path = 'templates/CANlib_c.template'
 
