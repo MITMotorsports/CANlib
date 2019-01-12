@@ -18,7 +18,6 @@ def swap_endianness_fn(type: Type):
 
     return 'swap_' + type.type
 
-
 def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
     '''
     Generate Can_Libary.c file.
@@ -117,16 +116,9 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
         for bus in can.bus:
             for msg in bus.frame:
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
-                    print("Multiplexed frame, skipping!")
-                else:
-                    # Write CAN_PACK
-                    fw(
-                        'CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
-                        '\t' 'uint64_t bitstring = 0;' '\n'
-                    )
-
-                    for atom in msg.atom:
+                # Write CAN_PACK
+                def write_atoms_pack(atoms):
+                    for atom in atoms:
                         # HACK/TODO: This is assuming big endian systems that run CANlib
                         if atom.type.endianness == Endianness.LITTLE:
                             fw(
@@ -138,6 +130,35 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                                 '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
                                 ', ' + str(atom.slice.length) + ');' '\n'
                             )
+
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                        fw(
+                            'CAN_PACK(' + coord(bus.name, msg.name, frame.name, prefix=False) + ') {' '\n'
+                            '\t' 'uint64_t bitstring = 0;' '\n'
+                        )
+                        fw(
+                            '\t' 'bitstring = INSERT(type_in->' + 'key' + ', bitstring, ' + str(msg.slice.start) +
+                            ', ' + str(msg.slice.length) + ');' '\n'
+                        )
+                        
+                        write_atoms_pack(frame.atom)
+
+                        length = max(atom.slice.start + atom.slice.length for atom in frame.atom)
+
+                        fw(
+                            '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
+                            '\t' 'can_out->id = {}_key;'.format(coord(bus.name, msg.name)) + '\n'
+                            '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
+                            '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
+                            '}' '\n\n'
+                        )
+                else:
+                    fw('CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
+                        '\t' 'uint64_t bitstring = 0;' '\n'
+                    )
+
+                    write_atoms_pack(msg.atom)
 
                     length = max(atom.slice.start + atom.slice.length for atom in msg.atom)
 
