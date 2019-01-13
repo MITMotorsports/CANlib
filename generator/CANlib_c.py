@@ -83,6 +83,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             # Write switch statement
             fw((
                 '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name), coord(bus.name, prefix=False)) + '{' '\n'
+                '\t' 'uint64_t bitstring = 0;' '\n'
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
@@ -91,7 +92,6 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
                     key_size = ceil(msg.slice.length / 8) * 8
                     fw(
-                        '\t' '\t' '\t' 'uint64_t bistring = 0;' '\n'
                         '\t' '\t' '\t' 'to_bitstring(frame->data, &bitstring);' '\n'
                     )
 
@@ -230,4 +230,8 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         # Write DEFINE statements
         for bus in can.bus:
             for msg in bus.frame:
-                fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                            fw('DEFINE(' + coord(bus.name, msg.name, frame.name, prefix=False) + ')\n')
+                else:
+                    fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')

@@ -50,12 +50,17 @@ def write(can, output_path=can_lib_h_path):
             fw('typedef enum {\n')
 
             for msg in bus.frame:
-                fw(templ['enum'].format(coord(bus.name, msg.name), idx))
-                idx += 1
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg. frame:
+                        fw(templ['enum'].format(coord(bus.name, msg.name, frame.name), idx))
+                        idx += 1
+                else:
+                    fw(templ['enum'].format(coord(bus.name, msg.name), idx))
+                    idx += 1
 
             fw('} ' + '{}_T;\n\n'.format(coord(bus.name)))
 
-            fw('{}_T CANlib_Identify_{}(Frame* frame);'.format(coord(bus.name), coord(bus.name, prefix=False)) + '\n')
+            fw('{}_T CANlib_Identify_{}(Frame* frame);'.format(coord(bus.name), coord(bus.name, prefix=False)) + '\n\n')
 
         # Write DECLARE statements
         for bus in can.bus:

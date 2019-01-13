@@ -41,12 +41,11 @@ def write(can, output_path=constants_path):
                                 fw(templ[form].format(coord(bus.name, msg.name, frame.name, finalnm), attr))
                             except AttributeError:
                                 pass
-                    else:
-                        try:
-                            attr = transform(getattr(msg, attrnm))
-                            fw(templ[form].format(coord(bus.name, msg.name, finalnm), attr))
-                        except AttributeError:
-                            pass
+                    try:
+                        attr = transform(getattr(msg, attrnm))
+                        fw(templ[form].format(coord(bus.name, msg.name, finalnm), attr))
+                    except AttributeError:
+                        pass
 
         fw(endif(header_name))
 
