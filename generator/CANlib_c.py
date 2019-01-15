@@ -87,26 +87,39 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
-            for msg in bus.frame:
-                fw('\t' '\t' 'case {}_key:\n'.format(coord(bus.name, msg.name)))
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
-                    key_size = ceil(msg.slice.length / 8) * 8
-                    fw(
-                        '\t' '\t' '\t' 'to_bitstring(frame->data, &bitstring);' '\n'
-                    )
+            def single_handler(frame, name_prepends, num_tabs):
+                fw(
+                    '\t' * num_tabs + 'case {}_key'.format(coord(name_prepends, frame.name)) + '\n' +
+                    '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(name_prepends, frame.name))
+                )
 
-                    fw(
-                        '\t' '\t' '\t' 'uint{}_t key = EXTRACT(bitstring, {}, {});\n'.format(key_size, msg.slice.start, msg.slice.length) +
-                        '\t' '\t' '\t' 'switch(key) {' '\n'
-                    )
-                    for frame in msg.frame:
-                        fw(
-                            '\t' '\t' '\t' '\t' 'case ' + coord(bus.name, msg.name, frame.name, 'key') + ':\n'
-                           '\t' '\t' '\t' '\t' '\t' 'return ' + coord(bus.name, msg.name, frame.name) + ';\n'
-                        )
-                    fw('\t' '\t' '\t' '}' '\n' )
+            def multplxd_handler(frame, name_prepends, num_tabs):
+                fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
+                key_size = ceil(frame.slice.length / 8) * 8
+                fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
+                fw(
+                    '\t' * (num_tabs + 1) + 'uint{}_t key = EXTRACT(bitstring, {}, {});\n'.format(key_size, frame.slice.start, frame.slice.length) +
+                    '\t' * (num_tabs + 1) + 'switch(key) {' '\n'
+                )
+
+                name_prepends = '_'.join([name_prepends, frame.name])
+
+                for sub_frame in frame.frame:
+                    if isinstance(sub_frame, ParseCAN.spec.bus.MultiplexedFrame):
+                        multplxd_handler(sub_frame, name_prepends, num_tabs + 2)
+                    else:
+                        single_handler(sub_frame, name_prepends, num_tabs + 2)
+                fw(
+                    '\t' * (num_tabs + 2) + 'default:\n' +
+                    '\t' * (num_tabs + 3) + 'return CAN_UNKNOWN_MSG;\n' +
+                    '\t' * (num_tabs + 1) + '}\n'
+                )
+
+            for msg in bus.frame:
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    multplxd_handler(msg, bus.name, 2)
                 else:
-                    fw('\t' '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name)))
+                    single_handler(msg, bus.name, 2)
             fw(
                 '\t' '\t' 'default:' '\n'
                 '\t' '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
