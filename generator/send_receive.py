@@ -28,18 +28,9 @@ def write(can, output_path=send_recieve_path):
             else:
                 tot_name = coord(name_prepends, frame.name,
                     prefix=False)
-                fw('void send_{}_msg(CANlib_{}_T inp)'.format(
+                fw('void send_{}_msg(CANlib_{}_T *inp)'.format(
                     tot_name, tot_name) + ' {\n' +
-                    '\tLIMIT(CANlib_{});\n\t{}_Write(&inp);\n'.format(tot_name, tot_name) + '}\n\n')
-        
-        # def define_sub_frame(frame, name_prepends):
-        #     if is_multplxd(frame):
-        #         for sub_frame in frame.frame:
-        #             declare_sub_frame(sub_frame, name_prepends + '_' + frame.name)
-        #     else:
-        #         tot_name = coord(name_prepends, frame.name)
-        #         fw('extern {}_T inp;\n'.format(
-        #             tot_name, tot_name))
+                    '\tLIMIT(CANlib_{});\n\tCANlib_Transmit_{}(inp);\n'.format(tot_name, tot_name) + '}\n\n')
 
         for bus in can.bus:
             for msg in bus.frame:

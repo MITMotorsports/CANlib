@@ -46,7 +46,7 @@ def write(can, computers, output_path=computer_dir_path):
                 else:
                     tot_name = coord(name_prepends, frame.name,
                         prefix=False)
-                    fw('void send_{}_msg(CANlib_{}_T inp);\n'.format(
+                    fw('void send_{}_msg(CANlib_{}_T *inp);\n'.format(
                         tot_name, tot_name))
             
             def declare_sub_frame(frame, name_prepends):
@@ -72,25 +72,6 @@ def write(can, computers, output_path=computer_dir_path):
                             fw('\t{} {};\n'.format(atom.type.ctype(), atom.name))
 
                     fw('} ' + '{}_T;\n\n'.format(coord(name_prepends, frame.name)))
-
-
-            
-            # Actual writes
-            # Structs
-            # pubs_subs = {}
-            # try:
-            #     for bus_name, bus in computer.participation['name']['can'].publish.items():
-            #         for frame in bus:
-            #             pubs_subs[frame.name] = (frame, bus_name)
-            #     for bus_name, bus in computer.participation['name']['can'].subscribe.items():
-            #         for frame in bus:
-            #             pubs_subs[frame.name] = (frame, bus_name)
-            # except KeyError:
-            #     pass # No CAN messages received by this board
-            
-            # for frame, bus_name in pubs_subs.values():
-            #     write_struct(frame, bus_name)
-
 
             # Pub
             try:

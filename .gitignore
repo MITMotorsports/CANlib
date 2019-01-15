@@ -9,7 +9,7 @@ src/CANlib.h
 src/enum_atom.h
 src/structs.h
 src/computers/
-src/send_recieve.c
+src/send_receive.c
 **/*.o
 **/*.out
 
