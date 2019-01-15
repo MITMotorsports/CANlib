@@ -6,7 +6,7 @@ ids.h or main.py to write all files.
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import enum_atom_path, templ, coord, ifndef, endif
+from common import enum_atom_path, templ, coord, ifndef, endif, is_multplxd
 
 
 def write(can, output_path=enum_atom_path):
@@ -27,7 +27,7 @@ def write(can, output_path=enum_atom_path):
 
         for bus in can.bus:
             for msg in bus.frame:
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg.frame:
                         for atom in frame.atom:
                             if atom.type.isenum():

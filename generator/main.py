@@ -12,6 +12,8 @@ import CANlib_h
 import enum_atom
 import structs
 import sys
+import computers
+import send_receive
 
 if __name__ == '__main__':
     specpath = sys.argv[1]
@@ -23,4 +25,6 @@ if __name__ == '__main__':
     CANlib_c.write(can)
     CANlib_h.write(can)
     enum_atom.write(can)
+    send_receive.write(can)
     structs.write(can)
+    computers.write(can, system.computer)

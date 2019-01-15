@@ -6,7 +6,17 @@ constants.h or main.py to write all files.
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import constants_path, coord, templ, ifndef, endif
+from common import constants_path, coord, templ, ifndef, endif, is_multplxd
+from pint import UnitRegistry as UR
+
+
+def get_ms(period_str):
+    ur = UR()
+    t = int(''.join([s for s in period_str if s.isdigit()]))
+    units = ''.join([s for s in period_str if s.isalpha()])
+    units = ur[units]
+    t = t * units
+    return t.to('ms').magnitude
 
 
 def write(can, output_path=constants_path):
@@ -25,8 +35,7 @@ def write(can, output_path=constants_path):
 
         props = (
             ('key', 'define', int),
-            # TODO(nistath): Add this back.
-            # ('period', 'define', lambda x: int(ParseCAN.parse.number_in('ms')(x))),
+            ('period', 'define', get_ms),
         )
 
         for bus in can.bus:
@@ -34,7 +43,7 @@ def write(can, output_path=constants_path):
                 finalnm = attrnm
 
                 for msg in bus.frame:
-                    if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    if is_multplxd(msg):
                         for frame in msg.frame:
                             try:
                                 attr = transform(getattr(frame, attrnm))

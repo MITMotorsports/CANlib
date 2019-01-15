@@ -6,7 +6,7 @@ Can_Libary.h or main.py to write all files.
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
-from common import can_lib_h_path, templ, coord, ifndef, endif
+from common import can_lib_h_path, templ, coord, ifndef, endif, is_multplxd
 
 
 def write(can, output_path=can_lib_h_path):
@@ -27,7 +27,7 @@ def write(can, output_path=can_lib_h_path):
         # Includes
         fw(
             '#include <stdint.h>' '\n'
-            '#include <stdbool.h>' '\n\n'
+            '#include <stdbool.h>' '\n'
             '#include "structs.h"' '\n'
             '#include "static_can.h"' '\n\n'
         )
@@ -50,7 +50,7 @@ def write(can, output_path=can_lib_h_path):
             fw('typedef enum {\n')
 
             for msg in bus.frame:
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg. frame:
                         fw(templ['enum'].format(coord(bus.name, msg.name, frame.name), idx))
                         idx += 1
@@ -65,7 +65,7 @@ def write(can, output_path=can_lib_h_path):
         # Write DECLARE statements
         for bus in can.bus:
             for msg in bus.frame:
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg.frame:
                         fw('DECLARE({})\n'.format(coord(bus.name, msg.name, frame.name, prefix=False)))
                 else:

@@ -1,9 +1,15 @@
+import sys
+sys.path.append('ParseCAN')
+import ParseCAN
+
 src_dir = '../src/'
 constants_path = f'{src_dir}constants.h'
 can_lib_c_path = f'{src_dir}CANlib.c'
 can_lib_h_path = f'{src_dir}CANlib.h'
 enum_atom_path = f'{src_dir}enum_atom.h'
 structs_path = f'{src_dir}structs.h'
+computer_dir_path = f'{src_dir}computers'
+send_recieve_path = f'{src_dir}send_receive.c'
 can_lib_c_base_path = 'templates/CANlib_c.template'
 
 
@@ -16,7 +22,6 @@ def coord(*args, prefix=True):
         args = ('CANlib', ) + args
 
     return '_'.join(args)
-
 
 def ifndef(name):
     '''
@@ -38,6 +43,10 @@ def endif(name):
     #endif // ... procedure.
     '''
     return '\n#endif // {0}\n'.format(name)
+
+
+def is_multplxd(frame):
+    return isinstance(frame, ParseCAN.spec.bus.MultiplexedFrame)
 
 
 '''A template dict to define assignment within a `key`.'''

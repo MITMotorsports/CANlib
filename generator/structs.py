@@ -6,7 +6,7 @@ these files or main.py to write all files.
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
-from common import structs_path, coord, ifndef, endif
+from common import structs_path, coord, ifndef, endif, is_multplxd
 
 def process_single(fw, frame, prefix):
     """
@@ -49,7 +49,7 @@ def write(can, output_path=structs_path):
             for msg in bus.frame:
                 fw('typedef struct {\n')
 
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg.frame:
                         process_single(fw, frame, bus.name + "_" + msg.name)
                 else:

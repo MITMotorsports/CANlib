@@ -9,7 +9,7 @@ import ParseCAN
 from ParseCAN.spec import Endianness, Type
 
 from math import ceil, floor, log2
-from common import can_lib_c_path, can_lib_c_base_path, coord
+from common import can_lib_c_path, can_lib_c_base_path, coord, is_multplxd
 
 
 def swap_endianness_fn(type: Type):
@@ -89,7 +89,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
             def single_handler(frame, name_prepends, num_tabs):
                 fw(
-                    '\t' * num_tabs + 'case {}_key'.format(coord(name_prepends, frame.name)) + '\n' +
+                    '\t' * num_tabs + 'case {}_key:'.format(coord(name_prepends, frame.name)) + '\n' +
                     '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(name_prepends, frame.name))
                 )
 
@@ -97,15 +97,15 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
                 key_size = ceil(frame.slice.length / 8) * 8
                 fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
+                key_name = '_'.join([name_prepends,frame.name, 'key'])
                 fw(
-                    '\t' * (num_tabs + 1) + 'uint{}_t key = EXTRACT(bitstring, {}, {});\n'.format(key_size, frame.slice.start, frame.slice.length) +
-                    '\t' * (num_tabs + 1) + 'switch(key) {' '\n'
+                    '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring, {}, {});\n'.format(key_size, key_name, frame.slice.start, frame.slice.length) + '\t' * (num_tabs + 1) + 'switch(' + key_name + ') {' '\n'
                 )
 
                 name_prepends = '_'.join([name_prepends, frame.name])
 
                 for sub_frame in frame.frame:
-                    if isinstance(sub_frame, ParseCAN.spec.bus.MultiplexedFrame):
+                    if is_multplxd(sub_frame):
                         multplxd_handler(sub_frame, name_prepends, num_tabs + 2)
                     else:
                         single_handler(sub_frame, name_prepends, num_tabs + 2)
@@ -116,7 +116,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                 )
 
             for msg in bus.frame:
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     multplxd_handler(msg, bus.name, 2)
                 else:
                     single_handler(msg, bus.name, 2)
@@ -144,7 +144,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                                 ', ' + str(atom.slice.length) + ');' '\n'
                             )
 
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg.frame:
                         fw(
                             'CAN_PACK(' + coord(bus.name, msg.name, frame.name, prefix=False) + ') {' '\n'
@@ -218,7 +218,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                                     )
 
                 # Write CAN_UNPACK
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg.frame:
                         fw(
                             'CAN_UNPACK(' + coord(bus.name, msg.name, frame.name, prefix=False) + ') {' '\n'
@@ -243,7 +243,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         # Write DEFINE statements
         for bus in can.bus:
             for msg in bus.frame:
-                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                if is_multplxd(msg):
                     for frame in msg.frame:
                             fw('DEFINE(' + coord(bus.name, msg.name, frame.name, prefix=False) + ')\n')
                 else:
