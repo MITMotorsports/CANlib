@@ -26,6 +26,10 @@ def write(can, computers, output_path=computer_dir_path):
         header_name = '_CAN_LIBRARY_{}_H'.format(computer.name.upper())
         f_path = os.path.join(output_path, 'canlib_{}.h'.format(computer.name))
 
+        if not ('can' in computer.participation['name'].keys()):
+            # This computer neither sends nor recieves can messagess
+            continue
+
         with open(f_path, 'w') as f:
             fw = f.write
 
@@ -37,6 +41,14 @@ def write(can, computers, output_path=computer_dir_path):
             fw('#include "structs.h"\n')
             fw('#include "static_can.h"\n')
             fw('#include "CANlib.h"\n\n')
+
+            for assigned_name, periph_name in computer.participation['name']['can'].mapping.items():
+                if assigned_name in computer.participation['name']['can'].publish.keys():
+                    fw('#define USING_{}\n'.format(periph_name))
+                elif assigned_name in computer.participation['name']['can'].subscribe.keys():
+                    fw('#define USING_{}\n'.format(periph_name))
+
+            fw('\n')
 
             # Helper functions to be used recursively
             def declare_pub_frame(frame, name_prepends):
