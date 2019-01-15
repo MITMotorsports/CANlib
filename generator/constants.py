@@ -11,6 +11,10 @@ from pint import UnitRegistry as UR
 
 
 def get_ms(period_str):
+    if type(period_str) is int:
+        # If it's set as an integer, assume ms
+        return period_str
+
     ur = UR()
     t = int(''.join([s for s in period_str if s.isdigit()]))
     units = ''.join([s for s in period_str if s.isalpha()])
@@ -38,16 +42,37 @@ def write(can, output_path=constants_path):
             ('period', 'define', get_ms),
         )
 
+        optional_props = {'period'}
+
         for bus in can.bus:
             for attrnm, form, transform in props:
                 finalnm = attrnm
-
                 for msg in bus.frame:
                     if is_multplxd(msg):
                         for frame in msg.frame:
-                            attr = transform(getattr(frame, attrnm))
+                            try:
+                                attr = getattr(msg, attrnm)
+                            except AttributeError as e:
+                                if not attrnm in optional_props:
+                                    raise e
+                            if attr is None:
+                                if attrnm in optional_props:
+                                    continue
+                                else:
+                                    raise AttributeError('{} missing required attribute {}'.format(msg.name, attrnm))
+                            attr = transform(attr)
                             fw(templ[form].format(coord(bus.name, msg.name, frame.name, finalnm), attr))
-                    attr = transform(getattr(msg, attrnm))
+                    try:
+                        attr = getattr(msg, attrnm)
+                    except AttributeError as e:
+                        if not attrnm in optional_props:
+                            raise e
+                    if attr is None:
+                        if attrnm in optional_props:
+                            continue
+                        else:
+                            raise AttributeError('{} missing required attribute {}'.format(msg.name, attrnm))
+                    attr = transform(attr)
                     fw(templ[form].format(coord(bus.name, msg.name, finalnm), attr))
 
         fw(endif(header_name))
