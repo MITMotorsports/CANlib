@@ -102,7 +102,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
                     '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring, {}, {});\n'.format(key_size, key_name, frame.slice.start, frame.slice.length) + '\t' * (num_tabs + 1) + 'switch(' + key_name + ') {' '\n'
                 )
 
-                name_prepends = '_'.join([name_prepends, frame.name])
+                name_prepends += '_' + frame.name
 
                 for sub_frame in frame.frame:
                     if is_multplxd(sub_frame):

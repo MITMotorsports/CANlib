@@ -45,16 +45,10 @@ def write(can, output_path=constants_path):
                 for msg in bus.frame:
                     if is_multplxd(msg):
                         for frame in msg.frame:
-                            try:
-                                attr = transform(getattr(frame, attrnm))
-                                fw(templ[form].format(coord(bus.name, msg.name, frame.name, finalnm), attr))
-                            except AttributeError:
-                                pass
-                    try:
-                        attr = transform(getattr(msg, attrnm))
-                        fw(templ[form].format(coord(bus.name, msg.name, finalnm), attr))
-                    except AttributeError:
-                        pass
+                            attr = transform(getattr(frame, attrnm))
+                            fw(templ[form].format(coord(bus.name, msg.name, frame.name, finalnm), attr))
+                    attr = transform(getattr(msg, attrnm))
+                    fw(templ[form].format(coord(bus.name, msg.name, finalnm), attr))
 
         fw(endif(header_name))
 
