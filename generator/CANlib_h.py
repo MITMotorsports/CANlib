@@ -51,7 +51,7 @@ def write(can, output_path=can_lib_h_path):
 
             for msg in bus.frame:
                 if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
-                    for frame in msg. frame:
+                    for frame in msg.frame:
                         fw(templ['enum'].format(coord(bus.name, msg.name, frame.name), idx))
                         idx += 1
                 else:
