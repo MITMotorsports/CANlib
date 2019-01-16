@@ -51,6 +51,14 @@ def is_multplxd(frame):
     return isinstance(frame, ParseCAN.spec.bus.MultiplexedFrame)
 
 
+def frame_handler(frame, name_prepends, func, *args):
+    if is_multplxd(frame):
+        for sub_frame in frame.frame:
+            frame_handler(sub_frame, name_prepends + '_' + frame.name, func, *args)
+    else:
+        tot_name = name_prepends + '_' + frame.name
+        func(frame, tot_name, *args)
+
 '''A template dict to define assignment within a `key`.'''
 templ = {
     'enum': '\t{} = {},\n',

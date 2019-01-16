@@ -103,6 +103,7 @@ def write(can, computers, output_path=computer_h_dir_path):
                     for frame in bus:
                         declare_sub_frame(frame, bus_name)
                         fw('\n')
+                fw('void update_can(void);\n')
             except KeyError:
                 pass # No CAN messages received by this board
 

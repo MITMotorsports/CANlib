@@ -7,7 +7,7 @@ import sys
 sys.path.append("ParseCAN")
 import os
 import ParseCAN
-from common import computer_c_dir_path, coord, templ, ifndef, endif, is_multplxd
+from common import computer_c_dir_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
 
 def handle_frame(frame, bus_name, fw):
     fw(coor())
@@ -40,7 +40,8 @@ def write(can, computers, output_path=computer_c_dir_path):
 
         with open(f_path, 'w') as f:
             fw = f.write
-            fw('#include "CANlib.h"\n\n')
+            fw('#include "CANlib.h"\n')
+            fw('#include "canlib_{}.h"\n\n'.format(computer.name))
             fw(
               'CAN_Raw_Bus_T CANlib_get_raw_bus(CANlib_Bus_T bus) {\n'
               '\tswitch (bus) {\n'
@@ -51,7 +52,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             fw('\t}\n}\n\n')
 
-            for busnm in computer.participation['name']['can'].subscribe.keys():
+            for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
                     'static void update_can_{}(void)'.format(busnm) + '{\n' +
                     '\tFrame frame;\n' +
@@ -61,13 +62,19 @@ def write(can, computers, output_path=computer_c_dir_path):
                     '\tCANlib_{}_T msgForm = CANlib_Identify_{}(&frame);\n\n'.format(busnm, busnm) +
                     '\tswitch(msgForm) {\n'
                 )
-                # for raw_bus in raw_buses:
-                #     fw(
-                #         '\t\tcase {}:\n'.format(raw_bus) +
-                #         '\t\t\tCANlib_ReadFrame(&frame, {});\n'.format(raw)
-                #     )
+
+                def msg_handler(frame, tot_name, num_tabs, *args):
+                    fw(
+                        '\t' * num_tabs + 'case CANlib_{}:\n'.format(tot_name) +
+                        '\t' * (num_tabs + 1) + 'handle_{}_msg(&frame);\n'.format(tot_name) +
+                        '\t' * (num_tabs + 1) + 'break;\n'
+                    )
+
+                for msg in bus:
+                    frame_handler(msg, busnm, msg_handler, 2)
+
                 fw(
-                    '}\n\n'
+                    '\t}\n}\n\n'
                 )
 
             fw('void update_can() {\n')

@@ -40,7 +40,7 @@ def write(can, output_path=send_recieve_path):
                 tot_name = coord(name_prepends, frame.name,
                     prefix=False)
                 fw('void handle_{}_msg(Frame *frame)'.format(
-                   tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(&{}_inp, frame);\n'.format(tot_name, tot_name) + '}\n\n')
+                   tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(frame, &{}_inp);\n'.format(tot_name, tot_name) + '}\n\n')
         
         def declare_struct(frame, name_prepends):
                 if is_multplxd(frame):
