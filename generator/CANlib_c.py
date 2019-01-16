@@ -245,6 +245,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             for msg in bus.frame:
                 if is_multplxd(msg):
                     for frame in msg.frame:
-                            fw('DEFINE(' + coord(bus.name, msg.name, frame.name, prefix=False) + ')\n')
+                            fw('DEFINE(' + coord(bus.name, msg.name, frame.name, prefix=False) +
+                              ', ' + bus.name + ')\n')
                 else:
-                    fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')
+                    fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ', ' + bus.name + ')\n')

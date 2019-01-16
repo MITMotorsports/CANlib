@@ -5,6 +5,7 @@
 #include "driver.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "bus.h"
 
 #define CAN_PACK(name) \
   void CANlib_Pack_ ## name(CANlib_ ## name ## _T *type_in, Frame *can_out)
@@ -17,11 +18,11 @@
   CAN_PACK(name); \
   CAN_UNPACK(name);
 
-#define DEFINE(name) \
+#define DEFINE(name, busnm) \
   CANlib_Transmit_Error_T CANlib_Transmit_ ## name(CANlib_ ## name ## _T *type) { \
     Frame frame; \
     CANlib_Pack_ ## name(type, &frame); \
-    return CANlib_TransmitFrame(&frame); \
+    return CANlib_TransmitFrame(&frame, busnm); \
   }
 
 #define LIMIT(name)                                         \

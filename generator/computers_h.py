@@ -7,14 +7,14 @@ import sys
 sys.path.append("ParseCAN")
 import os
 import ParseCAN
-from common import computer_dir_path, coord, templ, ifndef, endif, is_multplxd
+from common import computer_h_dir_path, coord, templ, ifndef, endif, is_multplxd
 
 def handle_frame(frame, bus_name, fw):
     fw(coor())
 
-def write(can, computers, output_path=computer_dir_path):
+def write(can, computers, output_path=computer_h_dir_path):
     '''
-    Generate constants.h file, which has CAN IDs and enum values.
+    Generate computer header files.
 
     :param output_path: file to be written to
     :param can: CAN spec
@@ -66,8 +66,10 @@ def write(can, computers, output_path=computer_dir_path):
                     for sub_frame in frame.frame:
                         declare_sub_frame(sub_frame, name_prepends + '_' + frame.name)
                 else:
-                    tot_name = coord(name_prepends, frame.name)
-                    fw('extern {}_T inp;\n'.format(
+                    tot_name = coord(name_prepends, frame.name, prefix=False)
+                    fw('extern CANlib_{}_T {}_inp;\n'.format(
+                        tot_name, tot_name))
+                    fw('void handle_{}_msg(Frame *frame);\n'.format(
                         tot_name, tot_name))
             
             def write_struct(frame, name_prepends):

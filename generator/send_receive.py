@@ -32,7 +32,34 @@ def write(can, output_path=send_recieve_path):
                     tot_name, tot_name) + ' {\n' +
                     '\tLIMIT(CANlib_{});\n\tCANlib_Transmit_{}(inp);\n'.format(tot_name, tot_name) + '}\n\n')
 
+        def define_sub_frame(frame, name_prepends):
+            if is_multplxd(frame):
+                for sub_frame in frame.frame:
+                    define_sub_frame(sub_frame, name_prepends + '_' + frame.name)
+            else:
+                tot_name = coord(name_prepends, frame.name,
+                    prefix=False)
+                fw('void handle_{}_msg(Frame *frame)'.format(
+                   tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(&{}_inp, frame);\n'.format(tot_name, tot_name) + '}\n\n')
+        
+        def declare_struct(frame, name_prepends):
+                if is_multplxd(frame):
+                    for sub_frame in frame.frame:
+                        declare_struct(sub_frame, name_prepends + '_' + frame.name)
+                else:
+                    tot_name = coord(name_prepends, frame.name, prefix=False)
+                    fw('CANlib_{}_T {}_inp;\n'.format(
+                        tot_name, tot_name))
+
+        for bus in can.bus:
+            for msg in bus.frame:
+                declare_struct(msg, bus.name)
+        fw('\n')
+
         for bus in can.bus:
             for msg in bus.frame:
                 define_pub_frame(msg, bus.name)
+                define_sub_frame(msg, bus.name)
+        fw('\n')
+
 
