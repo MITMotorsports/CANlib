@@ -29,8 +29,13 @@ def write(can, output_path=send_recieve_path):
                 tot_name = coord(name_prepends, frame.name,
                     prefix=False)
                 fw('void send_{}_msg(CANlib_{}_T *inp)'.format(
-                    tot_name, tot_name) + ' {\n' +
-                    '\tLIMIT(CANlib_{});\n\tCANlib_Transmit_{}(inp);\n'.format(tot_name, tot_name) + '}\n\n')
+                    tot_name, tot_name) + ' {\n'
+                )
+
+                if frame.period is not None:
+                    fw('\tLIMIT(CANlib_{});\n'.format(tot_name))
+
+                fw('\tCANlib_Transmit_{}(inp);\n'.format(tot_name, tot_name) + '}\n\n')
 
         def define_sub_frame(frame, name_prepends):
             if is_multplxd(frame):
