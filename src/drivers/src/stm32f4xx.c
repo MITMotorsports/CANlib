@@ -39,27 +39,22 @@ HAL_StatusTypeDef CANlib_Init(uint32_t baudrate) {
   filter.FilterActivation = ENABLE;
   filter.SlaveStartFilterBank = 0;
 
-  #if defined(USING_CAN_1) || defined(USING_CAN_2)
   // We need to initialize CAN1 regardless of wheter we are using CAN1 or CAN2
   can1.Instance = CAN1;
   config_handle_parameters(&can1);
   HAL_CAN_Init(&can1);
   HAL_CAN_ConfigFilter(&can1, &filter);
   HAL_CAN_Start(&can1);
-  #endif
-  #ifdef USING_CAN_2
   can2.Instance = CAN2;
   config_handle_parameters(&can2);
   HAL_CAN_Init(&can2);
   HAL_CAN_ConfigFilter(&can2, &filter);
   HAL_CAN_Start(&can2);
-  #elif defined(USING_CAN_3)
   can3.Instance = CAN3;
   config_handle_parameters(&can3);
   HAL_CAN_Init(&can3);
   HAL_CAN_ConfigFilter(&can3, &filter);
   HAL_CAN_Start(&can3);
-  #endif
 }
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
