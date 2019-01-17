@@ -11,7 +11,6 @@ typedef uint32_t Time_T; // in ms
 typedef HAL_StatusTypeDef CANlib_Transmit_Error_T;
 typedef HAL_StatusTypeDef CANlib_Init_Error_T;
 
-HAL_StatusTypeDef CANlib_Init(uint32_t baudrate);
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
 
 #endif // __STM32F4XX_CAN_H
