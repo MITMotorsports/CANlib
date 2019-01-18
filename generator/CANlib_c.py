@@ -18,6 +18,91 @@ def swap_endianness_fn(type: Type):
 
     return 'swap_' + type.type
 
+
+def write_atoms_unpack(fw, atoms, tot_name):
+    for atom in atoms:
+        if atom.type.isenum():
+            enum_name = coord(tot_name, atom.name) + '_T'
+
+            fw(
+                '\t' 'type_out->' + atom.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
+                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
+            )
+        elif atom.type.type == 'bool':
+            fw(
+                '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
+                str(atom.slice.length) + ');' '\n'
+            )
+        else:
+            if atom.type.endianness == Endianness.LITTLE:
+                fw(
+                    '\t' 'type_out->' + atom.name + ' = ' + swap_endianness_fn(atom.type) +
+                    '(EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
+                    str(atom.slice.length) + '));' '\n'
+                )
+            else:
+                if atom.type.issigned():
+                    fw(
+                        '\t' 'type_out->' + atom.name + ' = SIGN(EXTRACT(bitstring, ' +
+                        str(atom.slice.start) + ', ' + str(atom.slice.length) + '), ' +
+                        str(atom.slice.length) + ');' '\n'
+                    )
+                else:
+                    fw(
+                        '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
+                        str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
+                    )
+
+
+def write_can_unpack(frame, name_prepends, fw, *args):
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw(
+        'CAN_UNPACK(' + tot_name + ') {' '\n'
+        '\t' 'uint64_t bitstring = 0;' '\n'
+        '\t' 'to_bitstring(can_in->data, &bitstring);\n'
+    )
+
+    write_atoms_unpack(fw, frame.atom, tot_name)
+
+    fw('}' '\n\n')
+
+
+def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw, *args):
+    fw('CAN_PACK(' + coord(name_prepends, frame.name, prefix=False) + ') {' '\n'
+        '\t' 'uint64_t bitstring = 0;' '\n'
+    )
+
+    write_atoms_pack(fw, frame.atom)
+
+    length = max(atom.slice.start + atom.slice.length for atom in frame.atom)
+
+    fw(
+        '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
+    )
+    if (is_multplxd):
+        fw('\t' 'can_out->id = {}_key;'.format(coord(name_prepends)) + '\n')
+    fw(
+        '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
+        '\t' 'can_out->extended = ' + str(bus_ext).lower() + ';' '\n'
+        '}' '\n\n'
+    )
+
+
+def write_atoms_pack(fw, atoms):
+    for atom in atoms:
+        # HACK/TODO: This is assuming big endian systems that run CANlib
+        if atom.type.endianness == Endianness.LITTLE:
+            fw(
+                '\t' 'bitstring = INSERT(' + swap_endianness_fn(atom.type) + '(type_in->' + atom.name + '), bitstring, ' +
+                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n\n'
+            )
+        else:
+            fw(
+                '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
+                ', ' + str(atom.slice.length) + ');' '\n'
+            )
+
+
 def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
     '''
     Generate Can_Libary.c file.
@@ -37,47 +122,6 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             f.writelines(lines)
 
         fw('\n')
-
-        # Write init functions
-        if False:  # TODO: Restore
-            for board in can.board:
-                if board.arch:  # Means it's a board we program
-                    for bus in board.subscribe:
-                        fw('CANlib_Init_Error_T CANlib_Init_{}(void) '.format(coord(bus.name, board.name, prefix=False)) + '{' '\n')
-                        fw('\t' 'CANlib_Init({});\n'.format(coord(bus.baudrate, prefix=False)))
-
-                        max_id = max(msg.id for msg in bus.frame)
-
-                        # Find mask
-                        # The way hardware filtering works is that incoming IDs are
-                        # ANDed with the mask and then compared with a preset ID
-                        # The goal of this mask is to throw away most higher ID (i.e.,
-                        # lower priority) frame
-                        mask = 2**(floor(log2(max_id)) + 1) - 1
-                        # On a standard bus, IDs are 11 bit
-                        max_possible_id = 2**11-1
-                        if bus.is_extended:
-                            # On an extended bus, IDs are 29 bit
-                            max_possible_id = 2**29-1
-                        mask = mask ^ max_possible_id
-
-                        # Set mask (pass in binary to make file more readable)
-                        fw('\t' 'CANlib_SetFilter(' + hex(mask) + ', 0);' '\n')
-
-                        # Finish up
-                        fw('}' '\n\n')
-
-                # We still need to create init functions for board that publish
-                # on a bus but don't subscribe
-                # Filtering doesn't matter here
-                for bus in board.publish:
-                    if bus.name not in board.subscribe.name:
-                        fw(
-                            'void CANlib_Init_' + coord(bus.name, board.name) +
-                            '(void) {' '\n'
-                        )
-                        fw('\t' 'CANlib_Init({});\n'.format(bus.baudrate))
-                        fw('}' '\n\n')
 
         for bus in can.bus:
             # Write switch statement
@@ -130,91 +174,9 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
         for bus in can.bus:
             for msg in bus.frame:
-                # Write CAN_PACK
-                def write_atoms_pack(atoms):
-                    for atom in atoms:
-                        # HACK/TODO: This is assuming big endian systems that run CANlib
-                        if atom.type.endianness == Endianness.LITTLE:
-                            fw(
-                                '\t' 'bitstring = INSERT(' + swap_endianness_fn(atom.type) + '(type_in->' + atom.name + '), bitstring, ' +
-                                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n\n'
-                            )
-                        else:
-                            fw(
-                                '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
-                                ', ' + str(atom.slice.length) + ');' '\n'
-                            )
+                frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg), bus.extended, fw)
 
-                def write_can_pack(frame, name_prepends, is_multplxd, *args):
-                    fw('CAN_PACK(' + coord(name_prepends, frame.name, prefix=False) + ') {' '\n'
-                        '\t' 'uint64_t bitstring = 0;' '\n'
-                    )
-
-                    write_atoms_pack(frame.atom)
-
-                    length = max(atom.slice.start + atom.slice.length for atom in frame.atom)
-
-                    fw(
-                        '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
-                    )
-                    if (is_multplxd):
-                        fw('\t' 'can_out->id = {}_key;'.format(coord(name_prepends)) + '\n')
-                    fw(
-                        '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
-                        '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
-                        '}' '\n\n'
-                    )
-                
-                frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg))
-
-
-                # Write CAN_UNPACK
-                def write_atoms_unpack(atoms):
-                    for atom in atoms:
-                        if atom.type.isenum():
-                            enum_name = coord(bus.name, msg.name, atom.name) + '_T'
-
-                            fw(
-                                '\t' 'type_out->' + atom.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
-                                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
-                            )
-                        elif atom.type.type == 'bool':
-                            fw(
-                                '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
-                                str(atom.slice.length) + ');' '\n'
-                            )
-                        else:
-                            if atom.type.endianness == Endianness.LITTLE:
-                                fw(
-                                    '\t' 'type_out->' + atom.name + ' = ' + swap_endianness_fn(atom.type) +
-                                    '(EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
-                                    str(atom.slice.length) + '));' '\n'
-                                )
-                            else:
-                                if atom.type.issigned():
-                                    fw(
-                                        '\t' 'type_out->' + atom.name + ' = SIGN(EXTRACT(bitstring, ' +
-                                        str(atom.slice.start) + ', ' + str(atom.slice.length) + '), ' +
-                                        str(atom.slice.length) + ');' '\n'
-                                    )
-                                else:
-                                    fw(
-                                        '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
-                                        str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
-                                    )
-
-                def write_can_unpack(frame, name_prepends, *args):
-                    fw(
-                        'CAN_UNPACK(' + coord(name_prepends, frame.name, prefix=False) + ') {' '\n'
-                        '\t' 'uint64_t bitstring = 0;' '\n'
-                        '\t' 'to_bitstring(can_in->data, &bitstring);\n'
-                    )
-
-                    write_atoms_unpack(frame.atom)
-
-                    fw('}' '\n\n')
-
-                frame_handler(msg, bus.name, write_can_unpack)
+                frame_handler(msg, bus.name, write_can_unpack, fw)
 
         # Write DEFINE statements
         for bus in can.bus:
