@@ -49,14 +49,22 @@ def write(can, output_path=can_lib_h_path):
         for bus in can.bus:
             fw('typedef enum {\n')
 
+            # First frame needs to start at 2, the rest will follow
+            first_frame = True
             for msg in bus.frame:
                 if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
                     for frame in msg.frame:
-                        fw(templ['enum'].format(coord(bus.name, msg.name, frame.name), idx))
-                        idx += 1
+                        fw('\t' + coord(bus.name, msg.name, frame.name))
+                        if first_frame:
+                            fw(' = 2')
+                        first_frame = False
+                        fw(',\n')
                 else:
-                    fw(templ['enum'].format(coord(bus.name, msg.name), idx))
-                    idx += 1
+                    fw('\t' + coord(bus.name, msg.name))
+                    if first_frame:
+                        fw(' = 2')
+                    first_frame = False
+                    fw(',\n')
 
             fw('} ' + '{}_T;\n\n'.format(coord(bus.name)))
 

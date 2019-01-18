@@ -89,17 +89,17 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
             def single_handler(frame, name_prepends, num_tabs):
                 fw(
-                    '\t' * num_tabs + 'case {}_key'.format(coord(name_prepends, frame.name)) + '\n' +
+                    '\t' * num_tabs + 'case {}_key:'.format(coord(name_prepends, frame.name)) + '\n' +
                     '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(name_prepends, frame.name))
                 )
 
             def multplxd_handler(frame, name_prepends, num_tabs):
                 fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
                 key_size = ceil(frame.slice.length / 8) * 8
+                key_name = '_'.join([name_prepends,frame.name, 'key'])
                 fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
                 fw(
-                    '\t' * (num_tabs + 1) + 'uint{}_t key = EXTRACT(bitstring, {}, {});\n'.format(key_size, frame.slice.start, frame.slice.length) +
-                    '\t' * (num_tabs + 1) + 'switch(key) {' '\n'
+                    '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring, {}, {});\n'.format(key_size, key_name, frame.slice.start, frame.slice.length) + '\t' * (num_tabs + 1) + 'switch(' + key_name + ') {' '\n'
                 )
 
                 name_prepends += '_' + frame.name
