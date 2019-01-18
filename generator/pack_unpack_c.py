@@ -131,65 +131,6 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
         fw('\n')
 
         for bus in can.bus:
-            # Write switch statement
-            # This is difficult to make properly recursive before we want
-            # multiplexed messages to be treated more differently
-            fw((
-                '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name),
-                    coord(bus.name, prefix=False)) + '{' '\n'
-                '\t' 'uint64_t bitstring = 0;' '\n'
-                '\t' 'switch(frame->id) {' '\n'
-            ))
-
-            def switch_single_handler(frame, name_prepends, num_tabs):
-                fw(
-                    '\t' * num_tabs + 'case {}_key:'.format(coord(
-                        name_prepends, frame.name)) + '\n' +
-                    '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(
-                        name_prepends, frame.name))
-                )
-
-            def switch_multplxd_handler(frame, name_prepends, num_tabs):
-                fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(
-                    name_prepends, frame.name)))
-                key_size = ceil(frame.slice.length / 8) * 8
-                key_name = '_'.join([name_prepends,frame.name, 'key'])
-                fw('\t' * (num_tabs + 1) +
-                    'to_bitstring(frame->data, &bitstring);' '\n')
-                key_name = '_'.join([name_prepends,frame.name, 'key'])
-                fw(
-                    '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring,'
-                    ' {}, {});\n'.format(key_size, key_name, frame.slice.start,
-                        frame.slice.length) + '\t' * (num_tabs + 1) + 
-                    'switch(' + key_name + ') {' '\n'
-                )
-
-                name_prepends += '_' + frame.name
-
-                for sub_frame in frame.frame:
-                    if is_multplxd(sub_frame):
-                        switch_multplxd_handler(sub_frame, name_prepends, num_tabs + 2)
-                    else:
-                        switch_single_handler(sub_frame, name_prepends, num_tabs + 2)
-                fw(
-                    '\t' * (num_tabs + 2) + 'default:\n' +
-                    '\t' * (num_tabs + 3) + 'return CAN_UNKNOWN_MSG;\n' +
-                    '\t' * (num_tabs + 1) + '}\n'
-                )
-
-            for msg in bus.frame:
-                if is_multplxd(msg):
-                    switch_multplxd_handler(msg, bus.name, 2)
-                else:
-                    switch_single_handler(msg, bus.name, 2)
-            fw(
-                '\t' '\t' 'default:' '\n'
-                '\t' '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
-                '\t' '}' '\n'
-                '}' '\n\n'
-            )
-
-        for bus in can.bus:
             for msg in bus.frame:
                 frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg),
                     bus.extended, fw)

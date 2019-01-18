@@ -59,14 +59,13 @@ def write(can, computers, output_path=computer_c_dir_path):
                     #'\tCAN_Raw_Bus_T raw_bus = CANlib_get_raw_bus({})\n'.format(busnm) +
                     '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
                     #'\tswitch(raw_bus) {\n'
-                    '\tCANlib_{}_T msgForm = CANlib_Identify_{}(&frame);\n\n'.format(busnm, busnm) +
-                    '\tswitch(msgForm) {\n'
+                    '\tswitch(frame.id) {\n'
                 )
 
                 def msg_handler(frame, name_prepends, num_tabs, *args):
                     tot_name = name_prepends + '_' + frame.name
                     fw(
-                        '\t' * num_tabs + 'case CANlib_{}:\n'.format(tot_name) +
+                        '\t' * num_tabs + 'case CANlib_{}_key:\n'.format(tot_name) +
                         '\t' * (num_tabs + 1) + 'handle_{}_msg(&frame);\n'.format(tot_name) +
                         '\t' * (num_tabs + 1) + 'break;\n'
                     )
