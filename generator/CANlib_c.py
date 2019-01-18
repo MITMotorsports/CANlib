@@ -103,6 +103,10 @@ def write_atoms_pack(fw, atoms):
             )
 
 
+def write_define(frame, name_prepends, busnm, fw):
+    fw('DEFINE(' + coord(name_prepends, frame.name, prefix=False) + ', ' + busnm + ')\n')
+
+
 def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
     '''
     Generate Can_Libary.c file.
@@ -125,35 +129,45 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
         for bus in can.bus:
             # Write switch statement
+            # This is difficult to make properly recursive before we want
+            # multiplexed messages to be treated more differently
             fw((
-                '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name), coord(bus.name, prefix=False)) + '{' '\n'
+                '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name),
+                    coord(bus.name, prefix=False)) + '{' '\n'
                 '\t' 'uint64_t bitstring = 0;' '\n'
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
-            def single_handler(frame, name_prepends, num_tabs):
+            def switch_single_handler(frame, name_prepends, num_tabs):
                 fw(
-                    '\t' * num_tabs + 'case {}_key:'.format(coord(name_prepends, frame.name)) + '\n' +
-                    '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(name_prepends, frame.name))
+                    '\t' * num_tabs + 'case {}_key:'.format(coord(
+                        name_prepends, frame.name)) + '\n' +
+                    '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(
+                        name_prepends, frame.name))
                 )
 
-            def multplxd_handler(frame, name_prepends, num_tabs):
-                fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
+            def switch_multplxd_handler(frame, name_prepends, num_tabs):
+                fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(
+                    name_prepends, frame.name)))
                 key_size = ceil(frame.slice.length / 8) * 8
                 key_name = '_'.join([name_prepends,frame.name, 'key'])
-                fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
+                fw('\t' * (num_tabs + 1) +
+                    'to_bitstring(frame->data, &bitstring);' '\n')
                 key_name = '_'.join([name_prepends,frame.name, 'key'])
                 fw(
-                    '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring, {}, {});\n'.format(key_size, key_name, frame.slice.start, frame.slice.length) + '\t' * (num_tabs + 1) + 'switch(' + key_name + ') {' '\n'
+                    '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring,'
+                    ' {}, {});\n'.format(key_size, key_name, frame.slice.start,
+                        frame.slice.length) + '\t' * (num_tabs + 1) + 
+                    'switch(' + key_name + ') {' '\n'
                 )
 
                 name_prepends += '_' + frame.name
 
                 for sub_frame in frame.frame:
                     if is_multplxd(sub_frame):
-                        multplxd_handler(sub_frame, name_prepends, num_tabs + 2)
+                        switch_multplxd_handler(sub_frame, name_prepends, num_tabs + 2)
                     else:
-                        single_handler(sub_frame, name_prepends, num_tabs + 2)
+                        switch_single_handler(sub_frame, name_prepends, num_tabs + 2)
                 fw(
                     '\t' * (num_tabs + 2) + 'default:\n' +
                     '\t' * (num_tabs + 3) + 'return CAN_UNKNOWN_MSG;\n' +
@@ -162,9 +176,9 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
             for msg in bus.frame:
                 if is_multplxd(msg):
-                    multplxd_handler(msg, bus.name, 2)
+                    switch_multplxd_handler(msg, bus.name, 2)
                 else:
-                    single_handler(msg, bus.name, 2)
+                    switch_single_handler(msg, bus.name, 2)
             fw(
                 '\t' '\t' 'default:' '\n'
                 '\t' '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
@@ -174,16 +188,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
 
         for bus in can.bus:
             for msg in bus.frame:
-                frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg), bus.extended, fw)
-
+                frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg),
+                    bus.extended, fw)
                 frame_handler(msg, bus.name, write_can_unpack, fw)
-
-        # Write DEFINE statements
-        for bus in can.bus:
-            for msg in bus.frame:
-                if is_multplxd(msg):
-                    for frame in msg.frame:
-                            fw('DEFINE(' + coord(bus.name, msg.name, frame.name, prefix=False) +
-                              ', ' + bus.name + ')\n')
-                else:
-                    fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ', ' + bus.name + ')\n')
+                frame_handler(msg, bus.name, write_define, bus.name, fw)
