@@ -1,25 +1,20 @@
-'''
-Generate all of the headers in the computers directory.
-Run this file (with the spec path as a command line argument) to write just
-these files or main.py to write all files.
-'''
 import sys
 sys.path.append("ParseCAN")
 import os
 import ParseCAN
-from common import computer_c_dir_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
+from common import computer_c_dir_path, coord, templ, ifndef, endif, frame_handler
 
-def handle_frame(frame, bus_name, fw):
-    fw(coor())
+
+def msg_handler(frame, name_prepends, num_tabs, fw):
+    tot_name = name_prepends + '_' + frame.name
+    fw(
+        '\t' * num_tabs + 'case CANlib_{}_key:\n'.format(tot_name) +
+        '\t' * (num_tabs + 1) + 'handle_{}_msg(&frame);\n'.format(tot_name) +
+        '\t' * (num_tabs + 1) + 'break;\n'
+    )
+
 
 def write(can, computers, output_path=computer_c_dir_path):
-    '''
-    Generate computer c files
-
-    :param output_path: file to be written to
-    :param can: CAN spec
-    '''
-
     os.makedirs(output_path, exist_ok=True)
 
     raw_buses = set()
@@ -62,16 +57,8 @@ def write(can, computers, output_path=computer_c_dir_path):
                     '\tswitch(frame.id) {\n'
                 )
 
-                def msg_handler(frame, name_prepends, num_tabs, *args):
-                    tot_name = name_prepends + '_' + frame.name
-                    fw(
-                        '\t' * num_tabs + 'case CANlib_{}_key:\n'.format(tot_name) +
-                        '\t' * (num_tabs + 1) + 'handle_{}_msg(&frame);\n'.format(tot_name) +
-                        '\t' * (num_tabs + 1) + 'break;\n'
-                    )
-
                 for msg in bus:
-                    frame_handler(msg, busnm, msg_handler, 2)
+                    frame_handler(msg, busnm, msg_handler, 2, fw)
 
                 fw(
                     '\t}\n}\n\n'

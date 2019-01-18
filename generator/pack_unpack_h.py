@@ -1,10 +1,10 @@
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
-from common import can_lib_h_path, templ, coord, ifndef, endif, is_multplxd, frame_handler
+from common import can_lib_h_path, templ, coord, ifndef, endif, frame_handler
 
 
-def write_declare(frame, name_prepends, fw, *args):
+def write_declare(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw (
         'CANlib_Transmit_Error_T CANlib_Transmit_{}'.format(tot_name) +
@@ -34,7 +34,7 @@ def write(can, output_path=can_lib_h_path):
             '#include "structs.h"\n'
         )
 
-        # Write DECLARE statements
+        # Declare
         for bus in can.bus:
             for msg in bus.frame:
                 frame_handler(msg, bus.name, write_declare, fw)

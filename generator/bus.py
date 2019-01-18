@@ -1,12 +1,7 @@
-'''
-Generate constants.h file.
-Run this file (with the spec path as a command line argument) to write just
-constants.h or main.py to write all files.
-'''
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import bus_path, coord, templ, ifndef, endif, is_multplxd
+from common import bus_path, coord, templ, ifndef, endif
 from pint import UnitRegistry as UR
 
 

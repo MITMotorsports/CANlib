@@ -1,8 +1,3 @@
-'''
-Generate Can_Libary.c file.
-Run this file (with the spec path as a command line argument) to write just
-Can_Libary.c or main.py to write all files.
-'''
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
@@ -54,7 +49,7 @@ def write_atoms_unpack(fw, atoms, tot_name):
                     )
 
 
-def write_can_unpack(frame, name_prepends, fw, *args):
+def write_can_unpack(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         'void CANlib_Unpack_' + tot_name +'(Frame *can_in, CANlib_' + tot_name +
@@ -68,7 +63,7 @@ def write_can_unpack(frame, name_prepends, fw, *args):
     fw('}' '\n\n')
 
 
-def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw, *args):
+def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         'void CANlib_Pack_' + tot_name + '(CANlib_' + tot_name + '_T *type_in, Frame *can_out)'

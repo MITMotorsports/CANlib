@@ -1,7 +1,3 @@
-"""
-Generate all necessary files.
-Pass the spec_path as a command line argument.
-"""
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN

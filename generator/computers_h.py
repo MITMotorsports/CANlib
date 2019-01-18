@@ -1,25 +1,22 @@
-'''
-Generate all of the headers in the computers directory.
-Run this file (with the spec path as a command line argument) to write just
-these files or main.py to write all files.
-'''
 import sys
 sys.path.append("ParseCAN")
 import os
 import ParseCAN
-from common import computer_h_dir_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
+from common import computer_h_dir_path, coord, templ, ifndef, endif, frame_handler
 
-def handle_frame(frame, bus_name, fw):
-    fw(coor())
+
+def declare_pub_frame(frame, name_prepends, fw):
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw('void send_{}_msg(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
+
+
+def declare_sub_frame(frame, name_prepends, fw):
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw('extern CANlib_{}_T {}_inp;\n'.format(tot_name, tot_name))
+    fw('void handle_{}_msg(Frame *frame);\n'.format(tot_name, tot_name))
+
 
 def write(can, computers, output_path=computer_h_dir_path):
-    '''
-    Generate computer header files.
-
-    :param output_path: file to be written to
-    :param can: CAN spec
-    '''
-
     os.makedirs(output_path, exist_ok=True)
 
     for computer in computers:
@@ -50,36 +47,11 @@ def write(can, computers, output_path=computer_h_dir_path):
 
             fw('\n')
 
-            # Helper functions to be used recursively
-            def declare_pub_frame(frame, name_prepends, *args):
-                tot_name = coord(name_prepends, frame.name, prefix=False)
-                fw('void send_{}_msg(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
-            
-            def declare_sub_frame(frame, name_prepends, *args):
-                tot_name = coord(name_prepends, frame.name, prefix=False)
-                fw('extern CANlib_{}_T {}_inp;\n'.format(tot_name, tot_name))
-                fw('void handle_{}_msg(Frame *frame);\n'.format(tot_name, tot_name))
-            
-            def write_struct(frame, name_prepends):
-                if is_multplxd(frame):
-                    for sub_frame in frame.frame:
-                        write_struct(sub_frame, name_prepends + '_' + frame.name)
-                else:
-                    fw('typedef struct {\n')
-                    for atom in frame.atom:
-                        if atom.type.isenum():
-                            enum_name = coord(name_prepends, frame.name, atom.name) + '_T'
-                            fw('\t{} {};\n'.format(enum_name, atom.name))
-                        else:
-                            fw('\t{} {};\n'.format(atom.type.ctype(), atom.name))
-
-                    fw('} ' + '{}_T;\n\n'.format(coord(name_prepends, frame.name)))
-
             # Pub
             try:
                 for bus_name, bus in computer.participation['name']['can'].publish.items():
                     for frame in bus:
-                        frame_handler(frame, bus_name, declare_sub_frame)
+                        frame_handler(frame, bus_name, declare_sub_frame, fw)
             except KeyError:
                 pass # No CAN messages sent by this board
 
@@ -89,16 +61,11 @@ def write(can, computers, output_path=computer_h_dir_path):
             try:
                 for bus_name, bus in computer.participation['name']['can'].subscribe.items():
                     for frame in bus:
-                        frame_handler(frame, bus_name, declare_sub_frame)
+                        frame_handler(frame, bus_name, declare_sub_frame, fw)
                         fw('\n')
                 fw('void update_can(void);\n')
             except KeyError:
                 pass # No CAN messages received by this board
 
             fw(endif(header_name))
-
-
-
-
-    header_name = '_CAN_LIBRARY_CONSTANTS_H'
 

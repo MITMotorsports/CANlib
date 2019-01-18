@@ -53,6 +53,10 @@ def is_multplxd(frame):
 
 
 def frame_handler(frame, name_prepends, func, *args):
+    '''
+    Call func on frame if frame is single, otherwise call frame handler on its
+    sub frames (while properly handling names)
+    '''
     if is_multplxd(frame):
         for sub_frame in frame.frame:
             frame_handler(sub_frame, name_prepends + '_' + frame.name, func, *args)
