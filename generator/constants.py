@@ -1,7 +1,7 @@
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import constants_path, coord, templ, ifndef, endif, frame_handler
+from common import constants_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
 from pint import UnitRegistry as UR
 
 

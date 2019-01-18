@@ -28,10 +28,11 @@ def write(can, output_path=can_lib_h_path):
         # Includes
         fw(
             '#include <stdint.h>' '\n'
-            '#include <stdbool.h>' '\n'
+            '#include <stdbool.h>' '\n\n'
             '#include "static.h"' '\n'
             '#include "driver.h"\n'
-            '#include "structs.h"\n'
+            '#include "constants.h"\n'
+            '#include "structs.h"\n\n'
         )
 
         # Declare

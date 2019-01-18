@@ -24,7 +24,6 @@ def write(can, output_path=structs_path):
         fw(ifndef(header_name))
         fw('#include <stdint.h>\n')
         fw('#include <stdbool.h>\n\n')
-        fw('#include "constants.h"\n\n')
         fw('#include "enum_atom.h"\n\n')
 
         for bus in can.bus:

@@ -29,7 +29,6 @@ def write(can, output_path=enum_atom_path):
         fw = f.write
 
         fw(ifndef(header_name))
-        fw('#include "constants.h"\n\n')
 
         for bus in can.bus:
             for msg in bus.frame:

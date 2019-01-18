@@ -33,17 +33,12 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw(ifndef(header_name))
             fw('#include <stdint.h>\n')
             fw('#include <stdbool.h>\n\n')
+
             fw('#include "constants.h"\n')
             fw('#include "enum_atom.h"\n')
             fw('#include "structs.h"\n')
             fw('#include "static.h"\n')
             fw('#include "pack_unpack.h"\n\n')
-
-            for assigned_name, periph_name in computer.participation['name']['can'].mapping.items():
-                if assigned_name in computer.participation['name']['can'].publish.keys():
-                    fw('#define USING_{}\n'.format(periph_name))
-                elif assigned_name in computer.participation['name']['can'].subscribe.keys():
-                    fw('#define USING_{}\n'.format(periph_name))
 
             fw('\n')
 
