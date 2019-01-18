@@ -96,6 +96,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             def multplxd_handler(frame, name_prepends, num_tabs):
                 fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
                 key_size = ceil(frame.slice.length / 8) * 8
+                key_name = '_'.join([name_prepends,frame.name, 'key'])
                 fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
                 key_name = '_'.join([name_prepends,frame.name, 'key'])
                 fw(
