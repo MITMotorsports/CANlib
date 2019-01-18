@@ -29,8 +29,9 @@ def write(can, output_path=can_lib_h_path):
         fw(
             '#include <stdint.h>' '\n'
             '#include <stdbool.h>' '\n'
-            '#include "structs.h"' '\n'
-            '#include "static_can.h"' '\n\n'
+            '#include "static.h"' '\n'
+            '#include "driver.h"\n'
+            '#include "structs.h"\n'
         )
 
         # Write DECLARE statements

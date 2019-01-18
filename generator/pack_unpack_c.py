@@ -9,7 +9,7 @@ import ParseCAN
 from ParseCAN.spec import Endianness, Type
 
 from math import ceil, floor, log2
-from common import can_lib_c_path, can_lib_c_base_path, coord, is_multplxd, frame_handler
+from common import pack_unpack_c_path, pack_unpack_c_base_path, coord, is_multplxd, frame_handler
 
 
 def swap_endianness_fn(type: Type):
@@ -107,12 +107,20 @@ def write_atoms_pack(fw, atoms):
 
 
 def write_define(frame, name_prepends, busnm, fw):
-    fw('DEFINE(' + coord(name_prepends, frame.name, prefix=False) + ', ' + busnm + ')\n')
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw(
+        'CANlib_Transmit_Error_T CANlib_Transmit_' + tot_name + '(CANlib_' +
+        tot_name + '_T *type) {' +
+        '\tFrame frame;\n' +
+        '\tCANlib_Pack_' + tot_name + '(type, &frame);\n' +
+        '\treturn CANlib_TransmitFrame(&frame,' + busnm + ');\n'
+        '}'
+    )
 
 
-def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
+def write(can, output_path=pack_unpack_c_path, base_path=pack_unpack_c_base_path):
     '''
-    Generate Can_Libary.c file.
+    Generate pack_unpack.c file.
 
     :param output_path: file to be written to
     :param can: CAN spec

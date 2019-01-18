@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "can_raw.h"
+#include "static.h"
 
 #define TOGGLE(input, test, idx) \
   if (test) {\

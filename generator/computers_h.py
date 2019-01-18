@@ -39,7 +39,7 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('#include "constants.h"\n')
             fw('#include "enum_atom.h"\n')
             fw('#include "structs.h"\n')
-            fw('#include "static_can.h"\n')
+            fw('#include "static.h"\n')
             fw('#include "pack_unpack.h"\n\n')
 
             for assigned_name, periph_name in computer.participation['name']['can'].mapping.items():

@@ -1,10 +1,5 @@
 #include "evil_macros.h"
 
-typedef enum {
-  LITTLE,
-  BIG,
-} ENDIAN_T;
-
 typedef union {
   uint8_t byte[8];
   uint64_t bitstring;

@@ -1,7 +1,7 @@
 #ifndef __STM32F4XX_CAN_H
 #define __STM32F4XX_CAN_H
 
-#include "can_raw.h"
+#include "static.h"
 #include "stm32f4xx_hal.h"
 #include "bus.h"
 
