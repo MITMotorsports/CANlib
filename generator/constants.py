@@ -2,7 +2,7 @@ import sys
 sys.path.append("ParseCAN")
 import ParseCAN
 from common import constants_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
-from pint import UnitRegistry as UR
+from pint import UnitRegistry
 
 
 def get_ms(period_str):
@@ -10,12 +10,8 @@ def get_ms(period_str):
         # If it's set as an integer, assume ms
         return period_str
 
-    ur = UR()
-    t = int(''.join([s for s in period_str if s.isdigit()]))
-    units = ''.join([s for s in period_str if s.isalpha()])
-    units = ur[units]
-    t = t * units
-    return t.to('ms').magnitude
+    ur = UnitRegistry()
+    return ur[period_str].to('ms').magnitude
 
 
 def write(can, output_path=constants_path):

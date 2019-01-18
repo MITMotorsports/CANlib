@@ -10,19 +10,7 @@ extern CAN_HandleTypeDef can2;
 extern CAN_HandleTypeDef can3;
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
-  CAN_Raw_Bus_T raw_bus = CANlib_get_raw_bus(bus);
-  CAN_HandleTypeDef *hcan;
-  switch(raw_bus) {
-    case CAN_1:
-      hcan = &can1;
-      break;
-    case CAN_2:
-      hcan = &can2;
-      break;
-    case CAN_3:
-      hcan = &can3;
-      break;
-  }
+  CAN_Raw_Bus_T hcan = CANlib_GetRawBus(bus);
 
   CAN_TxHeaderTypeDef pHeader;
   uint32_t pTxMailbox = 0;
@@ -36,21 +24,9 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 }
 
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
-  CAN_Raw_Bus_T raw_bus = CANlib_get_raw_bus(bus);
-  CAN_HandleTypeDef *hcan;
-  switch(raw_bus) {
-    case CAN_1:
-      hcan = &can1;
-      break;
-    case CAN_2:
-      hcan = &can2;
-      break;
-    case CAN_3:
-      hcan = &can3;
-      break;
-  }
+  CAN_Raw_Bus_T hcan = CANlib_GetRawBus(bus);
 
-  uint8_t data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
   HAL_StatusTypeDef err = HAL_OK;
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
@@ -58,9 +34,8 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
         err = HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data);
         frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
         frame->dlc = pHeader.DLC;
-        for (int i = 0; i < 8; i++) {
-          frame->data[i] = data[i];
-        }
+
+        memcpy(frame->data, data, sizeof(data));
         frame->extended = pHeader.IDE == CAN_ID_EXT;
         return err;
       }

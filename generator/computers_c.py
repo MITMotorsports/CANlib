@@ -37,13 +37,18 @@ def write(can, computers, output_path=computer_c_dir_path):
             fw = f.write
             fw('#include "pack_unpack.h"\n')
             fw('#include "canlib_{}.h"\n\n'.format(computer.name))
+
+            for raw_bus in raw_buses:
+                fw('extern CAN_Raw_Bus_T {};\n'.format(raw_bus))
+            fw('\n')
+
             fw(
-              'CAN_Raw_Bus_T CANlib_get_raw_bus(CANlib_Bus_T bus) {\n'
+              'CAN_Raw_Bus_T CANlib_GetRawBus(CANlib_Bus_T bus) {\n'
               '\tswitch (bus) {\n'
             )
 
             for busnm, rawnm in computer.participation['name']['can'].mapping.items():
-              fw('\t\tcase {}:\n'.format(busnm) + '\t\t\treturn {};\n'.format(rawnm))
+                fw('\t\tcase {}:\n'.format(busnm) + '\t\t\treturn {};\n'.format(rawnm))
 
             fw('\t}\n}\n\n')
 
@@ -51,7 +56,7 @@ def write(can, computers, output_path=computer_c_dir_path):
                 fw(
                     'static void update_can_{}(void)'.format(busnm) + '{\n' +
                     '\tFrame frame;\n' +
-                    #'\tCAN_Raw_Bus_T raw_bus = CANlib_get_raw_bus({})\n'.format(busnm) +
+                    #'\tCAN_Raw_Bus_T raw_bus = CANlib_GetRawBus({})\n'.format(busnm) +
                     '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
                     #'\tswitch(raw_bus) {\n'
                     '\tswitch(frame.id) {\n'
