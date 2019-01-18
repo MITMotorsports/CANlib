@@ -57,7 +57,8 @@ def write_atoms_unpack(fw, atoms, tot_name):
 def write_can_unpack(frame, name_prepends, fw, *args):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
-        'CAN_UNPACK(' + tot_name + ') {' '\n'
+        'void CANlib_Unpack_' + tot_name +'(Frame *can_in, CANlib_' + tot_name +
+        '_T *type_out){\n'
         '\t' 'uint64_t bitstring = 0;' '\n'
         '\t' 'to_bitstring(can_in->data, &bitstring);\n'
     )
@@ -68,8 +69,10 @@ def write_can_unpack(frame, name_prepends, fw, *args):
 
 
 def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw, *args):
-    fw('CAN_PACK(' + coord(name_prepends, frame.name, prefix=False) + ') {' '\n'
-        '\t' 'uint64_t bitstring = 0;' '\n'
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw(
+        'void CANlib_Pack_' + tot_name + '(CANlib_' + tot_name + '_T *type_in, Frame *can_out)'
+        '{\n\t' 'uint64_t bitstring = 0;' '\n'
     )
 
     write_atoms_pack(fw, frame.atom)

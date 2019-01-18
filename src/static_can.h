@@ -7,17 +7,6 @@
 #include <stdbool.h>
 #include "bus.h"
 
-#define CAN_PACK(name) \
-  void CANlib_Pack_ ## name(CANlib_ ## name ## _T *type_in, Frame *can_out)
-
-#define CAN_UNPACK(name) \
-  void CANlib_Unpack_ ## name(Frame *can_in, CANlib_ ## name ## _T *type_out)
-
-#define DECLARE(name) \
-  CANlib_Transmit_Error_T CANlib_Transmit_ ## name(CANlib_ ## name ## _T *type); \
-  CAN_PACK(name); \
-  CAN_UNPACK(name);
-
 #define DEFINE(name, busnm) \
   CANlib_Transmit_Error_T CANlib_Transmit_ ## name(CANlib_ ## name ## _T *type) { \
     Frame frame; \

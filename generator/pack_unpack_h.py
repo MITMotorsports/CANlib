@@ -5,7 +5,15 @@ from common import can_lib_h_path, templ, coord, ifndef, endif, is_multplxd, fra
 
 
 def write_declare(frame, name_prepends, fw, *args):
-    fw('DECLARE({})\n'.format(coord(name_prepends, frame.name, prefix=False)))
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw (
+        'CANlib_Transmit_Error_T CANlib_Transmit_{}'.format(tot_name) +
+        '(CANlib_{}_T *type);\n'.format(tot_name)
+    )
+    fw(
+        'void CANlib_Pack_{}(CANlib_{}_T *type_in, Frame *can_out);'.format(tot_name, tot_name) +
+        'void CANlib_Unpack_{}(Frame *can_in, CANlib_{}_T *type_out);'.format(tot_name, tot_name)
+    )
 
 
 def write(can, output_path=can_lib_h_path):
