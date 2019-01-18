@@ -25,6 +25,7 @@ def coord(*args, prefix=True):
 
     return '_'.join(args)
 
+
 def ifndef(name):
     '''
     Return a string for beginning the
@@ -56,8 +57,8 @@ def frame_handler(frame, name_prepends, func, *args):
         for sub_frame in frame.frame:
             frame_handler(sub_frame, name_prepends + '_' + frame.name, func, *args)
     else:
-        tot_name = name_prepends + '_' + frame.name
-        func(frame, tot_name, *args)
+        func(frame, name_prepends, *args)
+
 
 '''A template dict to define assignment within a `key`.'''
 templ = {

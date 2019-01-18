@@ -7,7 +7,7 @@ import sys
 sys.path.append("ParseCAN")
 import os
 import ParseCAN
-from common import computer_h_dir_path, coord, templ, ifndef, endif, is_multplxd
+from common import computer_h_dir_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
 
 def handle_frame(frame, bus_name, fw):
     fw(coor())
@@ -51,26 +51,14 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('\n')
 
             # Helper functions to be used recursively
-            def declare_pub_frame(frame, name_prepends):
-                if is_multplxd(frame):
-                    for sub_frame in frame.frame:
-                        declare_pub_frame(sub_frame, name_prepends + '_' + frame.name)
-                else:
-                    tot_name = coord(name_prepends, frame.name,
-                        prefix=False)
-                    fw('void send_{}_msg(CANlib_{}_T *inp);\n'.format(
-                        tot_name, tot_name))
+            def declare_pub_frame(frame, name_prepends, *args):
+                tot_name = coord(name_prepends, frame.name, prefix=False)
+                fw('void send_{}_msg(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
             
-            def declare_sub_frame(frame, name_prepends):
-                if is_multplxd(frame):
-                    for sub_frame in frame.frame:
-                        declare_sub_frame(sub_frame, name_prepends + '_' + frame.name)
-                else:
-                    tot_name = coord(name_prepends, frame.name, prefix=False)
-                    fw('extern CANlib_{}_T {}_inp;\n'.format(
-                        tot_name, tot_name))
-                    fw('void handle_{}_msg(Frame *frame);\n'.format(
-                        tot_name, tot_name))
+            def declare_sub_frame(frame, name_prepends, *args):
+                tot_name = coord(name_prepends, frame.name, prefix=False)
+                fw('extern CANlib_{}_T {}_inp;\n'.format(tot_name, tot_name))
+                fw('void handle_{}_msg(Frame *frame);\n'.format(tot_name, tot_name))
             
             def write_struct(frame, name_prepends):
                 if is_multplxd(frame):
@@ -91,7 +79,7 @@ def write(can, computers, output_path=computer_h_dir_path):
             try:
                 for bus_name, bus in computer.participation['name']['can'].publish.items():
                     for frame in bus:
-                        declare_pub_frame(frame, bus_name)
+                        frame_handler(frame, bus_name, declare_sub_frame)
             except KeyError:
                 pass # No CAN messages sent by this board
 
@@ -101,7 +89,7 @@ def write(can, computers, output_path=computer_h_dir_path):
             try:
                 for bus_name, bus in computer.participation['name']['can'].subscribe.items():
                     for frame in bus:
-                        declare_sub_frame(frame, bus_name)
+                        frame_handler(frame, bus_name, declare_sub_frame)
                         fw('\n')
                 fw('void update_can(void);\n')
             except KeyError:
