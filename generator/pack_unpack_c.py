@@ -106,18 +106,6 @@ def write_atoms_pack(fw, atoms):
             )
 
 
-def write_define(frame, name_prepends, busnm, fw):
-    tot_name = coord(name_prepends, frame.name, prefix=False)
-    fw(
-        'CANlib_Transmit_Error_T CANlib_Transmit_' + tot_name + '(CANlib_' +
-        tot_name + '_T *type) {' +
-        '\tFrame frame;\n' +
-        '\tCANlib_Pack_' + tot_name + '(type, &frame);\n' +
-        '\treturn CANlib_TransmitFrame(&frame,' + busnm + ');\n'
-        '}'
-    )
-
-
 def write(can, output_path=pack_unpack_c_path, base_path=pack_unpack_c_base_path):
     '''
     Generate pack_unpack.c file.
@@ -143,4 +131,3 @@ def write(can, output_path=pack_unpack_c_path, base_path=pack_unpack_c_base_path
                 frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg),
                     bus.extended, fw)
                 frame_handler(msg, bus.name, write_can_unpack, fw)
-                frame_handler(msg, bus.name, write_define, bus.name, fw)
