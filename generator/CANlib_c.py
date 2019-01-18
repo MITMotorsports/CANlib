@@ -18,7 +18,6 @@ def swap_endianness_fn(type: Type):
 
     return 'swap_' + type.type
 
-
 def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
     '''
     Generate Can_Libary.c file.
@@ -84,97 +83,168 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
             # Write switch statement
             fw((
                 '{}_T CANlib_Identify_{}(Frame* frame)'.format(coord(bus.name), coord(bus.name, prefix=False)) + '{' '\n'
+                '\t' 'uint64_t bitstring = 0;' '\n'
                 '\t' 'switch(frame->id) {' '\n'
             ))
 
-            for msg in bus.frame:
+            def single_handler(frame, name_prepends, num_tabs):
                 fw(
-                    '\t' '\t' 'case {}_id:\n'.format(coord(bus.name, msg.name)) +
-                    '\t' '\t' '\t' 'return {};\n'.format(coord(bus.name, msg.name))
+                    '\t' * num_tabs + 'case {}_key:'.format(coord(name_prepends, frame.name)) + '\n' +
+                    '\t' * (num_tabs + 1) + 'return {};\n'.format(coord(name_prepends, frame.name))
                 )
 
+            def multplxd_handler(frame, name_prepends, num_tabs):
+                fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
+                key_size = ceil(frame.slice.length / 8) * 8
+                key_name = '_'.join([name_prepends,frame.name, 'key'])
+                fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
+                fw(
+                    '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring, {}, {});\n'.format(key_size, key_name, frame.slice.start, frame.slice.length) + '\t' * (num_tabs + 1) + 'switch(' + key_name + ') {' '\n'
+                )
+
+                name_prepends += '_' + frame.name
+
+                for sub_frame in frame.frame:
+                    if isinstance(sub_frame, ParseCAN.spec.bus.MultiplexedFrame):
+                        multplxd_handler(sub_frame, name_prepends, num_tabs + 2)
+                    else:
+                        single_handler(sub_frame, name_prepends, num_tabs + 2)
+                fw(
+                    '\t' * (num_tabs + 2) + 'default:\n' +
+                    '\t' * (num_tabs + 3) + 'return CAN_UNKNOWN_MSG;\n' +
+                    '\t' * (num_tabs + 1) + '}\n'
+                )
+
+            for msg in bus.frame:
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    multplxd_handler(msg, bus.name, 2)
+                else:
+                    single_handler(msg, bus.name, 2)
             fw(
-                '\t' 'default:' '\n'
-                '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
+                '\t' '\t' 'default:' '\n'
+                '\t' '\t' '\t' 'return CAN_UNKNOWN_MSG;' '\n'
                 '\t' '}' '\n'
                 '}' '\n\n'
             )
 
         for bus in can.bus:
             for msg in bus.frame:
-
                 # Write CAN_PACK
-                fw(
-                    'CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
-                    '\t' 'uint64_t bitstring = 0;' '\n'
-                )
-
-                for atom in msg.atom:
-                    # HACK/TODO: This is assuming big endian systems that run CANlib
-                    if atom.type.endianness == Endianness.LITTLE:
-                        fw(
-                            '\t' 'bitstring = INSERT(' + swap_endianness_fn(atom.type) + '(type_in->' + atom.name + '), bitstring, ' +
-                            str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n\n'
-                        )
-                    else:
-                        fw(
-                            '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
-                            ', ' + str(atom.slice.length) + ');' '\n'
-                        )
-
-                length = max(atom.slice.start + atom.slice.length for atom in msg.atom)
-
-                fw(
-                    '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
-                    '\t' 'can_out->id = {}_id;'.format(coord(bus.name, msg.name)) + '\n'
-                    '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
-                    '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
-                    '}' '\n\n'
-                )
-
-                # Write CAN_UNPACK
-                fw(
-                    'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
-                    '\t' 'uint64_t bitstring = 0;' '\n'
-                    '\t' 'to_bitstring(can_in->data, &bitstring);\n'
-                )
-
-                for atom in msg.atom:
-                    if atom.type.isenum():
-                        enum_name = coord(bus.name, msg.name, atom.name) + '_T'
-
-                        fw(
-                            '\t' 'type_out->' + atom.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
-                            str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
-                        )
-                    elif atom.type.type == 'bool':
-                        fw(
-                            '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
-                            str(atom.slice.length) + ');' '\n'
-                        )
-                    else:
+                def write_atoms_pack(atoms):
+                    for atom in atoms:
+                        # HACK/TODO: This is assuming big endian systems that run CANlib
                         if atom.type.endianness == Endianness.LITTLE:
                             fw(
-                                '\t' 'type_out->' + atom.name + ' = ' + swap_endianness_fn(atom.type) +
-                                '(EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
-                                str(atom.slice.length) + '));' '\n'
+                                '\t' 'bitstring = INSERT(' + swap_endianness_fn(atom.type) + '(type_in->' + atom.name + '), bitstring, ' +
+                                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n\n'
                             )
                         else:
-                            if atom.type.issigned():
+                            fw(
+                                '\t' 'bitstring = INSERT(type_in->' + atom.name + ', bitstring, ' + str(atom.slice.start) +
+                                ', ' + str(atom.slice.length) + ');' '\n'
+                            )
+
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                        fw(
+                            'CAN_PACK(' + coord(bus.name, msg.name, frame.name, prefix=False) + ') {' '\n'
+                            '\t' 'uint64_t bitstring = 0;' '\n'
+                        )
+                        fw(
+                            '\t' 'bitstring = INSERT(' + coord(bus.name, msg.name, frame.name) + '_key, bitstring, ' + str(msg.slice.start) +
+                            ', ' + str(msg.slice.length) + ');' '\n'
+                        )
+                        
+                        write_atoms_pack(frame.atom)
+
+                        length = max(atom.slice.start + atom.slice.length for atom in frame.atom)
+
+                        fw(
+                            '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
+                            '\t' 'can_out->id = {}_key;'.format(coord(bus.name, msg.name)) + '\n'
+                            '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
+                            '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
+                            '}' '\n\n'
+                        )
+                else:
+                    fw('CAN_PACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
+                        '\t' 'uint64_t bitstring = 0;' '\n'
+                    )
+
+                    write_atoms_pack(msg.atom)
+
+                    length = max(atom.slice.start + atom.slice.length for atom in msg.atom)
+
+                    fw(
+                        '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
+                        '\t' 'can_out->id = {}_key;'.format(coord(bus.name, msg.name)) + '\n'
+                        '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
+                        '\t' 'can_out->extended = ' + str(bus.extended).lower() + ';' '\n'
+                        '}' '\n\n'
+                    )
+
+                def write_atoms_pack(atoms):
+                    for atom in atoms:
+                        if atom.type.isenum():
+                            enum_name = coord(bus.name, msg.name, atom.name) + '_T'
+
+                            fw(
+                                '\t' 'type_out->' + atom.name + ' = (' + enum_name + ')EXTRACT(bitstring, ' +
+                                str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
+                            )
+                        elif atom.type.type == 'bool':
+                            fw(
+                                '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
+                                str(atom.slice.length) + ');' '\n'
+                            )
+                        else:
+                            if atom.type.endianness == Endianness.LITTLE:
                                 fw(
-                                    '\t' 'type_out->' + atom.name + ' = SIGN(EXTRACT(bitstring, ' +
-                                    str(atom.slice.start) + ', ' + str(atom.slice.length) + '), ' +
-                                    str(atom.slice.length) + ');' '\n'
+                                    '\t' 'type_out->' + atom.name + ' = ' + swap_endianness_fn(atom.type) +
+                                    '(EXTRACT(bitstring, ' + str(atom.slice.start) + ', ' +
+                                    str(atom.slice.length) + '));' '\n'
                                 )
                             else:
-                                fw(
-                                    '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
-                                    str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
-                                )
+                                if atom.type.issigned():
+                                    fw(
+                                        '\t' 'type_out->' + atom.name + ' = SIGN(EXTRACT(bitstring, ' +
+                                        str(atom.slice.start) + ', ' + str(atom.slice.length) + '), ' +
+                                        str(atom.slice.length) + ');' '\n'
+                                    )
+                                else:
+                                    fw(
+                                        '\t' 'type_out->' + atom.name + ' = EXTRACT(bitstring, ' +
+                                        str(atom.slice.start) + ', ' + str(atom.slice.length) + ');' '\n'
+                                    )
 
-                fw('}' '\n\n')
+                # Write CAN_UNPACK
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                        fw(
+                            'CAN_UNPACK(' + coord(bus.name, msg.name, frame.name, prefix=False) + ') {' '\n'
+                            '\t' 'uint64_t bitstring = 0;' '\n'
+                            '\t' 'to_bitstring(can_in->data, &bitstring);\n'
+                        )
+
+                        write_atoms_pack(frame.atom)
+
+                        fw('}' '\n\n')
+                else:
+                    fw(
+                        'CAN_UNPACK(' + coord(bus.name, msg.name, prefix=False) + ') {' '\n'
+                        '\t' 'uint64_t bitstring = 0;' '\n'
+                        '\t' 'to_bitstring(can_in->data, &bitstring);\n'
+                    )
+
+                    write_atoms_pack(msg.atom)
+
+                    fw('}' '\n\n')
 
         # Write DEFINE statements
         for bus in can.bus:
             for msg in bus.frame:
-                fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')
+                if isinstance(msg, ParseCAN.spec.bus.MultiplexedFrame):
+                    for frame in msg.frame:
+                            fw('DEFINE(' + coord(bus.name, msg.name, frame.name, prefix=False) + ')\n')
+                else:
+                    fw('DEFINE(' + coord(bus.name, msg.name, prefix=False) + ')\n')
