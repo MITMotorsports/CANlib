@@ -56,9 +56,7 @@ def write(can, computers, output_path=computer_c_dir_path):
                 fw(
                     'static void update_can_{}(void)'.format(busnm) + '{\n' +
                     '\tFrame frame;\n' +
-                    #'\tCAN_Raw_Bus_T raw_bus = CANlib_GetRawBus({})\n'.format(busnm) +
                     '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
-                    #'\tswitch(raw_bus) {\n'
                     '\tswitch(frame.id) {\n'
                 )
 
