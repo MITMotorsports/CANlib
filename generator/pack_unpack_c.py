@@ -118,7 +118,7 @@ def write(can, output_path=can_lib_c_path, base_path=can_lib_c_base_path):
     with open(output_path, 'w') as f:
         fw = f.write
 
-        fw('#include "CANlib.h"\n')
+        fw('#include "pack_unpack.h"\n')
 
         # Copy over base
         with open(base_path) as base:

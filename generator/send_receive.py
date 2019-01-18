@@ -19,7 +19,7 @@ def write(can, output_path=send_recieve_path):
 
     with open(output_path, 'w') as f:
         fw = f.write
-        fw('#include "CANlib.h"\n\n')
+        fw('#include "pack_unpack.h"\n\n')
 
         def define_pub_frame(frame, name_prepends):
             if is_multplxd(frame):

@@ -40,7 +40,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
         with open(f_path, 'w') as f:
             fw = f.write
-            fw('#include "CANlib.h"\n')
+            fw('#include "pack_unpack.h"\n')
             fw('#include "canlib_{}.h"\n\n'.format(computer.name))
             fw(
               'CAN_Raw_Bus_T CANlib_get_raw_bus(CANlib_Bus_T bus) {\n'

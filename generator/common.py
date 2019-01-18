@@ -4,8 +4,8 @@ import ParseCAN
 
 src_dir = '../src/'
 constants_path = f'{src_dir}constants.h'
-can_lib_c_path = f'{src_dir}CANlib.c'
-can_lib_h_path = f'{src_dir}CANlib.h'
+can_lib_c_path = f'{src_dir}pack_unpack.c'
+can_lib_h_path = f'{src_dir}pack_unpack.h'
 enum_atom_path = f'{src_dir}enum_atom.h'
 bus_path = f'{src_dir}bus.h'
 structs_path = f'{src_dir}structs.h'

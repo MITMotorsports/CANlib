@@ -4,8 +4,8 @@ compile_commands.json
 
 # Files that should be written from CAN spec
 src/constants.h
-src/CANlib.c
-src/CANlib.h
+src/pack_unpack.c
+src/pack_unpack.h
 src/enum_atom.h
 src/structs.h
 src/computers/

@@ -1,8 +1,3 @@
-'''
-Generate Can_Libary.h file.
-Run this file (with the spec path as a command line argument) to write just
-Can_Libary.h or main.py to write all files.
-'''
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
@@ -10,17 +5,11 @@ from common import can_lib_h_path, templ, coord, ifndef, endif, is_multplxd, fra
 
 
 def write_declare(frame, name_prepends, fw, *args):
-    fw('DECLARE({})\n'.format(coord(name_prepends, frame.name)))
+    fw('DECLARE({})\n'.format(coord(name_prepends, frame.name, prefix=False)))
 
 
 def write(can, output_path=can_lib_h_path):
-    '''
-    Generate Can_Libary.h file.
-
-    :param output_path: file to be written to
-    :param can: CAN spec
-    '''
-    header_name = '_CAN_LIBRARY_H'
+    header_name = '_PACK_UNPACK_H'
 
     with open(output_path, 'w') as f:
         fw = f.write

@@ -40,7 +40,7 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('#include "enum_atom.h"\n')
             fw('#include "structs.h"\n')
             fw('#include "static_can.h"\n')
-            fw('#include "CANlib.h"\n\n')
+            fw('#include "pack_unpack.h"\n\n')
 
             for assigned_name, periph_name in computer.participation['name']['can'].mapping.items():
                 if assigned_name in computer.participation['name']['can'].publish.keys():
