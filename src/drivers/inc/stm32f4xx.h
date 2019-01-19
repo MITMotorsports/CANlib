@@ -10,7 +10,6 @@
 typedef uint32_t Time_T; // in ms
 typedef HAL_StatusTypeDef CANlib_Transmit_Error_T;
 typedef HAL_StatusTypeDef CANlib_Init_Error_T;
-typedef CAN_HandleTypeDef* CAN_Raw_Bus_T;
 
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
 

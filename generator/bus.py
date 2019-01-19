@@ -29,8 +29,21 @@ def write(can, computers, output_path=bus_path):
         # Create enum among buses
         fw('typedef enum {\n')
         for bus in can.bus:
-          fw('\t' + bus.name + ',\n')
+            fw('\t' + bus.name + ',\n')
         fw('} CANlib_Bus_T;\n\n')
+
+        raw_buses = set()
+        for computer in computers:
+            if not ('can' in computer.participation['name'].keys()):
+                # This computer neither sends nor recieves can messagess
+                continue
+
+            raw_buses |= set(computer.participation['name']['can'].mapping.values())
+
+        fw('typedef enum {\n')
+        for bus in raw_buses:
+          fw('\t' + bus + ',\n')
+        fw('} CAN_Raw_Bus_T;\n\n')
 
         fw(endif(header_name))
 

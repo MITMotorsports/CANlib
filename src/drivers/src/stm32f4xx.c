@@ -10,7 +10,19 @@ extern CAN_HandleTypeDef can2;
 extern CAN_HandleTypeDef can3;
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
-  CAN_Raw_Bus_T hcan = CANlib_GetRawBus(bus);
+  CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
+  CAN_HandleTypeDef* hcan;
+  switch(raw_bus) {
+    case CAN_1:
+      hcan = &can1;
+      break;
+    case CAN_2:
+      hcan = &can2;
+      break;
+    case CAN_3:
+      hcan = &can3;
+      break;
+  }
 
   CAN_TxHeaderTypeDef pHeader;
   uint32_t pTxMailbox = 0;
@@ -24,7 +36,21 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 }
 
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
-  CAN_Raw_Bus_T hcan = CANlib_GetRawBus(bus);
+  CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
+  CAN_HandleTypeDef *hcan;
+  switch(raw_bus) {
+    case CAN_1:
+      hcan = &can1;
+      break;
+    case CAN_2:
+      hcan = &can2;
+      break;
+    case CAN_3:
+      hcan = &can3;
+      break;
+  }
+
+  hcan = &can1;
 
   uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
