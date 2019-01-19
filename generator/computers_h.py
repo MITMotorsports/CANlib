@@ -46,7 +46,7 @@ def write(can, computers, output_path=computer_h_dir_path):
             try:
                 for bus_name, bus in computer.participation['name']['can'].publish.items():
                     for frame in bus:
-                        frame_handler(frame, bus_name, declare_sub_frame, fw)
+                        frame_handler(frame, bus_name, declare_pub_frame, fw)
             except KeyError:
                 pass # No CAN messages sent by this board
 
