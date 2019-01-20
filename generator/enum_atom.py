@@ -18,6 +18,8 @@ def handle_frame(frame, name_prepends, fw):
                     tot_name + '_' + enum.name,
                     enum.value
                 ))
+            
+            fw('\t' + tot_name + '_' + 'NUM_FIELDS\n')
 
             fw('} ' + '{}_T;\n\n'.format(tot_name))
 
