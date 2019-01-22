@@ -12,5 +12,6 @@ typedef HAL_StatusTypeDef CANlib_Transmit_Error_T;
 typedef HAL_StatusTypeDef CANlib_Init_Error_T;
 
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
+void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus);
 
 #endif // __STM32F4XX_CAN_H
