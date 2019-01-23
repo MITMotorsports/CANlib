@@ -11,8 +11,8 @@ def write_declare(frame, name_prepends, fw):
         '(CANlib_{}_T *type);\n'.format(tot_name)
     )
     fw(
-        'void CANlib_Pack_{}(CANlib_{}_T *type_in, Frame *can_out);'.format(tot_name, tot_name) +
-        'void CANlib_Unpack_{}(Frame *can_in, CANlib_{}_T *type_out);'.format(tot_name, tot_name)
+        'void CANlib_Pack_{}(CANlib_{}_T *type_in, Frame *can_out);\n'.format(tot_name, tot_name) +
+        'void CANlib_Unpack_{}(Frame *can_in, CANlib_{}_T *type_out);\n'.format(tot_name, tot_name)
     )
 
 
