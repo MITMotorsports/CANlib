@@ -50,8 +50,6 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
       break;
   }
 
-  hcan = &can1;
-
   uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
   HAL_StatusTypeDef err = HAL_OK;
