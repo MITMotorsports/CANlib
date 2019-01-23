@@ -26,12 +26,12 @@ def define_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name,
         prefix=False)
     fw('void CANlib_handle_{}_msg(Frame *frame)'.format(
-        tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(frame, &CANlib_{}_inp);\n'.format(tot_name, tot_name) + '}\n\n')
+        tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(frame, &CANlib_{}_Input);\n'.format(tot_name, tot_name) + '}\n\n')
 
 
 def define_struct(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name)
-    fw('{}_T {}_inp;\n'.format(
+    fw('{}_T {}_Input;\n'.format(
         tot_name, tot_name))
 
 

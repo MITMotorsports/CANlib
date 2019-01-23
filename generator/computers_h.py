@@ -11,8 +11,8 @@ def declare_pub_frame(frame, name_prepends, fw):
 
 
 def declare_sub_frame(frame, name_prepends, fw):
-    tot_name = coord(name_prepends, frame.name)
-    fw('extern {}_T {}_inp;\n'.format(tot_name, tot_name))
+    tot_name = coord(name_prepends, frame.name, prefix=False)
+    fw('extern CANlib_{}_T CANlib_{}_Input;\n'.format(tot_name, tot_name))
     fw('void handle_{}_msg(Frame *frame);\n'.format(tot_name, tot_name))
 
 
