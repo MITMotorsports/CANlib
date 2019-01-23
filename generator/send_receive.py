@@ -25,7 +25,7 @@ def define_pub_frame(frame, name_prepends, busnm, fw):
 def define_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name,
         prefix=False)
-    fw('void CANlib_handle_{}_msg(Frame *frame)'.format(
+    fw('void CANlib_Handle_{}(Frame *frame)'.format(
         tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(frame, &CANlib_{}_Input);\n'.format(tot_name, tot_name) + '}\n\n')
 
 
