@@ -7,7 +7,7 @@ from common import send_recieve_path, coord, templ, ifndef, endif, frame_handler
 def define_pub_frame(frame, name_prepends, busnm, fw):
     tot_name = coord(name_prepends, frame.name,
         prefix=False)
-    fw('void CANlib_send_{}_msg(CANlib_{}_T *inp)'.format(
+    fw('void CANlib_Send_{}(CANlib_{}_T *inp)'.format(
         tot_name, tot_name) + ' {\n'
     )
 

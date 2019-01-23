@@ -7,13 +7,15 @@ from common import computer_h_dir_path, coord, templ, ifndef, endif, frame_handl
 
 def declare_pub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
-    fw('void CANlib_send_{}_msg(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
+    fw('void CANlib_Send_{}(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
 
 
 def declare_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
-    fw('extern CANlib_{}_T CANlib_{}_Input;\n'.format(tot_name, tot_name))
-    fw('void handle_{}_msg(Frame *frame);\n'.format(tot_name, tot_name))
+    fw(
+        'extern CANlib_{}_T CANlib_{}_Input;\n'.format(tot_name, tot_name)
+        'void CANlib_Handle_{}(Frame *frame('
+    )
 
 
 def write(can, computers, output_path=computer_h_dir_path):
