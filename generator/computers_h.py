@@ -12,10 +12,14 @@ def declare_pub_frame(frame, name_prepends, fw):
 
 def declare_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
+<<<<<<< HEAD
     fw(
         'extern CANlib_{}_T CANlib_{}_Input;\n'.format(tot_name, tot_name)
         'void CANlib_Handle_{}(Frame *frame('
     )
+=======
+    fw('extern CANlib_{}_T CANlib_{}_Input;\n'.format(tot_name, tot_name))
+>>>>>>> c4aeb2de1b7ab2ef5edf9d3c34ef344e25a3c489
 
 
 def write(can, computers, output_path=computer_h_dir_path):
