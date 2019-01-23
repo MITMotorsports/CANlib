@@ -77,9 +77,8 @@ def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw):
     fw(
         '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
     )
-    if (is_multplxd):
-        fw('\t' 'can_out->id = {}_key;'.format(coord(name_prepends)) + '\n')
     fw(
+        '\t' 'can_out->id = CANlib_{}_key;'.format(tot_name) + '\n'
         '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
         '\t' 'can_out->extended = ' + str(bus_ext).lower() + ';' '\n'
         '}' '\n\n'

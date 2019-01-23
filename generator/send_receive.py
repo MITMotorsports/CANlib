@@ -17,7 +17,7 @@ def define_pub_frame(frame, name_prepends, busnm, fw):
     fw(
         '\tFrame frame;\n' +
         '\tCANlib_Pack_' + tot_name + '(inp, &frame);\n' +
-        '\tCANlib_TransmitFrame(&frame,' + busnm + ');\n'
+        '\tCANlib_TransmitFrame(&frame, ' + busnm + ');\n'
         '}\n\n'
     )
 
