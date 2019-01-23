@@ -2,8 +2,6 @@ import sys
 sys.path.append("ParseCAN")
 import ParseCAN
 from common import bus_path, coord, templ, ifndef, endif
-from pint import UnitRegistry as UR
-
 
 def write(can, computers, output_path=bus_path):
     header_name = '_CAN_LIBRARY_BUS_H'
@@ -22,7 +20,7 @@ def write(can, computers, output_path=bus_path):
         raw_buses = set()
         for computer in computers:
             if not ('can' in computer.participation['name'].keys()):
-                # This computer neither sends nor recieves can messagess
+                # This computer neither sends nor recieves can messages
                 continue
 
             raw_buses |= set(computer.participation['name']['can'].mapping.values())

@@ -14,11 +14,12 @@ def handle_frame(frame, name_prepends, fw):
             fw('typedef enum {\n')
 
             for enum in atom.type.enum:
+                assert enum.name != 'NUM_FIELDS'
                 fw(templ['enum'].format(
                     tot_name + '_' + enum.name,
                     enum.value
                 ))
-            
+
             fw('\t' + tot_name + '_' + 'NUM_FIELDS\n')
 
             fw('} ' + '{}_T;\n\n'.format(tot_name))

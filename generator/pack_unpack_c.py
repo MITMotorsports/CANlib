@@ -53,7 +53,7 @@ def write_can_unpack(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         'void CANlib_Unpack_' + tot_name +'(Frame *can_in, CANlib_' + tot_name +
-        '_T *type_out){\n'
+        '_T *type_out) {\n'
         '\t' 'uint64_t bitstring = 0;' '\n'
         '\t' 'to_bitstring(can_in->data, &bitstring);\n'
     )

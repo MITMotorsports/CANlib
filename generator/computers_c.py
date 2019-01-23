@@ -9,7 +9,7 @@ def msg_handler(frame, name_prepends, num_tabs, fw):
     tot_name = name_prepends + '_' + frame.name
     fw(
         '\t' * num_tabs + 'case CANlib_{}_key:\n'.format(tot_name) +
-        '\t' * (num_tabs + 1) + 'handle_{}_msg(&frame);\n'.format(tot_name) +
+        '\t' * (num_tabs + 1) + 'CANlib_handle_{}_msg(&frame);\n'.format(tot_name) +
         '\t' * (num_tabs + 1) + 'break;\n'
     )
 
