@@ -50,7 +50,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
-                    'static void update_can_{}(void)'.format(busnm) + '{\n' +
+                    'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
                     '\tFrame frame;\n' +
                     '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
                     '\tswitch(frame.id) {\n'
@@ -63,7 +63,7 @@ def write(can, computers, output_path=computer_c_dir_path):
                     '\t}\n}\n\n'
                 )
 
-            fw('void update_can() {\n')
+            fw('void CANlib_update_can() {\n')
             for busnm in computer.participation['name']['can'].subscribe.keys():
-                fw('\tupdate_can_{}();\n'.format(busnm))
+                fw('\tCANlib_update_can_{}();\n'.format(busnm))
             fw('}\n\n')

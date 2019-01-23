@@ -7,7 +7,7 @@ from common import computer_h_dir_path, coord, templ, ifndef, endif, frame_handl
 
 def declare_pub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
-    fw('void send_{}_msg(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
+    fw('void CANlib_send_{}_msg(CANlib_{}_T *inp);\n'.format(tot_name, tot_name))
 
 
 def declare_sub_frame(frame, name_prepends, fw):
@@ -58,7 +58,7 @@ def write(can, computers, output_path=computer_h_dir_path):
                     for frame in bus:
                         frame_handler(frame, bus_name, declare_sub_frame, fw)
                         fw('\n')
-                fw('void update_can(void);\n')
+                fw('void CANlib_update_can(void);\n')
             except KeyError:
                 pass # No CAN messages received by this board
 

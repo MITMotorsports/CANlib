@@ -20,35 +20,34 @@ computer: # All boards on the car, along with CAN messages they publish and subs
     participation:
       can:
         mapping:
-          symbolic_bus_0: hardware_bus_2
-          symbolic_bus_1: hardware_bus_3
+          symbolicBus0: hardwareBus2
+          symbolicBus1: hardwareBus3
         publish:
-          symbolic_bus_0:
+          symbolicBus0:
             - Msg0
-          symbolic_bus_1:
+          symbolicBus1:
             - Msg0
         subscribe:
-          symbolic_bus_0:
+          symbolicBus0:
             - Msg2
 protocol:
   can:
     bus: # List of CAN buses on the car
-      symbolic_bus_0: # All messages on can0
+      symbolicBus0: # All messages on can0
         baudrate: 500000
         extended: false
         frame:
-          ### `void send_<bus.name>_<frame.name>_msg(CANlib_<bus.name>_<frame.naem>_T *inp);`:
-            key: 0x001 # Lower CAN IDs have higher priority
-            period: 50ms # optional, only add it if you will use it
-            atom:
-              atom0:
-                slice: 0 + 32  # [start index] + [length]
-                type: int32 big  # type and endianness
-                unit: V  # optional
-              atom1:
-                slice: 32 + 32
-                type: int32 big
-                unit: V
+          key: 0x001 # Lower CAN IDs have higher priority
+          period: 50ms # optional, only add it if you will use it
+          atom:
+            atom0:
+              slice: 0 + 32  # [start index] + [length]
+              type: int32 big  # type and endianness
+              unit: V  # optional
+            atom1:
+              slice: 32 + 32
+              type: int32 big
+              unit: V
           Msg2:
             key: 0x002
             atom:
@@ -62,7 +61,7 @@ protocol:
                     ENUM_B: 0x1
                     ENUM_C: 0x2
                     ENUM_D: 0x3
-      symbolic_bus_1:
+      symbolicBus1:
         baudrate: 1000000
         extended: true
         frame:
@@ -95,26 +94,22 @@ For example, for `Msg0` on `symbolic_can_1` above, it would be defined like this
 typedef struct {
 	int32_t atom0;
 	int32_t atom1;
-} CANlib_symbolic_bus_1_Msg0_T;
+} CANlib_symbolicBus1_Msg0_T;
 ```
 
  It will be available for every frame which the board publishes or subscribes to.
 
-### `void send_<bus.name>_<frame.name>_msg(CANlib_<bus.name>_<frame.name>_T *inp)`
+### `void CANlib_send_<bus.name>_<frame.name>_msg(CANlib_<bus.name>_<frame.name>_T *inp)`
 
 This function takes a pointer to a struct of the type described in the previous bullet and sends in on the correct CAN bus. It is only available for messages which the board publishes.
 
-### `void send_<bus.name>_<frame.name>_msg(CANlib_<bus.name>_<frame.name>_T *inp)`
-
-This function takes a pointer to a struct of the type described in the previous bullet and sends it on the correct CAN bus. It is only available for messages which the board publishes.
-
-### `update_can()`
+### `CANlib_update_can()`
 
 This function polls for any can messages and updates the relevant structs (see the next bullet). Call this periodically to update your inputs. It will only update structs corresponding to messages which a board subscribes to.
 
 ### `extern CANlib_<bus.name>_<frame.name>_T <bus.name>_<frame.name>_inp;`
 
-This statement extern declares the struct which will be updated when a `frame.name` message is received over can. Declare it in your own file and it will be updated whenever you call `update_can`.
+This statement extern declares the struct which will be updated when a `frame.name` message is received over can. Declare it in your own file and it will be updated whenever you call `CANlib_update_can`.
 
 ### `CANlib_<bus.name>_<message.name>_<atom.name>_T`
 This is an enum that includes values of the form `<bus.name>_<message.name>_<atom.name>_<value.name>` forall `value` in `atom.value`. Use this to refer to the type of enums created for enum segments (e.g., `Msg2` `atom1` above).
