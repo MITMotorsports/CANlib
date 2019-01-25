@@ -25,10 +25,12 @@ def write(can, computers, output_path=bus_path):
 
             raw_buses |= set(computer.participation['name']['can'].mapping.values())
 
+        assert 'INVALID_BUS' not in raw_buses, "INVALID_BUS is a reserved bus name"
+
         fw('typedef enum {\n')
         for bus in raw_buses:
           fw('\t' + bus + ',\n')
-        fw('} CAN_Raw_Bus_T;\n\n')
+        fw('\tINVALID_BUS\n} CAN_Raw_Bus_T;\n\n')
 
         # Create forms enum for each bus
         for bus in can.bus:

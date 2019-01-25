@@ -40,6 +40,7 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('#include "enum_atom.h"\n')
             fw('#include "structs.h"\n')
             fw('#include "static.h"\n')
+            fw('#include "evil_macros.h"\n')
             fw('#include "pack_unpack.h"\n\n')
 
             fw('\n')

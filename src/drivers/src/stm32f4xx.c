@@ -4,6 +4,7 @@
 #include "bus.h"
 #include "driver.h"
 #include <stdint.h>
+#include <string.h>
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
@@ -22,6 +23,8 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
     case CAN_3:
       hcan = &hcan3;
       break;
+    default:
+      return HAL_ERROR;
   }
 
   CAN_TxHeaderTypeDef pHeader;
@@ -48,23 +51,23 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
     case CAN_3:
       hcan = &hcan3;
       break;
+    default:
+      return;
   }
 
   uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
-  HAL_StatusTypeDef err = HAL_OK;
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
       if (HAL_CAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
-        err = HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data);
+        HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data);
         frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
         frame->dlc = pHeader.DLC;
 
         memcpy(frame->data, data, sizeof(data));
         frame->extended = pHeader.IDE == CAN_ID_EXT;
-        return err;
+        return;
       }
   }
-  return err;
 }
 
 
