@@ -2,7 +2,8 @@ import sys
 sys.path.append("ParseCAN")
 import os
 import ParseCAN
-from common import test_c_dir_path, coord, templ, ifndef, endif, frame_handler
+from common import test_c_dir_path, coord, templ, ifndef, endif, \
+    frame_handler, is_multplxd
 from computers_c import msg_handler
 
 
@@ -25,8 +26,11 @@ def write(can, output_path=test_c_dir_path):
         for bus in can.bus:
             fw(
                 'static void CANlib_update_can_TEST_{}(void)'.format(bus.name) + '{\n' +
-                '\tFrame frame;\n' +
-                '\tuint64_t bitstring;\n' +
+                '\tFrame frame;\n'
+            )
+            if any(is_multplxd(msg) for msg in bus.frame):
+                fw('\tuint64_t bitstring;\n')
+            fw(
                 '\tCANlib_ReadFrame(&frame, {});\n'.format(bus.name) +
                 '\tswitch(frame.id) {\n'
             )
@@ -34,8 +38,10 @@ def write(can, output_path=test_c_dir_path):
             for msg in bus.frame:
                 msg_handler(msg, bus.name, fw)
 
+            fw('\t}\n')
+
             fw(
-                '\t}\n}\n\n'
+                '}\n\n'
             )
 
         fw('void CANlib_update_can_TEST() {\n')
