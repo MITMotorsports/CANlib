@@ -11,6 +11,7 @@ src/structs.h
 src/computers/
 src/send_receive.c
 src/bus.h
+src/test/
 **/*.o
 **/*.out
 

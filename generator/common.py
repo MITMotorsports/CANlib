@@ -11,6 +11,8 @@ bus_path = f'{src_dir}bus.h'
 structs_path = f'{src_dir}structs.h'
 computer_h_dir_path = f'{src_dir}computers/inc'
 computer_c_dir_path = f'{src_dir}computers/src'
+test_h_dir_path = f'{src_dir}test/inc'
+test_c_dir_path = f'{src_dir}test/src'
 send_recieve_path = f'{src_dir}send_receive.c'
 pack_unpack_c_base_path = 'templates/pack_unpack_c.template'
 

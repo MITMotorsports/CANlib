@@ -10,6 +10,8 @@ import structs
 import sys
 import computers_h
 import computers_c
+import test_h
+import test_c
 import send_receive
 import bus
 
@@ -28,3 +30,5 @@ if __name__ == '__main__':
     bus.write(can, system.computer)
     computers_h.write(can, system.computer)
     computers_c.write(can, system.computer)
+    test_h.write(can)
+    test_c.write(can)
