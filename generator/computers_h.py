@@ -45,6 +45,8 @@ def write(can, computers, output_path=computer_h_dir_path):
 
             fw('\n')
 
+            fw('#ifdef __cplusplus\nextern "C" {\n#endif // __cplusplus\n\n')
+
             # Pub
             try:
                 for bus_name, bus in computer.participation['name']['can'].publish.items():
@@ -64,6 +66,8 @@ def write(can, computers, output_path=computer_h_dir_path):
                 fw('void CANlib_update_can(void);\n')
             except KeyError:
                 pass # No CAN messages received by this board
+
+            fw('\n#ifdef __cplusplus\n} // extern "C"\n#endif // __cplusplus\n\n')
 
             fw(endif(header_name))
 
