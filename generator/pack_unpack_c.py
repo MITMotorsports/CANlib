@@ -63,12 +63,32 @@ def write_can_unpack(frame, name_prepends, fw):
     fw('}' '\n\n')
 
 
-def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw):
+def can_pack_handler(frame, name_prepends, bus_ext, fw, parent_slice=None):
+    if is_multplxd(frame):
+        if parent_slice is not None:
+            raise NotImplementedError("Multilevel multiplexing not yet supported!")
+        for sub_frame in frame.frame:
+            can_pack_handler(sub_frame, name_prepends + '_' + frame.name, bus_ext, fw, frame.slice)
+    else:
+        write_can_pack(frame, name_prepends, bus_ext, fw, parent_slice)
+
+def write_can_pack(frame, name_prepends, bus_ext, fw, parent_slice=None):
+    is_multplxd_subframe = parent_slice is not None
+
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         'void CANlib_Pack_' + tot_name + '(CANlib_' + tot_name + '_T *type_in, Frame *can_out)'
         '{\n\t' 'uint64_t bitstring = 0;' '\n'
     )
+
+    if is_multplxd_subframe:
+        if True: # TODO: check endianness, like atom.type.endianness == Endianness.LITTLE:
+            # TODO: Actually grab key type
+            fw(
+                '\t' 'bitstring = INSERT(CANlib_' + tot_name +
+                '_key, bitstring, ' + str(parent_slice.start) + ', ' + str(parent_slice.length) +
+                ');' '\n\n'
+            )
 
     write_atoms_pack(fw, frame.atom)
 
@@ -77,8 +97,15 @@ def write_can_pack(frame, name_prepends, is_multplxd, bus_ext, fw):
     fw(
         '\t' 'from_bitstring(&bitstring, can_out->data);' '\n'
     )
+
+    key_name = ""
+    if not is_multplxd_subframe:
+        key_name = coord(name_prepends, frame.name, 'key')
+    else:
+        key_name = coord(name_prepends, 'key')
+
     fw(
-        '\t' 'can_out->id = CANlib_{}_key;'.format(tot_name) + '\n'
+        '\t' 'can_out->id = {};'.format(key_name) + '\n'
         '\t' 'can_out->dlc = ' + str(ceil(length / 8)) + ';' '\n'
         '\t' 'can_out->extended = ' + str(bus_ext).lower() + ';' '\n'
         '}' '\n\n'
@@ -122,6 +149,5 @@ def write(can, output_path=pack_unpack_c_path, base_path=pack_unpack_c_base_path
 
         for bus in can.bus:
             for msg in bus.frame:
-                frame_handler(msg, bus.name, write_can_pack, is_multplxd(msg),
-                    bus.extended, fw)
+                can_pack_handler(msg, bus.name, bus.extended, fw)
                 frame_handler(msg, bus.name, write_can_unpack, fw)
