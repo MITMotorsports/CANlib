@@ -5,6 +5,8 @@ from common import structs_path, coord, ifndef, endif, frame_handler
 
 
 def msg_handler(frame, name_prepends, fw):
+    fw('typedef struct {\n')
+
     for atom in frame.atom:
         if atom.type.isenum():
             enum_name = coord(name_prepends, frame.name, atom.name) + '_T'
@@ -28,7 +30,5 @@ def write(can, output_path=structs_path):
 
         for bus in can.bus:
             for msg in bus.frame:
-                fw('typedef struct {\n')
-
                 frame_handler(msg, bus.name, msg_handler, fw)
         fw(endif(header_name))
