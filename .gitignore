@@ -1,6 +1,7 @@
 obj/
 compile_commands.json
 *.pyc
+.DS_Store
 
 # Files that should be written from CAN spec
 src/constants.h
