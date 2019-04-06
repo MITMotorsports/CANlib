@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "can_raw.h"
-
 #define TOGGLE(input, test, idx) \
   if (test) {\
     ((input) |= (1 << (7 - (idx)))); \

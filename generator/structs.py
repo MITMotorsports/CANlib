@@ -1,20 +1,23 @@
-'''
-Generate header files that set up structs for all buses.
-Run this file (with the spec path as a command line argument) to write just
-these files or main.py to write all files.
-'''
 import sys
 sys.path.append('ParseCAN')
 import ParseCAN
-from common import structs_path, coord, ifndef, endif
+from common import structs_path, coord, ifndef, endif, frame_handler
 
-def write(car, output_path=structs_path):
-    '''
-    Write the header files for the main structs in the library.
 
-    :param output_path: file to be written to
-    :param car: CAN spec
-    '''
+def msg_handler(frame, name_prepends, fw):
+    fw('typedef struct {\n')
+
+    for atom in frame.atom:
+        if atom.type.isenum():
+            enum_name = coord(name_prepends, frame.name, atom.name) + '_T'
+            fw('\t{} {};\n'.format(enum_name, atom.name))
+        else:
+            fw('\t{} {};\n'.format(atom.type.ctype(), atom.name))
+
+    fw('} ' + '{}_T;\n\n'.format(coord(name_prepends, frame.name)))
+
+
+def write(can, output_path=structs_path):
     header_name = '_CAN_LIBRARY_STRUCTS'
 
     with open(output_path, 'w') as f:
@@ -23,20 +26,9 @@ def write(car, output_path=structs_path):
         fw(ifndef(header_name))
         fw('#include <stdint.h>\n')
         fw('#include <stdbool.h>\n\n')
-        fw('#include "constants.h"\n\n')
-        fw('#include "enum_segments.h"\n\n')
+        fw('#include "enum_atom.h"\n\n')
 
-        for bus in car.buses:
-            for msg in bus.frames:
-                fw('typedef struct {\n')
-
-                for seg in msg.segments:
-                    if seg.type.isenum():
-                        enum_name = coord(bus.name, msg.name, seg.name) + '_T'
-                        fw('\t{} {};\n'.format(enum_name, seg.name))
-                    else:
-                        fw('\t{} {};\n'.format(seg.type.ctype(), seg.name))
-
-                fw('} ' + '{}_T;\n\n'.format(coord(bus.name, msg.name)))
-
+        for bus in can.bus:
+            for msg in bus.frame:
+                frame_handler(msg, bus.name, msg_handler, fw)
         fw(endif(header_name))

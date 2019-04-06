@@ -1,10 +1,5 @@
 #include "evil_macros.h"
 
-typedef enum {
-  LITTLE,
-  BIG,
-} ENDIAN_T;
-
 typedef union {
   uint8_t byte[8];
   uint64_t bitstring;
@@ -27,6 +22,14 @@ void from_bitstring(uint64_t *in, uint8_t out[]) {
 
 // Shameless copypasta-ing from Stack Overflow for trivial endian swap.
 // https://stackoverflow.com/a/2637138
+uint8_t swap_uint8(uint8_t val) {
+  return val;
+}
+
+int8_t swap_int8(int8_t val) {
+  return val;
+}
+
 uint16_t swap_uint16(uint16_t val) {
   return (val << 8) | (val >> 8);
 }
@@ -43,4 +46,20 @@ uint32_t swap_uint32(uint32_t val) {
 int32_t swap_int32(int32_t val) {
   val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
   return (val << 16) | ((val >> 16) & 0xFFFF);
+}
+
+int64_t swap_int64(int64_t val) {
+  val = ((val << 8) & 0xFF00FF00FF00FF00ULL) |
+        ((val >> 8) & 0x00FF00FF00FF00FFULL);
+  val = ((val << 16) & 0xFFFF0000FFFF0000ULL) |
+        ((val >> 16) & 0x0000FFFF0000FFFFULL);
+  return (val << 32) | ((val >> 32) & 0xFFFFFFFFULL);
+}
+
+uint64_t swap_uint64(uint64_t val) {
+  val = ((val << 8) & 0xFF00FF00FF00FF00ULL) |
+        ((val >> 8) & 0x00FF00FF00FF00FFULL);
+  val = ((val << 16) & 0xFFFF0000FFFF0000ULL) |
+        ((val >> 16) & 0x0000FFFF0000FFFFULL);
+  return (val << 32) | (val >> 32);
 }

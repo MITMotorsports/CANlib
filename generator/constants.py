@@ -1,21 +1,20 @@
-'''
-Generate constants.h file.
-Run this file (with the spec path as a command line argument) to write just
-constants.h or main.py to write all files.
-'''
 import sys
 sys.path.append("ParseCAN")
 import ParseCAN
-from common import constants_path, coord, templ, ifndef, endif
+from common import constants_path, coord, templ, ifndef, endif, is_multplxd, frame_handler
+from pint import UnitRegistry
 
 
-def write(car, output_path=constants_path):
-    '''
-    Generate constants.h file, which has CAN IDs and enum values.
+def get_ms(period_str):
+    if type(period_str) is int:
+        # If it's set as an integer, assume ms
+        return period_str
 
-    :param output_path: file to be written to
-    :param car: CAN spec
-    '''
+    ur = UnitRegistry()
+    return ur[period_str].to('ms').magnitude
+
+
+def write(can, output_path=constants_path):
     header_name = '_CAN_LIBRARY_CONSTANTS_H'
 
     with open(output_path, 'w') as f:
@@ -24,27 +23,39 @@ def write(car, output_path=constants_path):
         fw(ifndef(header_name))
 
         props = (
-            ('id', 'define', int),
-            # TODO(nistath): Add this back.
-            # ('period', 'define', lambda x: int(ParseCAN.parse.number_in('ms')(x))),
+            ('key', 'define', int),
+            ('period', 'define', get_ms),
         )
 
-        for bus in car.buses:
+        optional_props = {'period'}
+
+        for bus in can.bus:
             for attrnm, form, transform in props:
-                if form == 'enum':
-                    fw('typedef enum {\n')
+                finalnm = attrnm
 
-                for msg in bus.frames:
+                # Define it in scope because it relies on too many locals
+                def msg_handler(frame, name_prepends):
+                    attr = None
                     try:
-                        attr = transform(getattr(msg, attrnm))
-                        fw(templ[form].format(coord(bus.name, msg.name, attrnm), attr))
-                    except AttributeError:
-                        pass
+                        attr = getattr(frame, attrnm)
+                    except AttributeError as e:
+                        if not attrnm in optional_props:
+                            raise e
+                    if attr is None:
+                        if attrnm in optional_props:
+                            return
+                        else:
+                            raise AttributeError('{} missing required attribute {}'.format(frame.name, attrnm))
+                    attr = transform(attr)
+                    fw(templ[form].format(coord(name_prepends, frame.name, finalnm), attr))
 
-                if form == 'enum':
-                    fw('} ' + '{}_T;'.format(coord(bus.name, attrnm)))
-
-                f.write('\n\n')
+                for msg in bus.frame:
+                    if is_multplxd(msg):
+                        # Keep multiplexed check because we want to call for
+                        # this function for both the top lvl multiplexed msg
+                        # and the sub-frames
+                        frame_handler(msg, bus.name, msg_handler)
+                    msg_handler(msg, bus.name)
 
         fw(endif(header_name))
 

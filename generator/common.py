@@ -1,10 +1,20 @@
+import sys
+sys.path.append('ParseCAN')
+import ParseCAN
+
 src_dir = '../src/'
 constants_path = f'{src_dir}constants.h'
-can_lib_c_path = f'{src_dir}CANlib.c'
-can_lib_h_path = f'{src_dir}CANlib.h'
-enum_segments_path = f'{src_dir}enum_segments.h'
+pack_unpack_c_path = f'{src_dir}pack_unpack.c'
+can_lib_h_path = f'{src_dir}pack_unpack.h'
+enum_atom_path = f'{src_dir}enum_atom.h'
+bus_path = f'{src_dir}bus.h'
 structs_path = f'{src_dir}structs.h'
-can_lib_c_base_path = 'templates/CANlib_c.template'
+computer_h_dir_path = f'{src_dir}computers/inc'
+computer_c_dir_path = f'{src_dir}computers/src'
+test_h_dir_path = f'{src_dir}test/inc'
+test_c_dir_path = f'{src_dir}test/src'
+send_recieve_path = f'{src_dir}send_receive.c'
+pack_unpack_c_base_path = 'templates/pack_unpack_c.template'
 
 
 def coord(*args, prefix=True):
@@ -38,6 +48,22 @@ def endif(name):
     #endif // ... procedure.
     '''
     return '\n#endif // {0}\n'.format(name)
+
+
+def is_multplxd(frame):
+    return isinstance(frame, ParseCAN.spec.bus.MultiplexedFrame)
+
+
+def frame_handler(frame, name_prepends, func, *args):
+    '''
+    Call func on frame if frame is single, otherwise call frame handler on its
+    sub frames (while properly handling names)
+    '''
+    if is_multplxd(frame):
+        for sub_frame in frame.frame:
+            frame_handler(sub_frame, name_prepends + '_' + frame.name, func, *args)
+    else:
+        func(frame, name_prepends, *args)
 
 
 '''A template dict to define assignment within a `key`.'''
