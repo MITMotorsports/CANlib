@@ -25,19 +25,22 @@ def define_pub_frame(frame, name_prepends, busnm, fw):
 def define_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name,
         prefix=False)
-    fw('void CANlib_Handle_{}(Frame *frame)'.format(
-        tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(frame, &CANlib_{}_Input);\n'.format(tot_name, tot_name) + '}\n\n')
+    fw('void CANlib_Handle_{}(Timestamped_Frame *ts_frame) {{\n'.format(tot_name, tot_name))
+    fw('\tCANlib_{}_Input.timestamp = HAL_GetTick();\n'.format(tot_name))
+    fw('\tCANlib_Unpack_{}(&(ts_frame->frame), &(CANlib_{}_Input.msg));\n'.format(tot_name,tot_name))
+    fw('}\n\n')
 
 
 def define_struct(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name)
-    fw('{}_T {}_Input;\n'.format(
+    fw('{}_Timestamped_T {}_Input;\n'.format(
         tot_name, tot_name))
 
 
 def write(can, output_path=send_recieve_path):
     with open(output_path, 'w') as f:
         fw = f.write
+        fw('#include <stm32f4xx_hal.h>\n')
         fw('#include "pack_unpack.h"\n\n')
 
         for bus in can.bus:

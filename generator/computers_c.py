@@ -81,13 +81,13 @@ def write(can, computers, output_path=computer_c_dir_path):
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
                     'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
-                    '\tFrame frame;\n'
+                    '\tTimestampedFrame ts_frame;\n'
                 )
                 if any(is_multplxd(msg) for msg in bus):
                     fw('\tuint64_t bitstring;\n')
                 fw(
-                    '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
-                    '\tswitch(frame.id) {\n'
+                    '\tCANlib_ReadFrame(&(ts_frame.frame), {});\n'.format(busnm) +
+                    '\tswitch(ts_frame.frame.id) {\n'
                 )
 
                 for msg in bus:
