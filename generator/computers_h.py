@@ -41,7 +41,8 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('#include "structs.h"\n')
             fw('#include "static.h"\n')
             fw('#include "evil_macros.h"\n')
-            fw('#include "pack_unpack.h"\n\n')
+            fw('#include "pack_unpack.h"\n')
+            fw('#include "bus.h"\n\n')
 
             fw('\n')
 
@@ -64,6 +65,7 @@ def write(can, computers, output_path=computer_h_dir_path):
                         frame_handler(frame, bus_name, declare_sub_frame, fw)
                         fw('\n')
                 fw('void CANlib_update_can(void);\n')
+                fw('void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus, Timestamped_Frame* frame);\n')
             except KeyError:
                 pass  # No CAN messages received by this board
 
