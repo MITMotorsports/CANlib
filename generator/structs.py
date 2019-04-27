@@ -17,6 +17,13 @@ def msg_handler(frame, name_prepends, fw):
     fw('} ' + '{}_T;\n\n'.format(coord(name_prepends, frame.name)))
 
 
+def timestamped_msg_handler(frame, name_prepends, fw):
+    fw('typedef struct {\n')
+    fw('\t{}_T msg;\n'.format(coord(name_prepends, frame.name)))
+    fw('\ttime_t timestamp;\n')
+    fw('} ' + '{}_Timestamped_T;\n\n'.format(coord(name_prepends, frame.name)))
+
+
 def write(can, output_path=structs_path):
     header_name = '_CAN_LIBRARY_STRUCTS'
 
@@ -26,9 +33,11 @@ def write(can, output_path=structs_path):
         fw(ifndef(header_name))
         fw('#include <stdint.h>\n')
         fw('#include <stdbool.h>\n\n')
+        fw('#include <time.h>\n\n')
         fw('#include "enum_atom.h"\n\n')
 
         for bus in can.bus:
             for msg in bus.frame:
                 frame_handler(msg, bus.name, msg_handler, fw)
+                frame_handler(msg, bus.name, timestamped_msg_handler, fw)
         fw(endif(header_name))
