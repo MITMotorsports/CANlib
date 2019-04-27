@@ -63,6 +63,7 @@ def switch_case(switch, cases, default=None, indentation=0):
     result += '\t\t{}break;\n'.format(tabs)
     return result
 
+
 def is_multplxd(frame):
     return isinstance(frame, ParseCAN.spec.bus.MultiplexedFrame)
 
