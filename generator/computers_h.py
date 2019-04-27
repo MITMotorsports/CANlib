@@ -26,7 +26,7 @@ def write(can, computers, output_path=computer_h_dir_path):
         f_path = os.path.join(output_path, 'canlib_{}.h'.format(computer.name))
 
         if not ('can' in computer.participation['name'].keys()):
-            # This computer neither sends nor recieves can messagess
+            # This computer neither sends nor receives can messages
             continue
 
         with open(f_path, 'w') as f:
