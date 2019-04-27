@@ -11,7 +11,7 @@ def single_handler(frame, name_prepends, num_tabs, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         '\t' * num_tabs + 'case CANlib_{}_key:'.format(tot_name) + '\n' +
-        '\t' * (num_tabs + 1) + 'CANlib_Handle_{}(&frame);\n'.format(tot_name) +
+        '\t' * (num_tabs + 1) + 'CANlib_Handle_{}(&ts_frame);\n'.format(tot_name) +
         '\t' * (num_tabs + 1) + 'break;\n'
     )
 
@@ -81,7 +81,7 @@ def write(can, computers, output_path=computer_c_dir_path):
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
                     'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
-                    '\tTimestampedFrame ts_frame;\n'
+                    '\tTimestamped_Frame ts_frame;\n'
                 )
                 if any(is_multplxd(msg) for msg in bus):
                     fw('\tuint64_t bitstring;\n')
