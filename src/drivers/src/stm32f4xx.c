@@ -5,6 +5,7 @@
 #include "driver.h"
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
@@ -38,7 +39,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
-void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
+bool CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
   CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
   CAN_HandleTypeDef *hcan;
   switch(raw_bus) {
@@ -52,22 +53,23 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
       hcan = &hcan3;
       break;
     default:
-      return;
+      return false;
   }
 
   uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
       if (HAL_CAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
-        HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data);
+        if (HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data) != HAL_OK) {
+          return false;
+        }
         frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
         frame->dlc = pHeader.DLC;
 
         memcpy(frame->data, data, sizeof(data));
         frame->extended = pHeader.IDE == CAN_ID_EXT;
-        return;
+        return true;
       }
   }
+  return false;
 }
-
-
