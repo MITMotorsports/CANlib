@@ -59,8 +59,9 @@ def switch_case(switch, cases, default=None, indentation=0):
         result += '\t\t{}break;\n'.format(tabs)
     result += '\t{}default:\n'.format(tabs)
     if default is not None:
-        result += '\t\t{}\n'.format(default)
+        result += '\t\t{0}{1}\n'.format(tabs, default)
     result += '\t\t{}break;\n'.format(tabs)
+    result += tabs + '}'
     return result
 
 
