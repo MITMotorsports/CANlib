@@ -51,6 +51,9 @@ def endif(name):
 
 
 def switch_case(switch, cases, default=None, indentation=0):
+    '''
+    Creates a switch-case block, where cases is a list of tuples.  
+    '''
     tabs = '\t'*indentation
     result = '{0}switch({1}) {{\n'.format(tabs, switch)
     for case, action in cases:
