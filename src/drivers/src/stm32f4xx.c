@@ -61,7 +61,7 @@ bool CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
       if (HAL_CAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
         if (HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data) != HAL_OK) {
-          return false;
+          continue;
         }
         frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
         frame->dlc = pHeader.DLC;
