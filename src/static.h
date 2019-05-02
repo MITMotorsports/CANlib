@@ -15,7 +15,7 @@ typedef struct {
 typedef struct {
   Frame frame;
   time_t timestamp;
-} Timestamped_Frame;
+} TimestampedFrame;
 
 #define LIMIT(name)                                         \
   static Time_T last_sent = 0;                              \

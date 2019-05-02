@@ -92,7 +92,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
-                    'static void CANlib_HandleFrame_{}(Timestamped_Frame* ts_frame)'.format(busnm) + '{\n' +
+                    'static void CANlib_HandleFrame_{}(TimestampedFrame* ts_frame)'.format(busnm) + '{\n' +
                         '\tswitch(ts_frame->frame.id) {\n'
                 )
 
@@ -109,7 +109,7 @@ def write(can, computers, output_path=computer_c_dir_path):
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
                     'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
-                    '\tTimestamped_Frame ts_frame;\n'
+                    '\tTimestampedFrame ts_frame;\n'
                 )
                 if any(is_multplxd(msg) for msg in bus):
                     fw('\tuint64_t bitstring;\n')
@@ -128,7 +128,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             fw('void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus) {\n')
             if len(computer.participation['name']['can'].subscribe.keys()) > 0: # check if computer receives messages
-                fw('\tTimestamped_Frame ts_frame;\n')
+                fw('\tTimestampedFrame ts_frame;\n')
                 fw('\tswitch(raw_bus) {\n')
                 for bus in computer.participation['name']['can'].subscribe.keys():
                     fw(

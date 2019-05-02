@@ -25,7 +25,7 @@ def define_pub_frame(frame, name_prepends, busnm, fw):
 def define_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name,
         prefix=False)
-    fw('void CANlib_Handle_{}(Timestamped_Frame *ts_frame) {{\n'.format(tot_name, tot_name))
+    fw('void CANlib_Handle_{}(TimestampedFrame *ts_frame) {{\n'.format(tot_name, tot_name))
     fw('\tCANlib_{}_Input.timestamp = HAL_GetTick();\n'.format(tot_name))
     fw('\tCANlib_Unpack_{}(&(ts_frame->frame), &(CANlib_{}_Input.msg));\n'.format(tot_name,tot_name))
     fw('}\n\n')

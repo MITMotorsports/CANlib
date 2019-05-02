@@ -14,7 +14,7 @@ def declare_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         'extern CANlib_{}_Timestamped_T CANlib_{}_Input;\n'.format(tot_name, tot_name) +
-        'void CANlib_Handle_{}(Timestamped_Frame *frame);\n'.format(tot_name, tot_name)
+        'void CANlib_Handle_{}(TimestampedFrame *frame);\n'.format(tot_name, tot_name)
     )
 
 
