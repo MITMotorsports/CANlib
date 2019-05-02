@@ -19,8 +19,8 @@ def msg_handler(frame, name_prepends, fw):
 
 def timestamped_msg_handler(frame, name_prepends, fw):
     fw('typedef struct {\n')
+    fw('\ttime_t stamp;\n')
     fw('\t{}_T msg;\n'.format(coord(name_prepends, frame.name)))
-    fw('\ttime_t timestamp;\n')
     fw('} ' + '{}_Timestamped_T;\n\n'.format(coord(name_prepends, frame.name)))
 
 

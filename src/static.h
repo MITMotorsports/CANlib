@@ -13,8 +13,8 @@ typedef struct {
 } Frame;
 
 typedef struct {
+  time_t stamp;
   Frame frame;
-  time_t timestamp;
 } TimestampedFrame;
 
 #define LIMIT(name)                                         \
