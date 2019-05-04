@@ -66,6 +66,8 @@ def write(can, computers, output_path=computer_h_dir_path):
                         fw('\n')
                 fw('void CANlib_update_can(void);\n')
                 fw('void CANlib_HandleFrame(TimestampedFrame *ts_frame, time_t stamp, CAN_TypeDef* instance);\n')
+                fw('bool HAL_CANlib_ReadFrame(CAN_HandleTypeDef *hcan, Frame* out);\n')
+                fw('bool HAL_CANlib_ReadFrameFromFIFO(CAN_HandleTypeDef *hcan, uint32_t RxFifo, Frame* out);\n')
             except KeyError:
                 pass  # No CAN messages received by this board
 
