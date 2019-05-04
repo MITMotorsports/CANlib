@@ -1,6 +1,6 @@
 import sys
 sys.path.append('ParseCAN')
-import ParseCAN
+import ParseCAN.ParseCAN as parse
 
 src_dir = '../src/'
 constants_path = f'{src_dir}constants.h'
@@ -69,7 +69,7 @@ def switch_case(switch, cases, default=None, indentation=0):
 
 
 def is_multplxd(frame):
-    return isinstance(frame, ParseCAN.spec.bus.MultiplexedFrame)
+    return isinstance(frame, parse.spec.bus.MultiplexedFrame)
 
 
 def frame_handler(frame, name_prepends, func, *args):

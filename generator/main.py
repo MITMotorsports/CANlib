@@ -1,6 +1,6 @@
 import sys
 sys.path.append('ParseCAN')
-import ParseCAN
+import ParseCAN.ParseCAN as parse
 
 import constants
 import pack_unpack_c
@@ -18,7 +18,7 @@ import bus
 if __name__ == '__main__':
     specpath = sys.argv[1]
     specfile = open(specpath, 'r')
-    system = ParseCAN.spec.System.from_yaml(specfile)
+    system = parse.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
 
     constants.write(can)

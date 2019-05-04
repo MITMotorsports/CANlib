@@ -1,7 +1,6 @@
 import sys
 sys.path.append('ParseCAN')
-import ParseCAN
-from ParseCAN.spec import Endianness, Type
+from ParseCAN.ParseCAN.spec import Endianness, Type
 
 from math import ceil, floor, log2
 from common import pack_unpack_c_path, pack_unpack_c_base_path, coord, is_multplxd, frame_handler
