@@ -6,6 +6,7 @@ from common import computer_c_dir_path, coord, templ, ifndef, endif, \
     frame_handler, is_multplxd
 from math import ceil
 
+raw_bus_to_instance = {"CAN_1": "hcan1", "CAN_2": "hcan2", "CAN_3": "hcan3"}
 
 def single_handler(frame, name_prepends, num_tabs, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
@@ -65,8 +66,13 @@ def write(can, computers, output_path=computer_c_dir_path):
             fw = f.write
             fw('#include <time.h>\n')
             fw('#include <stdbool.h>\n')
+            fw('#include <stm32f4xx_hal.h>\n')
             fw('#include "pack_unpack.h"\n')
             fw('#include "canlib_{}.h"\n\n'.format(computer.name))
+
+            fw('extern CAN_HandleTypeDef hcan1;\n')
+            fw('extern CAN_HandleTypeDef hcan2;\n')
+            fw('extern CAN_HandleTypeDef hcan3;\n\n')
 
             fw(
               'CAN_Raw_Bus_T CANlib_GetRawBus(CANlib_Bus_T bus) {\n'
@@ -116,9 +122,11 @@ def write(can, computers, output_path=computer_c_dir_path):
                 if any(is_multplxd(msg) for msg in bus):
                     fw('\tuint64_t bitstring;\n')
 
+                raw_bus = computer.participation['name']['can'].mapping[busnm]
+                instance = raw_bus_to_instance[raw_bus]
                 fw(
-                    '\tif (CANlib_ReadFrame(&(ts_frame.frame), {})) {{\n'.format(computer.participation['name'][
-                                                                                     'can'].mapping[busnm]) +
+                    '\tif (CANlib_ReadFrame(&{}, &(ts_frame.frame))) {{\n'.format(instance) +
+                    '\t\tts_frame.stamp = HAL_GetTick();\n' +
                     '\t\tCANlib_HandleFrame_{}(&ts_frame);\n'.format(busnm) +
                     '\t}\n' +
                     '}\n\n'
