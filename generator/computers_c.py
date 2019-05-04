@@ -108,7 +108,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
-                    'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
+                    'static void CANlib_Update_can_{}(void)'.format(busnm) + ' {\n' +
                     '\tTimestampedFrame ts_frame;\n'
                 )
                 if any(is_multplxd(msg) for msg in bus):
