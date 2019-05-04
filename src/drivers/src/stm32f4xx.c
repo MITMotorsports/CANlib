@@ -39,9 +39,9 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
-bool CANlib_ReadFrame(Frame *frame, CANlib_Raw_Bus_T bus) {
+bool CANlib_ReadFrame(Frame *frame, CAN_Raw_Bus_T bus) {
   CAN_HandleTypeDef *hcan;
-  switch(bus) {
+  switch (bus) {
     case CAN_1:
       hcan = &hcan1;
       break;

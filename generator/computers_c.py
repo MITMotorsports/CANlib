@@ -63,6 +63,7 @@ def write(can, computers, output_path=computer_c_dir_path):
 
         with open(f_path, 'w') as f:
             fw = f.write
+            fw('#include <time.h>\n')
             fw('#include "pack_unpack.h"\n')
             fw('#include "canlib_{}.h"\n\n'.format(computer.name))
 
@@ -115,7 +116,8 @@ def write(can, computers, output_path=computer_c_dir_path):
                     fw('\tuint64_t bitstring;\n')
 
                 fw(
-                    '\tif (CANlib_ReadFrame(&(ts_frame.frame), CANlib_GetRawBus({}))) {{\n'.format(busnm) +
+                    '\tif (CANlib_ReadFrame(&(ts_frame.frame), {})) {{\n'.format(computer.participation['name'][
+                                                                                     'can'].mapping[busnm]) +
                     '\t\tCANlib_HandleFrame_{}(&ts_frame);\n'.format(busnm) +
                     '\t}\n' +
                     '}\n\n'
@@ -126,20 +128,22 @@ def write(can, computers, output_path=computer_c_dir_path):
                 fw('\tCANlib_update_can_{}();\n'.format(busnm))
             fw('}\n\n')
 
-            fw('void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus) {\n')
+            fw('void CANlib_HandleFrame(TimestampedFrame *ts_frame, time_t stamp, CAN_Raw_Bus_T raw_bus) {\n')
             if len(computer.participation['name']['can'].subscribe.keys()) > 0: # check if computer receives messages
-                fw('\tTimestampedFrame ts_frame;\n')
-                fw('\tswitch(raw_bus) {\n')
+                fw('\tif (CANlib_ReadFrame(&(ts_frame->frame), raw_bus)) {\n')
+                fw('\t\tts_frame->stamp = stamp;\n')
+                fw('\t\tswitch (raw_bus) {\n')
                 for bus in computer.participation['name']['can'].subscribe.keys():
                     fw(
-                        '\t\tcase {}:\n'.format(computer.participation['name']['can'].mapping[bus]) +
-                        '\t\t\tif (CANlib_ReadFrame(&(ts_frame.frame), {})) {{\n'.format(bus) +
-                        '\t\t\t\tCANlib_HandleFrame_{}(&ts_frame);\n'.format(bus) +
-                        '\t\t\t}\n' +
-                        '\t\t\tbreak;\n'
+                        '\t\t\tcase {}:\n'.format(computer.participation['name']['can'].mapping[bus]) +
+                        '\t\t\t\tCANlib_HandleFrame_{}(ts_frame);\n'.format(bus) +
+                        '\t\t\t\tbreak;\n'
                     )
-                fw('\t\tdefault:\n\t\t\tbreak;\n')
+                fw('\t\t\tdefault:\n\t\t\tbreak;\n')
+                fw('\t\t}\n')
                 fw('\t}\n')
             else: # prevent unused warning
+                fw('\tUNUSED(ts_frame);\n')
+                fw('\tUNUSED(stamp);\n')
                 fw('\tUNUSED(raw_bus);\n')
             fw('}\n')
