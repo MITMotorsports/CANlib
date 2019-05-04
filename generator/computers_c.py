@@ -6,7 +6,8 @@ from common import computer_c_dir_path, coord, templ, ifndef, endif, \
     frame_handler, is_multplxd
 from math import ceil
 
-raw_bus_to_instance = {"CAN_1": "hcan1", "CAN_2": "hcan2", "CAN_3": "hcan3"}
+raw_bus_to_handle = {"CAN_1": "hcan1", "CAN_2": "hcan2", "CAN_3": "hcan3"}
+raw_bus_to_instance = {"CAN_1": "CAN1", "CAN_2": "CAN2", "CAN_3": "CAN3"}
 
 def single_handler(frame, name_prepends, num_tabs, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
@@ -123,9 +124,9 @@ def write(can, computers, output_path=computer_c_dir_path):
                     fw('\tuint64_t bitstring;\n')
 
                 raw_bus = computer.participation['name']['can'].mapping[busnm]
-                instance = raw_bus_to_instance[raw_bus]
+                instance = raw_bus_to_handle[raw_bus]
                 fw(
-                    '\tif (CANlib_ReadFrame(&{}, &(ts_frame.frame))) {{\n'.format(instance) +
+                    '\tif (HAL_CANlib_ReadFrame(&{}, &(ts_frame.frame))) {{\n'.format(instance) +
                     '\t\tts_frame.stamp = HAL_GetTick();\n' +
                     '\t\tCANlib_HandleFrame_{}(&ts_frame);\n'.format(busnm) +
                     '\t}\n' +
@@ -134,16 +135,17 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             fw('void CANlib_update_can() {\n')
             for busnm in computer.participation['name']['can'].subscribe.keys():
-                fw('\tCANlib_update_can_{}();\n'.format(busnm))
+                fw('\tCANlib_Update_can_{}();\n'.format(busnm))
             fw('}\n\n')
 
-            fw('void CANlib_HandleFrame(TimestampedFrame *ts_frame, time_t stamp, CAN_Raw_Bus_T raw_bus) {\n')
+            fw('void CANlib_HandleFrame(TimestampedFrame *ts_frame, time_t stamp, CAN_TypeDef* instance) {\n')
             if len(computer.participation['name']['can'].subscribe.keys()) > 0: # check if computer receives messages
                 fw('\tts_frame->stamp = stamp;\n')
-                fw('\tswitch (raw_bus) {\n')
+                fw('\tswitch ((intptr_t)instance) {\n')
                 for bus in computer.participation['name']['can'].subscribe.keys():
                     fw(
-                        '\t\tcase {}:\n'.format(computer.participation['name']['can'].mapping[bus]) +
+                        '\t\tcase (intptr_t){}:\n'.format(raw_bus_to_instance[computer.participation['name']['can'].mapping[
+                            bus]]) +
                         '\t\t\tCANlib_HandleFrame_{}(ts_frame);\n'.format(bus) +
                         '\t\t\tbreak;\n'
                     )
