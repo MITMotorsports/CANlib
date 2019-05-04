@@ -39,11 +39,11 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
-static void HAL_CANlib_ConvertFrame(CAN_RxHeaderTypeDef* pHeader, uint8_t[8] data, Frame *out) {
-  frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
-  frame->dlc = pHeader.DLC;
-  memcpy(frame->data, data, 8);
-  frame->extended = pHeader.IDE == CAN_ID_EXT;
+static void HAL_CANlib_ConvertFrame(CAN_RxHeaderTypeDef* pHeader, uint8_t data[8], Frame *out) {
+  out->id = pHeader->IDE == CAN_ID_STD ? pHeader->StdId : pHeader->ExtId;
+  out->dlc = pHeader->DLC;
+  memcpy(out->data, data, 8);
+  out->extended = pHeader->IDE == CAN_ID_EXT;
 }
 
 bool HAL_CANlib_ReadFrameFromFIFO(CAN_HandleTypeDef *hcan, uint32_t RxFifo, Frame* out) {
