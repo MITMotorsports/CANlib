@@ -115,7 +115,7 @@ def write(can, computers, output_path=computer_c_dir_path):
                     fw('\tuint64_t bitstring;\n')
 
                 fw(
-                    '\tif (CANlib_ReadFrame(&(ts_frame.frame), {})) {{\n'.format(busnm) +
+                    '\tif (CANlib_ReadFrame(&(ts_frame.frame), CANlib_GetRawBus({}))) {{\n'.format(busnm) +
                     '\t\tCANlib_HandleFrame_{}(&ts_frame);\n'.format(busnm) +
                     '\t}\n' +
                     '}\n\n'

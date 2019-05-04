@@ -39,7 +39,22 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
-bool CANlib_ReadFrame(Frame *frame, CAN_HandleTypeDef *hcan) {
+bool CANlib_ReadFrame(Frame *frame, CANlib_Raw_Bus_T bus) {
+  CAN_HandleTypeDef *hcan;
+  switch(bus) {
+    case CAN_1:
+      hcan = &hcan1;
+      break;
+    case CAN_2:
+      hcan = &hcan2;
+      break;
+    case CAN_3:
+      hcan = &hcan3;
+      break;
+    default:
+      return false;
+  }
+
   uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
