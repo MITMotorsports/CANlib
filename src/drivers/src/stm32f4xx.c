@@ -50,7 +50,7 @@ bool HAL_CANlib_ReadFrameFromFIFO(CAN_HandleTypeDef *hcan, uint32_t RxFifo, Fram
   uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
   if (HAL_CAN_GetRxFifoFillLevel(hcan, RxFifo) > 0) {
-    if (HAL_CAN_GetRxMessage(hcan, RxFifo, &pHeader, data) != HAL_OK) {
+    if (HAL_CAN_GetRxMessage(hcan, RxFifo, &pHeader, data) == HAL_OK) {
         HAL_CANlib_ConvertFrame(&pHeader, data, out);
         return true;
     }
