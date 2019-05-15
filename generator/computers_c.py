@@ -155,5 +155,5 @@ def write(can, computers, output_path=computer_c_dir_path):
             else: # prevent unused warning
                 fw('\tUNUSED(ts_frame);\n')
                 fw('\tUNUSED(stamp);\n')
-                fw('\tUNUSED(raw_bus);\n')
+                fw('\tUNUSED(instance);\n')
             fw('}\n')
