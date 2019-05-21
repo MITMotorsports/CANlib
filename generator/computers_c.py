@@ -91,10 +91,10 @@ def write(can, computers, output_path=computer_c_dir_path):
             fw('\t}\n}\n\n')
 
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
-                fw(
-                    'static void CANlib_HandleFrame_{}(Frame* frame)'.format(busnm) + '{\n' +
-                        '\tswitch(frame->id) {\n'
-                )
+                fw('static void CANlib_HandleFrame_{}(Frame* frame)'.format(busnm) + '{\n')
+                if any(is_multplxd(msg) for msg in bus):
+                    fw('\tuint64_t bitstring;\n')
+                fw('\tswitch(frame->id) {\n')
 
                 for msg in bus:
                     msg_handler(msg, busnm, fw)
@@ -111,8 +111,6 @@ def write(can, computers, output_path=computer_c_dir_path):
                     'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
                     '\tFrame frame;\n'
                 )
-                if any(is_multplxd(msg) for msg in bus):
-                    fw('\tuint64_t bitstring;\n')
                 fw(
                     '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
                     '\tCANlib_HandleFrame_{}(&frame);\n'.format(busnm) +
