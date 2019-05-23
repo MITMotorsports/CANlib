@@ -39,7 +39,9 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.IDE = frame->extended ? CAN_ID_EXT: CAN_ID_STD;
   pHeader.RTR = CAN_RTR_DATA; // Data frame (as opposed to a remote frame)
   pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
+#ifdef USING_LOGGING_CALLBACK
   log_frame(frame, bus_num);
+#endif
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
