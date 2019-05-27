@@ -11,7 +11,7 @@ def single_handler(frame, name_prepends, num_tabs, fw):
     tot_name = coord(name_prepends, frame.name, prefix=False)
     fw(
         '\t' * num_tabs + 'case CANlib_{}_key:'.format(tot_name) + '\n' +
-        '\t' * (num_tabs + 1) + 'CANlib_Handle_{}(&frame);\n'.format(tot_name) +
+        '\t' * (num_tabs + 1) + 'CANlib_Handle_{}(frame);\n'.format(tot_name) +
         '\t' * (num_tabs + 1) + 'break;\n'
     )
 
@@ -20,7 +20,7 @@ def multplxd_handler(frame, name_prepends, num_tabs, fw):
     fw('\t' * num_tabs + 'case {}_key:\n'.format(coord(name_prepends, frame.name)))
     key_size = ceil(frame.slice.length / 8) * 8
     key_name = '_'.join([name_prepends,frame.name, 'key'])
-    fw('\t' * (num_tabs + 1) + 'to_bitstring(frame.data, &bitstring);' '\n')
+    fw('\t' * (num_tabs + 1) + 'to_bitstring(frame->data, &bitstring);' '\n')
     fw(
         '\t' * (num_tabs + 1) + 'uint{}_t {} = EXTRACT(bitstring, {}, {});\n'.format(key_size, key_name, frame.slice.start, frame.slice.length) + '\t' * (num_tabs + 1) + 'switch(' + key_name + ') {' '\n'
     )
@@ -78,24 +78,42 @@ def write(can, computers, output_path=computer_c_dir_path):
 
             fw('\t}\n}\n\n')
 
+            fw(
+              'CAN_Raw_Bus_T CANlib_GetConceptualBus(CAN_Raw_Bus_T bus) {\n'
+              '\tswitch (bus) {\n'
+            )
+
+            for busnm, rawnm in computer.participation['name']['can'].mapping.items():
+                fw('\t\tcase {}:\n'.format(rawnm) + '\t\t\treturn {};\n'.format(busnm))
+
+            fw('\t\tdefault:\n\t\t\treturn INVALID_BUS;\n')
+
+            fw('\t}\n}\n\n')
+
+            for busnm, bus in computer.participation['name']['can'].subscribe.items():
+                fw('static void CANlib_HandleFrame_{}(Frame* frame)'.format(busnm) + '{\n')
+                if any(is_multplxd(msg) for msg in bus):
+                    fw('\tuint64_t bitstring;\n')
+                fw('\tswitch(frame->id) {\n')
+
+                for msg in bus:
+                    msg_handler(msg, busnm, fw)
+
+                fw('\t\tdefault:\n\t\t\treturn;\n')
+                fw('\t}\n')
+
+                fw(
+                    '}\n\n'
+                )
+
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
                 fw(
                     'static void CANlib_update_can_{}(void)'.format(busnm) + '{\n' +
                     '\tFrame frame;\n'
                 )
-                if any(is_multplxd(msg) for msg in bus):
-                    fw('\tuint64_t bitstring;\n')
                 fw(
                     '\tCANlib_ReadFrame(&frame, {});\n'.format(busnm) +
-                    '\tswitch(frame.id) {\n'
-                )
-
-                for msg in bus:
-                    msg_handler(msg, busnm, fw)
-
-                fw('\t}\n')
-
-                fw(
+                    '\tCANlib_HandleFrame_{}(&frame);\n'.format(busnm) +
                     '}\n\n'
                 )
 
@@ -103,3 +121,14 @@ def write(can, computers, output_path=computer_c_dir_path):
             for busnm in computer.participation['name']['can'].subscribe.keys():
                 fw('\tCANlib_update_can_{}();\n'.format(busnm))
             fw('}\n\n')
+
+            fw('void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus, Frame* frame) {\n')
+            fw('\tswitch(raw_bus) {\n')
+            for bus in computer.participation['name']['can'].subscribe.keys():
+                fw(
+                    '\t\tcase {}:\n'.format(computer.participation['name']['can'].mapping[bus]) +
+                    '\t\t\tCANlib_HandleFrame_{}(frame);\n'.format(bus) +
+                    '\t\t\tbreak;\n'
+                )
+            fw('\t\tdefault:\n\t\t\tbreak;\n')
+            fw('\t}\n}\n')
