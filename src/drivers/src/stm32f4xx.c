@@ -41,6 +41,8 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
 #ifdef USING_LOGGING_CALLBACK
   log_frame(frame, bus_num);
+#else
+  UNUSED(bus_num);
 #endif
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }

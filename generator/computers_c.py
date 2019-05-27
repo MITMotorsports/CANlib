@@ -130,5 +130,5 @@ def write(can, computers, output_path=computer_c_dir_path):
                     '\t\t\tCANlib_HandleFrame_{}(frame);\n'.format(bus) +
                     '\t\t\tbreak;\n'
                 )
-            fw('\t\tdefault:\n\t\t\tbreak;\n')
+            fw('\t\tdefault:\n\t\t\tUNUSED(frame);\n\t\tbreak;\n')
             fw('\t}\n}\n')
