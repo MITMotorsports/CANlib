@@ -50,6 +50,24 @@ def endif(name):
     return '\n#endif // {0}\n'.format(name)
 
 
+def switch_case(switch, cases, default=None, indentation=0):
+    '''
+    Creates a switch-case block, where cases is a list of tuples.  
+    '''
+    tabs = '\t'*indentation
+    result = '{0}switch({1}) {{\n'.format(tabs, switch)
+    for case, action in cases:
+        result += '\t{0}case {1}:\n'.format(tabs, case)
+        result += '\t\t{0}{1}\n'.format(tabs, action)
+        result += '\t\t{}break;\n'.format(tabs)
+    result += '\t{}default:\n'.format(tabs)
+    if default is not None:
+        result += '\t\t{0}{1}\n'.format(tabs, default)
+    result += '\t\t{}break;\n'.format(tabs)
+    result += tabs + '}'
+    return result
+
+
 def is_multplxd(frame):
     return isinstance(frame, ParseCAN.spec.bus.MultiplexedFrame)
 
