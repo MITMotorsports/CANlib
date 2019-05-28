@@ -5,6 +5,9 @@
 #include "driver.h"
 #include <stdint.h>
 #include <string.h>
+#ifdef USING_LOGGING_CALLBACK
+#include "log.h"
+#endif
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
