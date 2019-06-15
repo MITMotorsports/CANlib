@@ -7,6 +7,7 @@
 #include <string.h>
 #ifdef USING_LOGGING_CALLBACK
 #include "log.h"
+#include "telemetry.h"
 #endif
 
 extern CAN_HandleTypeDef hcan1;
@@ -44,6 +45,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
 #ifdef USING_LOGGING_CALLBACK
   log_frame(frame, bus_num);
+  send_telemetry(frame, bus_num);
 #else
   UNUSED(bus_num);
 #endif
@@ -81,5 +83,3 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
       }
   }
 }
-
-
