@@ -13,16 +13,20 @@ extern CAN_HandleTypeDef hcan3;
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
+  int bus_num;
   CAN_HandleTypeDef* hcan;
   switch(raw_bus) {
     case CAN_1:
       hcan = &hcan1;
+      bus_num = 1;
       break;
     case CAN_2:
       hcan = &hcan2;
+      bus_num = 2;
       break;
     case CAN_3:
       hcan = &hcan3;
+      bus_num = 3;
       break;
     default:
       return HAL_ERROR;
@@ -36,6 +40,11 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.IDE = frame->extended ? CAN_ID_EXT: CAN_ID_STD;
   pHeader.RTR = CAN_RTR_DATA; // Data frame (as opposed to a remote frame)
   pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
+#ifdef USING_LOGGING_CALLBACK
+  log_frame(frame, bus_num);
+#else
+  UNUSED(bus_num);
+#endif
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 

@@ -100,10 +100,11 @@ def write(can, computers, output_path=computer_c_dir_path):
             fw('\t}\n}\n\n')
 
             for busnm, bus in computer.participation['name']['can'].subscribe.items():
-                fw(
-                    'static void CANlib_HandleFrame_{}(TimestampedFrame* ts_frame)'.format(busnm) + '{\n' +
-                        '\tswitch(ts_frame->frame.id) {\n'
-                )
+
+                fw('static void CANlib_HandleFrame_{}(TimestampedFrame* ts_frame)'.format(busnm) + '{\n')
+                if any(is_multplxd(msg) for msg in bus):
+                    fw('\tuint64_t bitstring;\n')
+                fw('\tswitch(ts_frame->frame.id) {\n')
 
                 for msg in bus:
                     msg_handler(msg, busnm, fw)
@@ -120,11 +121,10 @@ def write(can, computers, output_path=computer_c_dir_path):
                     'static void CANlib_Update_can_{}(void)'.format(busnm) + ' {\n' +
                     '\tTimestampedFrame ts_frame;\n'
                 )
-                if any(is_multplxd(msg) for msg in bus):
-                    fw('\tuint64_t bitstring;\n')
 
                 raw_bus = computer.participation['name']['can'].mapping[busnm]
                 instance = raw_bus_to_handle[raw_bus]
+
                 fw(
                     '\tif (HAL_CANlib_ReadFrame(&{}, &(ts_frame.frame))) {{\n'.format(instance) +
                     '\t\tts_frame.stamp = HAL_GetTick();\n' +
