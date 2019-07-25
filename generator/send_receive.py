@@ -25,13 +25,15 @@ def define_pub_frame(frame, name_prepends, busnm, fw):
 def define_sub_frame(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name,
         prefix=False)
-    fw('void CANlib_Handle_{}(Frame *frame)'.format(
-        tot_name, tot_name) + ' {\n' + '\tCANlib_Unpack_{}(frame, &CANlib_{}_Input);\n'.format(tot_name, tot_name) + '}\n\n')
+    fw('void CANlib_Handle_{}(TimestampedFrame *ts_frame) {{\n'.format(tot_name, tot_name))
+    fw('\tCANlib_{}_Input.stamp = ts_frame->stamp;\n'.format(tot_name))
+    fw('\tCANlib_Unpack_{}(&(ts_frame->frame), &(CANlib_{}_Input.msg));\n'.format(tot_name,tot_name))
+    fw('}\n\n')
 
 
 def define_struct(frame, name_prepends, fw):
     tot_name = coord(name_prepends, frame.name)
-    fw('{}_T {}_Input;\n'.format(
+    fw('{}_Timestamped_T {}_Input;\n'.format(
         tot_name, tot_name))
 
 

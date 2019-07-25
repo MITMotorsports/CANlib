@@ -20,7 +20,7 @@ def write(can, computers, output_path=bus_path):
         raw_buses = set()
         for computer in computers:
             if not ('can' in computer.participation['name'].keys()):
-                # This computer neither sends nor recieves can messages
+                # This computer neither sends nor receives can messages
                 continue
 
             raw_buses |= set(computer.participation['name']['can'].mapping.values())

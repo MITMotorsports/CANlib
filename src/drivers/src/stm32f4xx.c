@@ -5,6 +5,7 @@
 #include "driver.h"
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
@@ -47,36 +48,30 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
-void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
-  CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
-  CAN_HandleTypeDef *hcan;
-  switch(raw_bus) {
-    case CAN_1:
-      hcan = &hcan1;
-      break;
-    case CAN_2:
-      hcan = &hcan2;
-      break;
-    case CAN_3:
-      hcan = &hcan3;
-      break;
-    default:
-      return;
-  }
-
-  uint8_t data[8] = {};
-  CAN_RxHeaderTypeDef pHeader;
-  for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
-      if (HAL_CAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
-        HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data);
-        frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
-        frame->dlc = pHeader.DLC;
-
-        memcpy(frame->data, data, sizeof(data));
-        frame->extended = pHeader.IDE == CAN_ID_EXT;
-        return;
-      }
-  }
+static void HAL_CANlib_ConvertFrame(CAN_RxHeaderTypeDef* pHeader, uint8_t data[8], Frame *out) {
+  out->id = pHeader->IDE == CAN_ID_STD ? pHeader->StdId : pHeader->ExtId;
+  out->dlc = pHeader->DLC;
+  memcpy(out->data, data, 8);
+  out->extended = pHeader->IDE == CAN_ID_EXT;
 }
 
+bool HAL_CANlib_ReadFrameFromFIFO(CAN_HandleTypeDef *hcan, uint32_t RxFifo, Frame* out) {
+  uint8_t data[8] = {};
+  CAN_RxHeaderTypeDef pHeader;
+  if (HAL_CAN_GetRxFifoFillLevel(hcan, RxFifo) > 0) {
+    if (HAL_CAN_GetRxMessage(hcan, RxFifo, &pHeader, data) == HAL_OK) {
+        HAL_CANlib_ConvertFrame(&pHeader, data, out);
+        return true;
+    }
+  }
+  return false;
+}
 
+bool HAL_CANlib_ReadFrame(CAN_HandleTypeDef *hcan, Frame* out) {
+  for (uint8_t fifo = 0; fifo < 2; fifo++) {
+    if (HAL_CANlib_ReadFrameFromFIFO(hcan, fifo, out)) {
+      return true;
+    }
+  }
+  return false;
+}

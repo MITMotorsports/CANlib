@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <time.h>
 
 typedef struct {
   uint32_t id;
@@ -10,6 +11,11 @@ typedef struct {
   uint8_t dlc;
   bool extended;
 } Frame;
+
+typedef struct {
+  time_t stamp;
+  Frame frame;
+} TimestampedFrame;
 
 #define LIMIT(name)                                         \
   static Time_T last_sent = 0;                              \
