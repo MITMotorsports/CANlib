@@ -64,7 +64,7 @@ def write(can, computers, output_path=computer_h_dir_path):
                     for frame in bus:
                         frame_handler(frame, bus_name, declare_sub_frame, fw)
                         fw('\n')
-                fw('void CANlib_update_can(void);\n')
+                fw('void CANlib_update_can(void); // for those who still lack CAN interrupts\n')
                 fw('void CANlib_HandleFrame(TimestampedFrame *ts_frame, time_t stamp, CAN_TypeDef* instance);\n')
                 fw('bool HAL_CANlib_ReadFrame(CAN_HandleTypeDef *hcan, Frame* out);\n')
                 fw('bool HAL_CANlib_ReadFrameFromFIFO(CAN_HandleTypeDef *hcan, uint32_t RxFifo, Frame* out);\n')
@@ -74,4 +74,3 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('\n#ifdef __cplusplus\n} // extern "C"\n#endif // __cplusplus\n\n')
 
             fw(endif(header_name))
-
