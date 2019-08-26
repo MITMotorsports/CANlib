@@ -32,7 +32,10 @@ def multplxd_handler(frame, name_prepends, num_tabs, fw):
             multplxd_handler(sub_frame, name_prepends, num_tabs + 2, fw)
         else:
             single_handler(sub_frame, name_prepends, num_tabs + 2, fw)
+    fw('\t' * (num_tabs + 2) + 'default:\n')
+    fw('\t' * (num_tabs + 3) + 'return;\n')
     fw('\t' * (num_tabs + 1) + '}\n')
+    fw('\t' * (num_tabs + 1) + 'break;\n')
 
 
 def msg_handler(msg, busnm, fw):
