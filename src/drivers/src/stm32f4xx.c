@@ -5,6 +5,9 @@
 #include "driver.h"
 #include <stdint.h>
 #include <string.h>
+#ifdef USING_LOGGING_CALLBACK
+  #include "log.h"
+#endif
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
@@ -78,5 +81,3 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
       }
   }
 }
-
-
