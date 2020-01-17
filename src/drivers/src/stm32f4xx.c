@@ -1,5 +1,6 @@
 #include "static.h"
 
+#include "drivers/inc/stm32f4xx.h"
 #include "stm32f4xx_hal.h"
 #include "bus.h"
 #include "driver.h"

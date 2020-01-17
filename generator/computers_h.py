@@ -18,12 +18,14 @@ def declare_sub_frame(frame, name_prepends, fw):
     )
 
 
-def write(can, computers, output_path=computer_h_dir_path):
+def write(system, can, computers, output_path=computer_h_dir_path):
     os.makedirs(output_path, exist_ok=True)
 
     for computer in computers:
         header_name = '_CAN_LIBRARY_{}_H'.format(computer.name.upper())
         f_path = os.path.join(output_path, 'canlib_{}.h'.format(computer.name))
+
+        architecture = system.architecture['name'][computer.architecture]
 
         if not ('can' in computer.participation['name'].keys()):
             # This computer neither sends nor recieves can messagess
@@ -41,8 +43,8 @@ def write(can, computers, output_path=computer_h_dir_path):
             fw('#include "structs.h"\n')
             fw('#include "static.h"\n')
             fw('#include "evil_macros.h"\n')
-            fw('#include "pack_unpack.h"\n')
             fw('#include "bus.h"\n\n')
+            fw('\n#include "drivers/inc/{}.h"\n'.format(architecture.family))
 
             fw('\n')
 
@@ -68,6 +70,8 @@ def write(can, computers, output_path=computer_h_dir_path):
                 fw('void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus, Frame* frame);\n')
             except KeyError:
                 pass # No CAN messages received by this board
+
+            fw('#include "pack_unpack.h"\n')
 
             fw('\n#ifdef __cplusplus\n} // extern "C"\n#endif // __cplusplus\n\n')
 
