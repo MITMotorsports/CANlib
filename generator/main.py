@@ -14,6 +14,7 @@ import test_h
 import test_c
 import send_receive
 import bus
+import drivers_inc
 
 if __name__ == '__main__':
     specpath = sys.argv[1]
@@ -28,7 +29,9 @@ if __name__ == '__main__':
     send_receive.write(can)
     structs.write(can)
     bus.write(can, system.computer)
-    computers_h.write(can, system.computer)
+    computers_h.write(system, can, system.computer)
     computers_c.write(can, system.computer)
     test_h.write(can)
     test_c.write(can)
+
+    drivers_inc.write(system)

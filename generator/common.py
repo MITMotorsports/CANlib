@@ -8,6 +8,8 @@ pack_unpack_c_path = f'{src_dir}pack_unpack.c'
 can_lib_h_path = f'{src_dir}pack_unpack.h'
 enum_atom_path = f'{src_dir}enum_atom.h'
 bus_path = f'{src_dir}bus.h'
+drivers_inc_dir_path = f'{src_dir}/drivers/inc'
+drivers_inc_template_dir_path = f'{src_dir}/drivers/inc_template'
 structs_path = f'{src_dir}structs.h'
 computer_h_dir_path = f'{src_dir}computers/inc'
 computer_c_dir_path = f'{src_dir}computers/src'
@@ -52,7 +54,7 @@ def endif(name):
 
 def switch_case(switch, cases, default=None, indentation=0):
     '''
-    Creates a switch-case block, where cases is a list of tuples.  
+    Creates a switch-case block, where cases is a list of tuples.
     '''
     tabs = '\t'*indentation
     result = '{0}switch({1}) {{\n'.format(tabs, switch)

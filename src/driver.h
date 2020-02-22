@@ -1,7 +1,9 @@
 #ifndef __DRIVER_H
 #define __DRIVER_H
 
-#include "drivers/inc/stm32f4xx.h"
+// INCLUDE THIS AFTER YOUR DRIVER
+
+#include "drivers/inc/stm32f4xx.h"  // BAD HACK
 #include "bus.h"
 
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
