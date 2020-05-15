@@ -10,14 +10,14 @@
   #include "log.h"
 #endif
 
-extern CAN_HandleTypeDef hcan1;
-extern CAN_HandleTypeDef hcan2;
-extern CAN_HandleTypeDef hcan3;
+extern FDCAN_HandleTypeDef hcan1;
+extern FDCAN_HandleTypeDef hcan2;
+extern FDCAN_HandleTypeDef hcan3;
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
   int bus_num;
-  CAN_HandleTypeDef* hcan;
+  FDCAN_HandleTypeDef* hcan;
   switch(raw_bus) {
     case CAN_1:
       hcan = &hcan1;
@@ -35,14 +35,14 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
       return HAL_ERROR;
   }
 
-  CAN_TxHeaderTypeDef pHeader;
+  FDCAN_TxHeaderTypeDef pHeader;
   uint32_t pTxMailbox = 0;
 
-  pHeader.DLC = frame->dlc;
-  pHeader.StdId = frame->id;
-  pHeader.IDE = frame->extended ? CAN_ID_EXT: CAN_ID_STD;
-  pHeader.RTR = CAN_RTR_DATA; // Data frame (as opposed to a remote frame)
-  pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
+  pHeader.DataLength = frame->dlc;
+  pHeader.Identifier= frame->id;
+  pHeader.IdType = frame->extended ? FDCAN_EXTENDED_ID: FDCAN_STANDARD_ID;
+  //pHeader.RTR = CAN_RTR_DATA; // Data frame (as opposed to a remote frame)
+  //pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
 #ifdef USING_LOGGING_CALLBACK
   log_frame(frame, bus_num);
 #else
@@ -51,9 +51,8 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   return HAL_FDCAN_AddMessageToTxBuffer(hcan, &pHeader, frame->data, &pTxMailbox);
 }
 
-void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
-  CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
-  CAN_HandleTypeDef *hcan;
+void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) { CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
+  FDCAN_HandleTypeDef *hcan;
   switch(raw_bus) {
     case CAN_1:
       hcan = &hcan1;
@@ -69,15 +68,15 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
   }
 
   uint8_t data[8] = {};
-  CAN_RxHeaderTypeDef pHeader;
+  FDCAN_RxHeaderTypeDef pHeader;
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
       if (HAL_FDCAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
         HAL_FDCAN_GetRxMessage(hcan, fifo, &pHeader, data);
-        frame->id = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
-        frame->dlc = pHeader.DLC;
+        frame->id = pHeader.IdType == FDCAN_STANDARD_ID ? pHeader.Identifier: pHeader.Identifier;
+        frame->dlc = pHeader.DataLength;
 
         memcpy(frame->data, data, sizeof(data));
-        frame->extended = pHeader.IDE == CAN_ID_EXT;
+        frame->extended = pHeader.IdType == FDCAN_EXTENDED_ID;
         return;
       }
   }
