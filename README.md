@@ -11,9 +11,22 @@ The CAN spec should be a YAML file with the following structure:
 name: MYwhatever # Name of your CAN spec
 units: # Any custom units you need to define
   - newtonmeter = N * m = J = Nm
-architectures: # Allowed architectures for boards
-  - arch0
-  - arch1
+architecture:
+  arch1:
+    family: archx
+    participation:
+      can:
+        buses:
+          - CAN_1
+          - CAN_2
+          - CAN_3
+  arch2:
+    family: archx
+    participation:
+      can:
+        buses:
+          - CAN_1
+          - CAN_2
 computer: # All boards on the car, along with CAN messages they publish and subscribe to
   board1:
     architecture: arch1
