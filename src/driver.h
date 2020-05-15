@@ -3,7 +3,7 @@
 
 // INCLUDE THIS AFTER YOUR DRIVER
 
-#include "drivers/inc/stm32f4xx.h"  // BAD HACK
+#include "drivers/inc/stm32h7xx.h"
 #include "bus.h"
 
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
