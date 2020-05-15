@@ -17,16 +17,16 @@ architecture:
     participation:
       can:
         buses:
-          - CAN_1
-          - CAN_2
-          - CAN_3
+          - hardwareBus1
+          - hardwareBus2
+          - hardwareBus3
   arch2:
     family: archx
     participation:
       can:
         buses:
-          - CAN_1
-          - CAN_2
+          - hardwareBus1
+          - hardwareBus2
 computer: # All boards on the car, along with CAN messages they publish and subscribe to
   board1:
     architecture: arch1
