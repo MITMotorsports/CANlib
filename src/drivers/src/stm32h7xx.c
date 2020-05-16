@@ -10,25 +10,26 @@
   #include "log.h"
 #endif
 
-extern FDCAN_HandleTypeDef hcan1;
-extern FDCAN_HandleTypeDef hcan2;
-extern FDCAN_HandleTypeDef hcan3;
+extern FDCAN_HandleTypeDef hfdcan1;
+// TODO: do some macro crap to automatically deal with these if not used
+extern FDCAN_HandleTypeDef hfdcan2;
+extern FDCAN_HandleTypeDef hfdcan3;
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
   int bus_num;
-  FDCAN_HandleTypeDef* hcan;
+  FDCAN_HandleTypeDef* hfdcan;
   switch(raw_bus) {
     case CAN_1:
-      hcan = &hcan1;
+      hfdcan = &hfdcan1;
       bus_num = 1;
       break;
     case CAN_2:
-      hcan = &hcan2;
+      hfdcan = &hfdcan2;
       bus_num = 2;
       break;
     case CAN_3:
-      hcan = &hcan3;
+      hfdcan = &hfdcan3;
       bus_num = 3;
       break;
     default:
@@ -48,20 +49,20 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 #else
   UNUSED(bus_num);
 #endif
-  return HAL_FDCAN_AddMessageToTxBuffer(hcan, &pHeader, frame->data, &pTxMailbox);
+  return HAL_FDCAN_AddMessageToTxBuffer(hfdcan, &pHeader, frame->data, &pTxMailbox);
 }
 
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) { CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
-  FDCAN_HandleTypeDef *hcan;
+  FDCAN_HandleTypeDef *hfdcan;
   switch(raw_bus) {
     case CAN_1:
-      hcan = &hcan1;
+      hfdcan = &hfdcan1;
       break;
     case CAN_2:
-      hcan = &hcan2;
+      hfdcan = &hfdcan2;
       break;
     case CAN_3:
-      hcan = &hcan3;
+      hfdcan = &hfdcan3;
       break;
     default:
       return;
@@ -70,8 +71,8 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) { CAN_Raw_Bus_T raw_bus = 
   uint8_t data[8] = {};
   FDCAN_RxHeaderTypeDef pHeader;
   for (int fifo = 0; fifo < 2; fifo++) { // There are 2 receive FIFOs
-      if (HAL_FDCAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
-        HAL_FDCAN_GetRxMessage(hcan, fifo, &pHeader, data);
+      if (HAL_FDCAN_GetRxFifoFillLevel(hfdcan, fifo) > 0) {
+        HAL_FDCAN_GetRxMessage(hfdcan, fifo, &pHeader, data);
         frame->id = pHeader.IdType == FDCAN_STANDARD_ID ? pHeader.Identifier: pHeader.Identifier;
         frame->dlc = pHeader.DataLength;
 
