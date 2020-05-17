@@ -40,8 +40,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 
   pHeader.DataLength = FDCAN_DLC_BYTES_8;
   //pHeader.DataLength = frame->dlc;
-  pHeader.Identifier= 0x333;
-  //pHeader.Identifier= frame->id;
+  pHeader.Identifier= frame->id;
   pHeader.IdType = frame->extended ? FDCAN_EXTENDED_ID: FDCAN_STANDARD_ID;
   pHeader.FDFormat =  FDCAN_CLASSIC_CAN;
   pHeader.TxFrameType = FDCAN_DATA_FRAME;
