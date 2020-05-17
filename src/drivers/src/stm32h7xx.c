@@ -37,19 +37,21 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   }
 
   FDCAN_TxHeaderTypeDef pHeader;
-  uint32_t pTxMailbox = 0;
 
-  pHeader.DataLength = frame->dlc;
-  pHeader.Identifier= frame->id;
+  pHeader.DataLength = FDCAN_DLC_BYTES_8;
+  //pHeader.DataLength = frame->dlc;
+  pHeader.Identifier= 0x333;
+  //pHeader.Identifier= frame->id;
   pHeader.IdType = frame->extended ? FDCAN_EXTENDED_ID: FDCAN_STANDARD_ID;
-  //pHeader.RTR = CAN_RTR_DATA; // Data frame (as opposed to a remote frame)
+  pHeader.FDFormat =  FDCAN_CLASSIC_CAN;
+  pHeader.TxFrameType = FDCAN_DATA_FRAME;
   //pHeader.TransmitGlobalTime = DISABLE; // Don't replace last 2 bytes of data with TX time.
 #ifdef USING_LOGGING_CALLBACK
   log_frame(frame, bus_num);
 #else
   UNUSED(bus_num);
 #endif
-  return HAL_FDCAN_AddMessageToTxBuffer(hfdcan, &pHeader, frame->data, &pTxMailbox);
+  return HAL_FDCAN_AddMessageToTxFifoQ(hfdcan, &pHeader, frame->data);
 }
 
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) { CAN_Raw_Bus_T raw_bus = CANlib_GetRawBus(bus);
