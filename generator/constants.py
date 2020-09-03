@@ -15,7 +15,7 @@ def get_ms(period_str):
     return ur[period_str].to('ms').magnitude
 
 
-def write(env, can, output_path=constants_path):
+def write(env, output_path=constants_path):
     template = env.get_template("constants.h.j2")
     with open(output_path, 'w') as f:
-        f.write(template.render(can=can, get_ms=get_ms))
+        f.write(template.render(get_ms=get_ms))

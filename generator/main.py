@@ -21,17 +21,19 @@ import drivers_inc
 
 if __name__ == '__main__':
 
-    generator_dir = os.path.dirname(sys.argv[0])
-    template_dir = os.path.join(generator_dir, "templates")
-    template_loader = jinja2.FileSystemLoader(searchpath=template_dir)
-    template_env = jinja2.Environment(loader=template_loader)
-
     specpath = sys.argv[1]
     specfile = open(specpath, 'r')
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
 
-    constants.write(template_env, can)
+    generator_dir = os.path.dirname(sys.argv[0])
+    template_dir = os.path.join(generator_dir, "templates")
+    template_loader = jinja2.FileSystemLoader(searchpath=template_dir)
+    template_env = jinja2.Environment(loader=template_loader)
+    template_env.globals["can"] = can
+    template_env.globals["system"] = system
+
+    constants.write(template_env)
     pack_unpack_c.write(can)
     pack_unpack_h.write(can)
     enum_atom.write(can)
