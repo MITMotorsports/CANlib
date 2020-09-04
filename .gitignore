@@ -126,3 +126,6 @@ venv.bak/
 
 # MacOS
 *.DS_Store
+
+# Precompiled header
+*.gch
