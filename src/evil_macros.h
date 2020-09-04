@@ -30,7 +30,7 @@
 
 #define SIGN(input, data_width) \
   ( \
-   ((int64_t)((input) << (64 - (data_width)))) >> \
+   ((int64_t)((uint64_t)(input) << (64 - (data_width)))) >> \
    (64 - (data_width)) \
   )
 

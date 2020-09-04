@@ -7,7 +7,7 @@
 {%- else -%}
 {%- set name_prepends = name_prepends + [frame.name] -%}
 {%- set tot_name = '_'.join(name_prepends) -%}
-void CANlib_Pack_{{ tot_name }}(CANlib_{{ tot_name }} *type_in, Frame *can_out) {
+void CANlib_Pack_{{ tot_name }}(CANlib_{{ tot_name }}_T *type_in, Frame *can_out) {
   uint64_t bitstring = 0;
 {%- for i in range(parent_slices | length) -%}
 {%- set part_name = '_'.join(name_prepends[:i + 3]) %}
@@ -25,8 +25,42 @@ void CANlib_Pack_{{ tot_name }}(CANlib_{{ tot_name }} *type_in, Frame *can_out) 
 }
 {%- endif %}
 {%- endmacro -%}
-#pragma once
 
+{%- macro can_unpack_handler(frame, name_prepends) -%}
+{%- if frame.frame is defined -%}
+{% for sub_frame in frame.frame -%}
+{{ can_unpack_handler(sub_frame, name_prepends + '_' + frame.name) }}
+
+{% endfor -%}
+{%- else -%}
+{%- set tot_name = name_prepends + '_' + frame.name -%}
+void CANlib_Unpack_{{ tot_name }}(Frame *can_in, CANlib_{{ tot_name }}_T *type_out) {
+  uint64_t bitstring = 0;
+  to_bitstring(can_in->data, &bitstring);
+{%- for atom in frame.atom %}
+  type_out->{{ atom.name }} = {% if 0 %}{% endif %}
+  {%- if atom.type.isenum() -%}
+    (CANlib_{{ tot_name }}_{{ atom.name }}_T)
+  {%- endif -%}
+  {%- if atom.type.issigned() -%}
+    SIGN(
+  {%- endif -%}
+  {%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}
+    swap_{{ atom.type.type }}(
+  {%- endif -%}
+  EXTRACT(bitstring, {{ atom.slice.start }}, {{ atom.slice.length }})
+  {%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}
+    )
+  {%- endif -%}
+  {%- if atom.type.issigned() -%}
+    , {{ atom.slice.length }})
+  {%- endif -%}
+  ;
+{%- endfor %}
+}
+{%- endif %}
+{%- endmacro -%}
+#include "pack_unpack.h"
 #include "evil_macros.h"
 
 typedef union {
@@ -34,6 +68,7 @@ typedef union {
   uint64_t bitstring;
 } DATA_T;
 
+// utility functions
 void data_transfer(DATA_T *in, DATA_T *out) {
   uint8_t i;
   for (i = 0; i < 8; i++) {
@@ -93,9 +128,18 @@ uint64_t swap_uint64(uint64_t val) {
   return (val << 32) | (val >> 32);
 }
 
+// Pack functions
 {% for bus in can.bus %}
 {%- for msg in bus.frame -%}
 {{ can_pack_handler(msg, [bus.name], bus.extended) }}
+
+{% endfor %}
+{% endfor %}
+
+// Unpack functions
+{% for bus in can.bus %}
+{%- for msg in bus.frame -%}
+{{ can_unpack_handler(msg, bus.name) }}
 
 {% endfor %}
 {% endfor %}

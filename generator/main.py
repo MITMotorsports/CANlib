@@ -34,7 +34,7 @@ if __name__ == '__main__':
     template_env.globals["system"] = system
 
     constants.write(template_env)
-    pack_unpack_c.write(can)
+    pack_unpack_c.write(template_env, can)
     pack_unpack_h.write(can)
     enum_atom.write(can)
     send_receive.write(can)
