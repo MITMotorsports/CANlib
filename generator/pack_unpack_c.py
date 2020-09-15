@@ -5,7 +5,7 @@ import ParseCAN
 from common import pack_unpack_c_path
 
 
-def write(env, can, output_path=pack_unpack_c_path):
+def write(env, output_path=pack_unpack_c_path):
     '''
     Generate pack_unpack.c file.
 

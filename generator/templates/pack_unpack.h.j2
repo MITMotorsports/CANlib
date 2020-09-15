@@ -1,0 +1,28 @@
+{%- macro function_declarations(bus, msg, msg_name=msg.name) -%}
+{%- if msg.frame is defined -%}
+{% for sub_frame in msg.frame -%}
+{{ function_declarations(bus, sub_frame, msg_name + '_' + sub_frame.name) }}
+{% endfor -%}
+{%- else -%}
+void CANlib_Pack_{{ bus.name }}_{{ msg_name }}(CANlib_{{ bus.name }}_{{ msg_name }}_T *type_in, Frame *can_out);
+void CANlib_Unpack_{{ bus.name }}_{{ msg_name }}(Frame *can_in, CANlib_{{ bus.name }}_{{ msg_name }}_T *type_out);
+{% endif %}
+{%- endmacro -%}
+#pragma once
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "static.h"
+#include "driver.h"
+#include "constants.h"
+#include "structs.h"
+
+{%- for bus in can.bus %}
+
+// {{ bus.name }}
+{%- for msg in bus.frame %}
+{{ function_declarations(bus, msg) }}
+{%- endfor %}
+{%- endfor %}
+void to_bitstring(uint8_t in[], uint64_t *out);
