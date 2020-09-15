@@ -29,7 +29,7 @@ if __name__ == '__main__':
     generator_dir = os.path.dirname(sys.argv[0])
     template_dir = os.path.join(generator_dir, "templates")
     template_loader = jinja2.FileSystemLoader(searchpath=template_dir)
-    template_env = jinja2.Environment(loader=template_loader)
+    template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True)
     template_env.globals["can"] = can
     template_env.globals["system"] = system
 
