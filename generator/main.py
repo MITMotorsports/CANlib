@@ -67,7 +67,7 @@ if __name__ == '__main__':
     pack_unpack_c.write(template_env)
     pack_unpack_h.write(template_env)
     enum_atom.write(template_env)
-    send_receive.write(can)
+    send_receive.write(template_env)
     structs.write(can)
     bus.write(can, system.computer)
     computers_h.write(system, can, system.computer)
