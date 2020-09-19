@@ -1,0 +1,31 @@
+{%- macro struct_declarations(bus, msg, msg_name=msg.name) -%}
+{%- if msg.frame is defined -%}
+{%- for sub_frame in msg.frame -%}
+{{ struct_declarations(bus, sub_frame, msg_name + '_' + sub_frame.name) }}
+{%- endfor -%}
+{%- else %}
+typedef struct {
+{%- for atom in msg.atom %}
+{%- if atom.type.isenum() %}
+  CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T {{ atom.name }};
+{%- else %}
+  {{ atom.type.ctype() }} {{ atom.name }};
+{%- endif -%}
+{% endfor %}
+} CANlib_{{ bus.name }}_{{ msg_name }}_T;
+{% endif %}
+{%- endmacro -%}
+
+#pragma once
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "enum_atom.h"
+
+{% for bus in can.bus -%}
+// {{ bus.name }}
+{% for msg in bus.frame -%}
+{{ struct_declarations(bus, msg) }}
+{%- endfor -%}
+{%- endfor -%}
