@@ -1,0 +1,30 @@
+{%- set ns = namespace(first_frame=true) -%}
+
+{%- macro enum_name(bus, msg, msg_name=msg.name) -%}
+{%- if msg.frame is defined -%}
+{% for sub_frame in msg.frame -%}
+{{ enum_name(bus, sub_frame, msg_name + '_' + sub_frame.name) }}
+{%- endfor -%}
+{%- else %}
+  CANlib_{{ bus.name }}_{{ msg_name }}{%- if ns.first_frame %} = 2
+    {%- set ns.first_frame = false -%}
+  {%- endif -%},
+{%- endif -%}
+{%- endmacro -%}
+#pragma once
+
+typedef enum {
+{%- for bus in can.bus %}
+  {{ bus.name }},
+{%- endfor %}
+} CANlib_Bus_T;
+{% for bus in can.bus %}
+{%- set ns.first_frame = true %}
+typedef enum {
+{%- for msg in bus.frame -%}
+{{- enum_name(bus, msg) }}
+{%- endfor %}
+} CANlib_{{ bus.name }}_T;
+
+CANlib_{{ bus.name }}_T CANlib_Identify_{{ bus.name }}(Frame* frame);
+{% endfor -%}
