@@ -70,7 +70,7 @@ if __name__ == '__main__':
     send_receive.write(template_env)
     structs.write(template_env)
     bus.write(template_env)
-    computers_h.write(system, can, system.computer)
+    computers_h.write(template_env, system.computer)
     computers_c.write(can, system.computer)
     test_h.write(can)
     test_c.write(can)
