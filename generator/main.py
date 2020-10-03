@@ -13,8 +13,8 @@ import structs
 import sys
 import computers_h
 import computers_c
-import test_h
-import test_c
+# import test_h
+# import test_c
 import send_receive
 import bus
 import drivers_inc
@@ -71,8 +71,8 @@ if __name__ == '__main__':
     structs.write(template_env)
     bus.write(template_env)
     computers_h.write(template_env, system.computer)
-    computers_c.write(can, system.computer)
-    test_h.write(can)
-    test_c.write(can)
+    computers_c.write(template_env, system.computer)
+    # test_h.write(can)
+    # test_c.write(can)
 
     drivers_inc.write(system)
