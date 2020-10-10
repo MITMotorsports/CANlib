@@ -13,6 +13,8 @@
 {%- endmacro -%}
 #pragma once
 
+#define CANlib_UNKNOWN_MSG 0
+
 typedef enum {
 {%- for bus in can.bus %}
   {{ bus.name }},

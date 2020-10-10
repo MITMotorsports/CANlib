@@ -135,7 +135,7 @@ This is an enum that includes values of the form `<bus.name>_<message.name>` for
 
 ### `CANlib_<bus.name>_T CANlib_Identify_<bus.name>(Frame* frame)`
 Given a **pointer** to a Frame, returns the appropriate value from `<bus.name>_T`. It currently identifies
-messages based on their `id`. If a message is unknown w.r.t. the spec, it returns `CAN_UNKNOWN_MSG`.
+messages based on their `id`. If a message is unknown w.r.t. the spec, it returns `CANlib_UNKNOWN_MSG`.
 
 ### `void CANlib_Pack_<bus.name>_<message.name>(CANlib_<bus.name>_<message.name>_T* type_in, Frame* can_out)`
 Given **pointers** to a message struct and a Frame respectively, unpacks the message contents into the Frame.
