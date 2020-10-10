@@ -84,13 +84,13 @@ protocol:
               atom0:
                 slice: 0 + 32  # [start index] + [length]
                 type: int32 big  # type and endianness
-                unit: V 
+                unit: V
               atom1:
                 slice: 32 + 32
                 type: int32 big
                 unit: V
 ```
-Once thie spec is set up, to add a new message you need to do each of the following:
+Once this spec is set up, to add a new message you need to do each of the following:
 - **Add the message to the list of messages.** Using the format like the messages above, specify `key`, `period`, (if necessary), and `atom`. For each atom, add `slice`, (of the form `starting_position + length`), `type` (of the form `c_type endianness`, or the more expanded version in the enum)
 - **Update the publish and subscribe fields for the relevant boards.** Add the name of your message to the publish list of your board and whichever boards subscribes to it.
 
@@ -128,7 +128,7 @@ This statement extern declares the struct which will be updated when a `frame.na
 This is an enum that includes values of the form `<bus.name>_<message.name>_<atom.name>_<value.name>` forall `value` in `atom.value`. Use this to refer to the type of enums created for enum segments (e.g., `Msg2` `atom1` above).
 
 ## Other library names
-Do not use these structs in code outside of CANlib. This section is internal documenation.
+Do not use these structs in code outside of CANlib. This section is internal documentation.
 
 ### `CANlib_<bus.name>_T`
 This is an enum that includes values of the form `<bus.name>_<message.name>` forall `message` in `bus.messages`.
@@ -142,9 +142,6 @@ Given **pointers** to a message struct and a Frame respectively, unpacks the mes
 
 ### `void CANlib_Unpack_<bus.name>_<message.name>(Frame *can_in, CANlib_<bus.name>_<message.name>_T *type_out)`
 Given **pointers** to a Frame and message struct respectively, unpacks the Frame contents into the message object.
-
-### `CANlib_Transmit_Error_T CANlib_Transmit_<bus.name>_<message.name>(CANlib_<bus.name>_<message.name>_T *type)`
-Given a **pointer** to a message struct, unpack it into a CAN frame and transmit it over `bus` using `Can_RawRead`.
 
 ### `CANlib_<bus.name>_<message.name>_<property>` forall `property` in `["id", "period"]`
 The CANlib exposes certain properties for each message defined in the spec. Use them in your code with the above expression. There is no guarantee as to whether you learn about it as part of an enum or though a #define.
