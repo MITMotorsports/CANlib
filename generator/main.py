@@ -1,27 +1,31 @@
 import sys
-import os
 import jinja2
 
-sys.path.append('ParseCAN')
-import ParseCAN
+import ParseCAN.ParseCAN as ParseCAN
 
 import constants
-import pack_unpack_c
-import pack_unpack_h
-import enum_atom
-import structs
-import sys
 import computers_h
 import computers_c
 # import test_h
 # import test_c
-import send_receive
-import bus
 import drivers_inc
 
 from jinja2 import nodes
 from jinja2.ext import Extension
 from jinja2.exceptions import TemplateRuntimeError
+
+
+src_dir = '../src/'
+constants_path = f'{src_dir}constants.h'
+drivers_inc_dir_path = f'{src_dir}/drivers/inc'
+computer_h_dir_path = f'{src_dir}computers/inc'
+computer_c_dir_path = f'{src_dir}computers/src'
+
+template_dir = './templates/'
+computer_c_template_path = f'{template_dir}computer.c.j2'
+computer_h_template_path = f'{template_dir}computer.h.j2'
+constants_template_path = f'{template_dir}constants.h.j2'
+drivers_inc_template_dir_path = f'{template_dir}drivers/inc'
 
 
 # FROM: https://github.com/duelafn/python-jinja2-apci/blob/master/jinja2_apci/error.py
@@ -49,30 +53,37 @@ class RaiseExtension(Extension):
         raise TemplateRuntimeError(msg)
 
 
-if __name__ == '__main__':
+def render_template_from_to(env, input_path, output_path):
+    template = env.get_template(input_path)
+    with open(output_path, 'w') as f:
+        f.write(template.render())
 
+
+def render_template(env, relative_path):
+    render_template_from_to(env, template_dir + relative_path + ".j2", src_dir + relative_path)
+
+
+if __name__ == '__main__':
     specpath = sys.argv[1]
     specfile = open(specpath, 'r')
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
 
-    generator_dir = os.path.dirname(sys.argv[0])
-    template_dir = os.path.join(generator_dir, "templates")
-    template_loader = jinja2.FileSystemLoader(searchpath=[template_dir, "."])
+    template_loader = jinja2.FileSystemLoader(searchpath=".")
     template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True, extensions=[RaiseExtension])
     template_env.globals["can"] = can
     template_env.globals["system"] = system
 
-    constants.write(template_env)
-    pack_unpack_c.write(template_env)
-    pack_unpack_h.write(template_env)
-    enum_atom.write(template_env)
-    send_receive.write(template_env)
-    structs.write(template_env)
-    bus.write(template_env)
-    computers_h.write(template_env, system.computer)
-    computers_c.write(template_env, system.computer)
+    constants.write(template_env, constants_template_path, constants_path)
+    render_template(template_env, "pack_unpack.c")
+    render_template(template_env, "pack_unpack.h")
+    render_template(template_env, "enum_atom.h")
+    render_template(template_env, "send_receive.c")
+    render_template(template_env, "structs.h")
+    render_template(template_env, "bus.h")
+    computers_h.write(template_env, system.computer, computer_h_template_path, computer_h_dir_path)
+    computers_c.write(template_env, system.computer, computer_c_template_path, computer_c_dir_path)
     # test_h.write(can)
     # test_c.write(can)
 
-    drivers_inc.write(template_env, system)
+    drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path)

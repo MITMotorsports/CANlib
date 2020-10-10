@@ -1,9 +1,4 @@
-import sys
-sys.path.append("ParseCAN")
-import ParseCAN
-from common import constants_path
 from pint import UnitRegistry
-import jinja2
 
 
 def get_ms(period_str):
@@ -15,7 +10,7 @@ def get_ms(period_str):
     return ur[period_str].to('ms').magnitude
 
 
-def write(env, output_path=constants_path):
-    template = env.get_template("constants.h.j2")
+def write(env, input_path, output_path):
+    template = env.get_template(input_path)
     with open(output_path, 'w') as f:
         f.write(template.render(get_ms=get_ms))

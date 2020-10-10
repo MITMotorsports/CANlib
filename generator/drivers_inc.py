@@ -1,7 +1,3 @@
-import sys
-sys.path.append("ParseCAN")
-import ParseCAN
-from common import drivers_inc_template_dir_path, drivers_inc_dir_path
 from pathlib import Path
 
 
@@ -17,7 +13,7 @@ def find_architecture(system, template):
     return None
 
 
-def write(env, system, input_path=drivers_inc_template_dir_path, output_path=drivers_inc_dir_path):
+def write(env, system, input_path, output_path):
     input_path = Path(input_path)
     output_path = Path(output_path)
     output_path.mkdir(parents=True, exist_ok=True)
