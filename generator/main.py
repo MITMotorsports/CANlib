@@ -1,4 +1,5 @@
 import sys
+import os
 import jinja2
 
 import ParseCAN.ParseCAN as ParseCAN
@@ -68,6 +69,11 @@ if __name__ == '__main__':
     specfile = open(specpath, 'r')
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
+
+    script_dir = os.path.dirname(sys.argv[0])
+    if script_dir == '':
+        script_dir = '.'
+    os.chdir(script_dir)
 
     template_loader = jinja2.FileSystemLoader(searchpath=".")
     template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True, extensions=[RaiseExtension])
