@@ -1,13 +1,21 @@
-#ifndef __DRIVER_H
-#define __DRIVER_H
+#pragma once
 
 // INCLUDE THIS AFTER YOUR DRIVER
 
-#include "drivers/inc/stm32f4xx.h"  // BAD HACK
+#ifndef CANLIB_ARCH
+#error "No architecture specified!"
+#endif
+
+#if CANLIB_ARCH == STM32F4xx
+#include "drivers/inc/stm32f4xx.h"
+#elif CANLIB_ARCH == STM32F2xx
+#include "drivers/inc/stm32f2xx.h"
+#else
+#error "Architecture not supported!"
+#endif
+
 #include "bus.h"
 
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus);
 CAN_Raw_Bus_T CANlib_GetRawBus(CANlib_Bus_T bus);
-
-#endif // __DRIVER_H

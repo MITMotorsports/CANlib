@@ -82,3 +82,7 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
       }
   }
 }
+
+Time_T CANlib_GetTick(void) {
+  return HAL_GetTick();
+}

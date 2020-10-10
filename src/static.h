@@ -1,8 +1,7 @@
-#ifndef _CAN_LIB_STATIC_H
-#define _CAN_LIB_STATIC_H
+#pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
   uint32_t id;
@@ -10,10 +9,3 @@ typedef struct {
   uint8_t dlc;
   bool extended;
 } Frame;
-
-#define LIMIT(name)                                         \
-  static Time_T last_sent = 0;                              \
-  if (HAL_GetTick() - last_sent < name ## _period) return;  \
-  last_sent = HAL_GetTick();
-
-#endif // _CAN_LIB_STATIC_H

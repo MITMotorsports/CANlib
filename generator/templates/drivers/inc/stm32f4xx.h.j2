@@ -26,6 +26,7 @@ typedef HAL_StatusTypeDef CANlib_Init_Error_T;
 
 CANlib_Transmit_Error_T CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus);
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus);
+Time_T CANlib_GetTick(void);
 
 #ifdef __cplusplus
 } // extern "C"

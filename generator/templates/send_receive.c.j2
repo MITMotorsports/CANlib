@@ -30,6 +30,13 @@ void CANlib_Handle_{{ bus.name }}_{{ msg_name }}(Frame *frame) {
 {%- endmacro -%}
 
 #include "pack_unpack.h"
+#include "bus.h"
+#include "driver.h"
+
+#define LIMIT(name)                                         \
+  static Time_T last_sent = 0;                              \
+  if (CANlib_GetTick() - last_sent < name##_period) return; \
+  last_sent = CANlib_GetTick();
 
 // Input Structs
 {% for bus in can.bus %}

@@ -24,6 +24,7 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "driver.h"
 #include "constants.h"
 #include "enum_atom.h"
 #include "structs.h"
@@ -31,8 +32,6 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 #include "evil_macros.h"
 #include "bus.h"
 #include "pack_unpack.h"
-
-#include "drivers/inc/{{ system.architecture['name'][computer.architecture].family }}.h"
 
 #ifdef __cplusplus
 extern "C" {
