@@ -13,7 +13,7 @@
 
 #define CHECK(a, b) (((a) & (1 << (7 - (b)))) != 0)
 
-#define ONES(len) ((1ULL << (len)) - 1)
+#define ONES(len) ((((1ULL << (len - 1)) - 1) << 1) + 1)
 
 #define START_IDX(start, len) (64 - (start) - (len))
 
