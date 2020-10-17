@@ -11,6 +11,6 @@ def get_ms(period_str):
 
 
 def write(env, input_path, output_path):
-    template = env.get_template(input_path)
+    template = env.get_template(str(input_path))
     with open(output_path, 'w') as f:
         f.write(template.render(get_ms=get_ms))
