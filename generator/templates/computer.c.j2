@@ -1,9 +1,11 @@
+{%- macro key_type(num_bits) -%} uint{{ (((num_bits / 8) | round(method='ceil')) * 8) | int }}_t {%- endmacro -%}
+
 {%- macro handle_case(busnm, msg, msg_name=msg.name, indent=2) -%}
 {%- if msg.frame is defined -%}
 case CANlib_{{ busnm }}_{{ msg_name }}_key: {
   uint64_t bitstring;
   to_bitstring(frame->data, &bitstring);
-  uint{{ (((msg.slice.length / 8) | round(method='ceil')) * 8) | int }}_t {{ busnm }}_{{ msg_name }}_key = EXTRACT(bitstring, {{ msg.slice.start }}, {{ msg.slice.length }});
+  {{ key_type(msg.slice.length) }} {{ busnm }}_{{ msg_name }}_key = EXTRACT(bitstring, {{ msg.slice.start }}, {{ msg.slice.length }});
   switch ({{ busnm }}_{{ msg_name }}_key) {
   {%- for sub_frame in msg.frame %}
     {{ handle_case(busnm, sub_frame, msg_name + '_' + sub_frame.name, indent + 2) | indent(indent + 2) }}
@@ -25,7 +27,7 @@ case CANlib_{{ busnm }}_{{ msg_name }}_key:
 case CANlib_{{ busnm }}_{{ msg_name }}_key: {
   uint64_t bitstring;
   to_bitstring(frame->data, &bitstring);
-  uint{{ (((msg.slice.length / 8) | round(method='ceil')) * 8) | int }}_t {{ busnm }}_{{ msg_name }}_key = EXTRACT(bitstring, {{ msg.slice.start }}, {{ msg.slice.length }});
+  {{ key_type(msg.slice.length) }} {{ busnm }}_{{ msg_name }}_key = EXTRACT(bitstring, {{ msg.slice.start }}, {{ msg.slice.length }});
   switch ({{ busnm }}_{{ msg_name }}_key) {
   {%- for sub_frame in msg.frame %}
     {{ identify_case(busnm, sub_frame, msg_name + '_' + sub_frame.name, indent + 2) | indent(indent + 2) }}
