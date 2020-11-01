@@ -1,0 +1,139 @@
+{%- macro struct_declarations(bus, msg, msg_name) -%}
+{%- if msg.frame is defined %}
+    namespace {{msg.name}} {
+    {% for sub_frame in msg.frame %}
+        {{ struct_declarations(bus, sub_frame, msg_name + '::' + sub_frame.name) }}
+    {% endfor %}
+    }
+
+{% else %}
+    {{msg.name}}_T {{msg.name}}_input;
+{% endif %}
+{%- endmacro -%}
+
+{%- macro get_messages(msg, msg_names) -%}
+{%- if msg.frame is defined -%}
+    nullptr,
+    {%- for sub_frame in msg.frame -%}
+        {{ get_messages(sub_frame, msg_names + [sub_frame.name]) }}
+    {%- endfor -%}
+{%- else -%}
+     &{{'::'.join(msg_names)}}_input,
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_keys(msg, msg_names) -%}
+{%- if msg.frame is defined -%}
+    {{ "::".join(msg_names) }}::key,
+    {%- for sub_frame in msg.frame -%}
+        {{ get_keys(sub_frame, msg_names + [sub_frame.name]) }}
+    {%- endfor -%}
+{%- else -%}
+     {{"::".join(msg_names)}}_T::key,
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_message_ranges(msg, msg_names) -%}
+{%- if msg.frame is defined -%}
+    std::make_pair({{ msg.slice.start }}, {{ msg.slice.length }}),
+    {%- for sub_frame in msg.frame -%}
+        {{ get_message_ranges(sub_frame, msg_names + [sub_frame.name]) }}
+    {%- endfor -%}
+{%- else -%}
+     std::make_pair(1, 0),
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_frame_ranges(msg, msg_names, cnt = 0) -%}
+{%- if msg.frame is defined -%}
+    {{ get_msg_len(msg) }},
+    {%- for sub_frame in msg.frame -%}
+        {{ get_frame_ranges(sub_frame, msg_names + [sub_frame.name], cnt + 1) }}
+    {%- endfor -%}
+{%- else -%}
+     0,
+{%- endif -%}
+{%- endmacro -%}
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <chrono>
+#include "static.hpp"
+#include "bus.hpp"
+#include "structs.hpp"
+
+namespace CANlib {
+
+void send(Clock::time_point &last_sent_, Message_T* msg) {
+    if (Clock::now() - last_sent_ > msg->period_)  {
+        last_sent_ = Clock::now();
+        Frame frame;
+        msg->pack(frame);
+        TransmitFrame(frame, msg->name_);
+    }
+}
+
+{%- for bus in can.bus %}
+namespace {{bus.name}} {
+{% for msg in bus.frame -%}
+{{ struct_declarations(bus, msg, msg.name) }}
+{%- endfor -%}
+}
+
+const uint32_t {{bus.name}}_keys[] = {
+    {% for msg in bus.frame -%}
+        {{ get_keys(msg, [bus.name, msg.name]) }}
+    {%- endfor -%}
+};
+
+const std::pair<uint32_t, uint32_t> {{bus.name}}_frame_id_range[] = {
+    std::make_pair(1,0),
+    {% for msg in bus.frame -%}
+        {{ get_message_ranges(msg, [bus.name, msg.name]) }}
+    {%- endfor -%}
+};
+
+const uint32_t {{bus.name}}_frame_len[] = {
+    {% for msg in bus.frame -%}
+        {{ get_frame_ranges(msg, [bus.name, msg.name]) }}
+    {%- endfor -%}
+};
+
+Message_T* {{bus.name}}_messages[] = {
+    {%- for msg in bus.frame -%}
+        {{ get_messages(msg, ['CANlib', bus.name, msg.name]) }}
+    {%- endfor -%}
+};
+{%- endfor -%}
+
+const uint32_t* keys[static_cast<int>(Bus_Names_T::INVALID_NAME)] = {
+{%- for bus in can.bus -%}
+{{bus.name}}_keys,
+{%- endfor -%}
+};
+
+const std::pair<uint32_t, uint32_t>* frame_id_range[static_cast<int>(Bus_Names_T::INVALID_NAME)] = {
+{%- for bus in can.bus -%}
+{{bus.name}}_frame_id_range,
+{%- endfor -%}
+};
+
+const uint32_t* frame_len[static_cast<int>(Bus_Names_T::INVALID_NAME)] = {
+{%- for bus in can.bus -%}
+{{bus.name}}_frame_len,
+{%- endfor -%}
+};
+
+//const size_t can_size[static_cast<int>(Bus_Names_T::INVALID_NAME)] = {
+//{%- for bus in can.bus -%}
+//{{ get_msg_len(bus.frame) }},
+//{%- endfor -%}
+//};
+
+Message_T** messages[static_cast<int>(Bus_Names_T::INVALID_NAME)] = {
+{%- for bus in can.bus -%}
+{{bus.name}}_messages,
+{%- endfor -%}
+
+};
+}

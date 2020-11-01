@@ -1,0 +1,52 @@
+{%- macro key_type(num_bits) -%} uint{{ (((num_bits / 8) | round(method='ceil')) * 8) | int }}_t {%- endmacro -%}
+
+#include "static.hpp"
+#include "bus.hpp"
+#include "structs.hpp"
+#include "pack_unpack.hpp"
+#
+
+namespace CANlib {
+extern const std::pair<uint32_t, uint32_t>* frame_id_range[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+extern const uint32_t* frame_len[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+extern const uint32_t* keys[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+//extern const size_t can_size[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+extern Message_T** messages[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+}
+
+using namespace CANlib;
+
+static uint32_t Identify_internal(const uint32_t key, const Frame& frame, int l, int r, int bus_idx) {
+    for (int i = l;i <= r;++i) {
+        if (keys[bus_idx][i] == key) {
+            int left_bound = frame_id_range[bus_idx][i].first;
+            int right_bound = frame_id_range[bus_idx][i].second;
+            if (left_bound <= right_bound) {
+                uint64_t bitstring;
+                to_bitstring((uint8_t*)frame.data, &bitstring);
+                return Identify_internal(EXTRACT(bitstring, left_bound, right_bound), frame, i + 1, i + 1 + frame_len[bus_idx][i], bus_idx);
+            } else {
+                return i;
+            }
+        }
+    }
+    return 0;
+}
+
+
+uint32_t CANlib::Identify(Bus_Names_T bus, const Frame& frame) {
+    const int bus_idx = static_cast<int>(bus);
+//    return Identify_internal(frame.id, frame, 1, can_size[bus_idx], bus_idx);
+}
+
+void CANlib::HandleFrame(Bus_Names_T bus_name, const Frame& frame) {
+    if (bus_name == Bus_Names_T::INVALID_NAME) {
+        return;
+    }
+
+    uint32_t message_idx = Identify(bus_name, frame);
+    uint32_t bus_idx = static_cast<int>(bus_name);
+    if (message_idx > 0) {
+        messages[bus_idx][message_idx]->pack(frame);
+    }
+}

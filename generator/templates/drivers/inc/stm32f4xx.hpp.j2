@@ -1,0 +1,34 @@
+#pragma once
+
+#include "static.hpp"
+#include "stm32f4xx_hal.h"
+#include "bus.hpp"
+#include "clock.h"
+
+#include <stdint.h>
+
+Clock::time_point Clock::now() noexcept {
+    static const auto start_time = HAL_GetTick();
+    const auto time_passed = HAL_GetTick() - start_time;
+    return time_point(std::chrono::milliseconds(time_passed));
+}
+
+namespace CANlib {
+
+enum class Raw_Bus_T {
+{%- for bus in architecture.participation['name']['can'].buses -%}
+{%- if bus == 'INVALID_BUS' -%}
+  {%- raise "INVALID_BUS is a reserved bus name" -%}
+{%- endif %}
+  {{ bus }},
+{%- endfor %}
+	INVALID_BUS
+};
+
+typedef HAL_StatusTypeDef Transmit_Error_T;
+typedef HAL_StatusTypeDef Init_Error_T;
+
+Transmit_Error_T TransmitFrame(const Frame& frame, Bus_Names_T bus);
+void ReadFrame(Frame& frame, Bus_Names_T bus);
+
+} // CANlib

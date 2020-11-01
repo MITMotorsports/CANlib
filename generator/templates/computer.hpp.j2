@@ -1,0 +1,20 @@
+#pragma once
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "driver.hpp"
+#include "structs.hpp"
+#include "static.hpp"
+#include "bus.hpp"
+
+namespace CANlib {
+    {%- if testing -%} 
+    {%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+        void {{busnm}}_update_can();
+    {%- endfor %}
+    {% endif %}
+        void update_can(void);
+    Raw_Bus_T GetRawBus(Bus_Names_T bus);
+    Bus_Names_T GetBusName(Raw_Bus_T bus);
+}

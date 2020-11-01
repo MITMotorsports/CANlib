@@ -1,0 +1,56 @@
+#include "canlib_{{ computer.name }}.hpp"
+#include "bus.hpp"
+#include "drivers/{{ system.architecture['name'][computer.architecture].family }}.hpp"
+
+using namespace CANlib;
+
+{% if testing %}
+Raw_Bus_T CANlib::GetRawBus(Bus_Names_T bus) {
+{% else %}
+Raw_Bus_T CANlib::GetRawBus(Bus_Names_T bus) {
+{% endif %}
+  switch (bus) {
+{%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+    case Bus_Names_T::{{ busnm }}:
+      return Raw_Bus_T::{{ rawnm }};
+{%- endfor %}
+    default:
+      return Raw_Bus_T::INVALID_BUS;
+  }
+}
+
+{% if testing %}
+Bus_Names_T CANlib::GetBusName(Raw_Bus_T bus) {
+{% else %}
+Bus_Names_T CANlib::GetBusName(Raw_Bus_T bus) {
+{% endif %}
+	switch (bus) {
+{%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+    case Raw_Bus_T::{{ rawnm }}:
+      return Bus_Names_T::{{ busnm }};
+{%- endfor %}
+    default:
+      return Bus_Names_T::INVALID_NAME;
+  }
+}
+
+
+namespace CANlib {
+{%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+{% if testing %}
+void {{busnm}}_update_can() {
+{% else %}
+static void {{busnm}}_update_can() {
+{% endif %}
+  Frame frame;
+  ReadFrame(frame, Bus_Names_T::{{ busnm }});
+  HandleFrame(Bus_Names_T::{{busnm}}, frame);
+}
+{%- endfor %}
+void update_can(void) {
+{%- for busnm in computer.participation['name']['can'].subscribe.keys() %}
+  {{ busnm }}_update_can();
+{%- endfor %}
+}
+}
+

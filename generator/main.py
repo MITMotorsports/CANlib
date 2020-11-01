@@ -9,23 +9,35 @@ from pathlib import Path
 import ParseCAN.ParseCAN as ParseCAN
 
 import constants
-import computers_h
-import computers_c
+import computers_hpp
+import computers_cpp
 import drivers_inc
 
 
-src_dir = Path('../src/')
-constants_path = src_dir.joinpath('constants.h')
-drivers_inc_dir_path = src_dir.joinpath('drivers/inc')
-computer_h_dir_path = src_dir.joinpath('computers/inc')
-computer_c_dir_path = src_dir.joinpath('computers/src')
+src_dir = Path('../src/src/')
+inc_dir = Path('../src/inc/')
+drivers_inc_dir_path = inc_dir.joinpath('drivers/')
+computer_hpp_dir_path = inc_dir.joinpath('computers/')
+computer_cpp_dir_path = src_dir.joinpath('computers/')
 
 template_dir = Path('./templates/')
-computer_c_template_path = template_dir.joinpath('computer.c.j2')
-computer_h_template_path = template_dir.joinpath('computer.h.j2')
-constants_template_path = template_dir.joinpath('constants.h.j2')
+computer_cpp_template_path = template_dir.joinpath('computer.cpp.j2')
+computer_hpp_template_path = template_dir.joinpath('computer.hpp.j2')
 drivers_inc_template_dir_path = template_dir.joinpath('drivers/inc')
 
+from pint import UnitRegistry
+def get_ms(period_str):
+    if type(period_str) is int:
+        # If it's set as an integer, assume ms
+        return period_str
+
+    ur = UnitRegistry()
+    return (int)(ur[period_str].to('ms').magnitude)
+
+def get_msg_len(msg):
+    if hasattr(msg, "frame"):
+       return 1 + sum([get_msg_len(sub_frame) for sub_frame in msg.frame])
+    return 1
 
 # FROM: https://github.com/duelafn/python-jinja2-apci/blob/master/jinja2_apci/error.py
 class RaiseExtension(Extension):
@@ -51,15 +63,19 @@ class RaiseExtension(Extension):
     def _raise(self, msg, caller):
         raise TemplateRuntimeError(msg)
 
-
 def render_template_from_to(env, input_path, output_path):
     template = env.get_template(str(input_path))
     with open(output_path, 'w') as f:
-        f.write(template.render())
-
+        if output_path in [inc_dir.joinpath("structs.hpp"), src_dir.joinpath("structs.cpp")]:
+            f.write(template.render(get_ms = get_ms, get_msg_len = get_msg_len))
+        else:
+            f.write(template.render())
 
 def render_template(env, relative_path):
-    render_template_from_to(env, template_dir.joinpath(f"{relative_path}.j2"), src_dir.joinpath(relative_path))
+    if relative_path.endswith('hpp') or relative_path.endswith('h'):
+        render_template_from_to(env, template_dir.joinpath(f"{relative_path}.j2"), inc_dir.joinpath(relative_path))
+    else:
+        render_template_from_to(env, template_dir.joinpath(f"{relative_path}.j2"), src_dir.joinpath(relative_path))
 
 
 if __name__ == '__main__':
@@ -78,10 +94,17 @@ if __name__ == '__main__':
     template_env.globals["can"] = can
     template_env.globals["system"] = system
 
-    for filename in ["pack_unpack.c", "pack_unpack.h", "enum_atom.h", "send_receive.c", "structs.h", "bus.h"]:
+    for filename in ["pack_unpack.cpp", "pack_unpack.hpp", "structs.hpp", "bus.hpp", "bus.cpp", "structs.cpp"]:
         render_template(template_env, filename)
 
-    constants.write(template_env, constants_template_path, constants_path)
-    computers_h.write(template_env, system.computer, computer_h_template_path, computer_h_dir_path)
-    computers_c.write(template_env, system.computer, computer_c_template_path, computer_c_dir_path)
-    drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path)
+    testing = '--testing' in sys.argv 
+    computers_hpp.write(template_env, system.computer, computer_hpp_template_path, computer_hpp_dir_path, testing)
+    computers_cpp.write(template_env, system.computer, computer_cpp_template_path, computer_cpp_dir_path, testing)
+    drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path, testing)
+    import os
+    try:
+        os.system('clang-format -i ../src/inc/drivers/* ../src/src/drivers/*')
+        os.system('clang-format -i ../src/inc/*')
+        os.system('clang-format -i ../src/src/*')
+    except:
+        print('Error during clang-format, is it installed?')
