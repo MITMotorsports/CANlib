@@ -17,6 +17,16 @@
         void send() override {
             CANlib::send(this->last_sent_, this);
         }
+        Bus_Names_T get_bus_name() override {
+            return Bus_Names_T::{{ bus.name }};
+        }
+        Clock::duration get_period() override {
+            {% if msg.period %}
+            return std::chrono::milliseconds({{ get_ms(msg.period) }});
+            {% else %}
+            return std::chrono::milliseconds(0);
+            {% endif %}
+        }
         {% for atom in msg.atom %}
             {%- if atom.type.isenum() -%}
                 enum class {{ atom.name }}_T {                                                                 
@@ -38,11 +48,7 @@
                 {{ atom.type.ctype() }} {{ atom.name }};
             {%- endif -%}
         {% endfor %}
-        const Bus_Names_T name_ = Bus_Names_T::{{ bus.name }};
-        Clock::time_point last_sent_;
-        {% if msg.period %}
-        const Clock::duration period_ = std::chrono::milliseconds({{ get_ms(msg.period) }});
-        {% endif %}
+        static Clock::time_point last_sent_;
         static const uint32_t key = 0x{{ '%0X' % msg.key }};
     };
 {% endif %}
@@ -97,11 +103,12 @@ struct Message_T {
     virtual void pack(const Frame&) = 0;
     virtual uint32_t get_key() = 0;
     virtual void send() = 0;
-    const Clock::duration period_ = std::chrono::milliseconds(0);
-    const Bus_Names_T name_ = Bus_Names_T::INVALID_NAME;
+    virtual Bus_Names_T get_bus_name() = 0;
+    virtual Clock::duration get_period() = 0;
 };
 
 void send(Clock::time_point &last_sent_, Message_T* msg);
+void send(Message_T* msg);
 
 {%- for bus in can.bus %}
 

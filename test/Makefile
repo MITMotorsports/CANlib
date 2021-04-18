@@ -25,12 +25,15 @@ COMPUTER_FLAGS := -I../src/inc/drivers -I../src/inc/computers
 CPPFLAGS := $(INC_FLAGS) -std=c++17
 
 # The final build step.
-main0:
-	g++ $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) ../src/src/bus.cpp ../src/src/structs.cpp ../src/src/drivers/testfamily.cpp ../src/src/pack_unpack.cpp ../src/src/computers/canlib_testcomp0.cpp tests/src/identify.cpp tests/src/message.cpp tests/src/send.cpp tests/src/constants.cpp tests/src/arch0.cpp tests/main.cpp -o main0
-main1:
-	g++ $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) ../src/src/bus.cpp ../src/src/structs.cpp ../src/src/drivers/testfamily.cpp ../src/src/pack_unpack.cpp ../src/src/computers/canlib_testcomp1.cpp tests/src/send.cpp tests/src/constants.cpp tests/src/arch1.cpp tests/main.cpp -o main1
-main2:
-	g++ $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) ../src/src/bus.cpp ../src/src/structs.cpp ../src/src/drivers/testfamily.cpp ../src/src/pack_unpack.cpp ../src/src/computers/canlib_testcomp2.cpp tests/src/send.cpp tests/src/constants.cpp tests/src/arch2.cpp tests/main.cpp -o main2
+gen:
+	python3 ../generator/main.py can_spec.yml --testing
+	
+main0: gen
+	g++ $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) -DCANLIB_ARCH_TESTFAMILY -DARCH0 ../src/src/bus.cpp ../src/src/structs.cpp ../src/src/drivers/testfamily.cpp ../src/src/pack_unpack.cpp ../src/src/computers/canlib_testcomp0.cpp tests/src/identify.cpp tests/src/message.cpp tests/src/send.cpp tests/src/constants.cpp tests/src/arch0.cpp tests/main.cpp -o main0
+main1: gen
+	g++ $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) -DCANLIB_ARCH_TESTFAMILY -DARCH1 ../src/src/bus.cpp ../src/src/structs.cpp ../src/src/drivers/testfamily.cpp ../src/src/pack_unpack.cpp ../src/src/computers/canlib_testcomp1.cpp tests/src/identify.cpp tests/src/message.cpp tests/src/send.cpp tests/src/constants.cpp tests/src/arch1.cpp tests/main.cpp -o main1
+main2: gen
+	g++ $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) -DCANLIB_ARCH_TESTFAMILY -DARCH2 ../src/src/bus.cpp ../src/src/structs.cpp ../src/src/drivers/testfamily.cpp ../src/src/pack_unpack.cpp ../src/src/computers/canlib_testcomp2.cpp tests/src/identify.cpp tests/src/message.cpp tests/src/send.cpp tests/src/constants.cpp tests/src/arch2.cpp tests/main.cpp -o main2
 
 $(BUILD_DIR):
 	mkdir -p build/src/src
@@ -84,7 +87,9 @@ $(BUILD_DIR)/src/src/computers/canlib_testcomp1.cpp.o: $(BUILD_DIR)
 $(BUILD_DIR)/src/src/computers/canlib_testcomp2.cpp.o: $(BUILD_DIR)
 	g++ ../src/src/computers/canlib_testcomp2.cpp $(CPPFLAGS) $(COMPUTER_FLAGS) $(CXXFLAGS) -c $< -o $(BUILD_DIR)/src/src/computers/canlib_testcomp2.cpp.o
 
-.PHONY: clean
+.PHONY: clean build
 clean:
-	rm -r $(BUILD_DIR)
-
+	rm main0 main1 main2
+build: main0 main1 main2
+run: 
+	./main0 & ./main1 & ./main2

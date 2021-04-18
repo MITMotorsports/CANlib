@@ -1,17 +1,29 @@
 {%- macro key_type(num_bits) -%} uint{{ (((num_bits / 8) | round(method='ceil')) * 8) | int }}_t {%- endmacro -%}
 
+{%- macro last_sent_def(bus, msg, msg_name) -%}
+{%- if msg.frame is defined %}
+    {% for sub_frame in msg.frame %}
+        {{ last_sent_def(bus, sub_frame, msg_name + '::' + sub_frame.name) }}
+    {% endfor %}
+{% else %}
+    Clock::time_point {{msg_name}}_T::last_sent_;
+{% endif %}
+{%- endmacro -%}
+
 #include "static.hpp"
 #include "bus.hpp"
 #include "structs.hpp"
 #include "pack_unpack.hpp"
-#
 
 namespace CANlib {
 extern const std::pair<uint32_t, uint32_t>* frame_id_range[static_cast<int>(Bus_Names_T::INVALID_NAME)];
 extern const uint32_t* frame_len[static_cast<int>(Bus_Names_T::INVALID_NAME)];
 extern const uint32_t* keys[static_cast<int>(Bus_Names_T::INVALID_NAME)];
-//extern const size_t can_size[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+extern const size_t can_size[static_cast<int>(Bus_Names_T::INVALID_NAME)];
 extern Message_T** messages[static_cast<int>(Bus_Names_T::INVALID_NAME)];
+{%- for bus in can.bus -%}
+{{ last_sent_def(bus, bus, bus.name) }}
+{%- endfor -%}
 }
 
 using namespace CANlib;
@@ -36,7 +48,7 @@ static uint32_t Identify_internal(const uint32_t key, const Frame& frame, int l,
 
 uint32_t CANlib::Identify(Bus_Names_T bus, const Frame& frame) {
     const int bus_idx = static_cast<int>(bus);
-//    return Identify_internal(frame.id, frame, 1, can_size[bus_idx], bus_idx);
+    return Identify_internal(frame.id, frame, 1, can_size[bus_idx] - 1, bus_idx);
 }
 
 void CANlib::HandleFrame(Bus_Names_T bus_name, const Frame& frame) {

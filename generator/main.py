@@ -104,6 +104,7 @@ if __name__ == '__main__':
     import os
     try:
         os.system('clang-format -i ../src/inc/drivers/* ../src/src/drivers/*')
+        os.system('clang-format -i ../src/inc/computers/* ../src/src/computers/*')
         os.system('clang-format -i ../src/inc/*')
         os.system('clang-format -i ../src/src/*')
     except:

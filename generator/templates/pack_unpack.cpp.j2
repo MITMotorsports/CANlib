@@ -123,17 +123,10 @@ uint64_t swap_uint64(uint64_t val) {
   return (val << 32) | (val >> 32);
 }
 
-// Pack functions
+// Pack+Unpack functions
 {% for bus in can.bus %}
 {%- for msg in bus.frame -%}
 {{ can_pack_handler(msg, [bus.name], bus.extended) }}
-
-{% endfor %}
-{% endfor %}
-
-// Unpack functions
-{% for bus in can.bus %}
-{%- for msg in bus.frame -%}
 {{ can_unpack_handler(msg, [bus.name, msg.name]) }}
 
 {% endfor %}
