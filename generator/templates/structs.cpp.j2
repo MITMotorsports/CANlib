@@ -134,31 +134,31 @@ Message_T* {{bus.name}}_messages[] = {
 };
 {%- endfor -%}
 
-const uint32_t* keys[static_cast<int>(AbstractBus::INVALID_NAME)] = {
+const uint32_t* keys[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
 {{bus.name}}_keys,
 {%- endfor -%}
 };
 
-const std::pair<uint32_t, uint32_t>* frame_id_range[static_cast<int>(AbstractBus::INVALID_NAME)] = {
+const std::pair<uint32_t, uint32_t>* frame_id_range[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
 {{bus.name}}_frame_id_range,
 {%- endfor -%}
 };
 
-const uint32_t* frame_len[static_cast<int>(AbstractBus::INVALID_NAME)] = {
+const uint32_t* frame_len[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
 {{bus.name}}_frame_len,
 {%- endfor -%}
 };
 
-extern const size_t can_size[static_cast<int>(AbstractBus::INVALID_NAME)] = {
+extern const size_t can_size[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
 {{ get_msg_len(bus) }},
 {%- endfor -%}
 };
 
-Message_T** messages[static_cast<int>(AbstractBus::INVALID_NAME)] = {
+Message_T** messages[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
 {{bus.name}}_messages,
 {%- endfor -%}

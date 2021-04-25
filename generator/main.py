@@ -39,6 +39,9 @@ def get_msg_len(msg):
        return 1 + sum([get_msg_len(sub_frame) for sub_frame in msg.frame])
     return 1
 
+def get_len(can):
+    return len(can.bus)
+
 # FROM: https://github.com/duelafn/python-jinja2-apci/blob/master/jinja2_apci/error.py
 class RaiseExtension(Extension):
     # This is our keyword(s):
@@ -67,9 +70,9 @@ def render_template_from_to(env, input_path, output_path):
     template = env.get_template(str(input_path))
     with open(output_path, 'w') as f:
         if output_path in [inc_dir.joinpath("structs.hpp"), src_dir.joinpath("structs.cpp")]:
-            f.write(template.render(get_ms = get_ms, get_msg_len = get_msg_len))
+            f.write(template.render(get_len = get_len, get_ms = get_ms, get_msg_len = get_msg_len))
         else:
-            f.write(template.render())
+            f.write(template.render(get_len = get_len))
 
 def render_template(env, relative_path):
     if relative_path.endswith('hpp') or relative_path.endswith('h'):
@@ -79,12 +82,14 @@ def render_template(env, relative_path):
 
 
 if __name__ == '__main__':
+    pth = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    spth = str(pth)
     if '--clean' in sys.argv:
-        os.system("rm src/inc/computers/*.hpp")
-        os.system("rm src/inc/drivers/*.hpp")
-        os.system("rm src/inc/bus.hpp src/inc/pack_unpack.hpp src/inc/structs.hpp")
-        os.system("rm src/src/computers/*.cpp")
-        os.system("rm src/src/bus.cpp src/src/pack_unpack.cpp src/src/structs.cpp")
+        os.system("rm " + spth + "/src/inc/computers/*.hpp")
+        os.system("rm " + spth + "/src/inc/drivers/*.hpp")
+        os.system("rm " + spth + "/src/inc/bus.hpp " + spth + "/src/inc/pack_unpack.hpp " + spth + "/src/inc/structs.hpp")
+        os.system("rm " + spth + "/src/src/computers/*.cpp")
+        os.system("rm " + spth + "/src/src/bus.cpp " + spth + "/src/src/pack_unpack.cpp " + spth + "/src/src/structs.cpp")
     else:
         specpath = sys.argv[1]
         specfile = open(specpath, 'r')
@@ -108,9 +113,7 @@ if __name__ == '__main__':
         computers_hpp.write(template_env, system.computer, computer_hpp_template_path, computer_hpp_dir_path, testing)
         computers_cpp.write(template_env, system.computer, computer_cpp_template_path, computer_cpp_dir_path, testing)
         drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path, testing)
-        pth = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
         try:
-            spth = str(pth)
             os.system('clang-format -i ' + spth + '/src/inc/drivers/*.hpp ' + spth + '/src/src/drivers/*.cpp')
             os.system('clang-format -i ' + spth + '/src/inc/computers/*.hpp ' + spth + '/src/src/computers/*.cpp')
             os.system('clang-format -i ' + spth + '/src/inc/*.hpp')

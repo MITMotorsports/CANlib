@@ -16,11 +16,11 @@
 #include "pack_unpack.hpp"
 
 namespace CANlib {
-extern const std::pair<uint32_t, uint32_t>* frame_id_range[static_cast<int>(AbstractBus::INVALID_NAME)];
-extern const uint32_t* frame_len[static_cast<int>(AbstractBus::INVALID_NAME)];
-extern const uint32_t* keys[static_cast<int>(AbstractBus::INVALID_NAME)];
-extern const size_t can_size[static_cast<int>(AbstractBus::INVALID_NAME)];
-extern Message_T** messages[static_cast<int>(AbstractBus::INVALID_NAME)];
+extern const std::pair<uint32_t, uint32_t>* frame_id_range[{{ get_len(can) }}];
+extern const uint32_t* frame_len[{{ get_len(can) }}];
+extern const uint32_t* keys[{{ get_len(can) }}];
+extern const size_t can_size[{{ get_len(can) }}];
+extern Message_T** messages[{{ get_len(can) }}];
 {%- for bus in can.bus -%}
 {{ last_sent_def(bus, bus, bus.name) }}
 {%- endfor -%}
