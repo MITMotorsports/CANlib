@@ -1,9 +1,10 @@
 {%- macro can_pack_handler(frame, name_prepends, bus_ext, parent_slices = []) -%}
 {%- if frame.frame is defined -%}
-    {% for sub_frame in frame.frame -%}
+    {% for sub_frame in frame.frame %}
         {{ can_pack_handler(sub_frame, name_prepends + [frame.name], bus_ext, parent_slices + [frame.slice]) }}
     {% endfor -%}
-{%- else -%}
+
+{% else -%}
     {%- set name_prepends = name_prepends + [frame.name] -%}
     {%- set tot_name = '::'.join(name_prepends) -%}
         void {{tot_name}}::unpack(Frame& can_out) {
@@ -22,7 +23,7 @@
             can_out.dlc = {{ (ns.length / 8) | round(method='ceil') | int }};
             can_out.extended = {{ bus_ext | lower }};
         }
-{%- endif %}
+{% endif %}
 {%- endmacro -%}
 
 {%- macro can_unpack_handler(frame, name_prepends) -%}
@@ -30,7 +31,8 @@
     {% for sub_frame in frame.frame -%}
         {{ can_unpack_handler(sub_frame, name_prepends + [sub_frame.name]) }}
     {% endfor -%}
-{%- else -%}
+
+{% else -%}
     {%- set tot_name = "::".join(name_prepends) -%}
     void {{ tot_name }}::pack(const Frame& can_in) {
       uint64_t bitstring = 0;
@@ -56,7 +58,7 @@
           ;
         {%- endfor %}
     }
-{%- endif %}
+{% endif %}
 {%- endmacro -%}
 #include "structs.hpp"
 #include "pack_unpack.hpp"
@@ -127,6 +129,7 @@ uint64_t swap_uint64(uint64_t val) {
 {% for bus in can.bus %}
 {%- for msg in bus.frame -%}
 {{ can_pack_handler(msg, [bus.name], bus.extended) }}
+
 {{ can_unpack_handler(msg, [bus.name, msg.name]) }}
 
 {% endfor %}

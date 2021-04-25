@@ -27,17 +27,18 @@ AbstractBus CANlib::get_bus_name(RawBus bus) {
 }
 
 
-{%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
-{% if testing %}
+{% for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+{% if testing -%}
 void CANlib::{{busnm}}_update_can() {
-{% else %}
+{%- else -%}
 static void CANlib::{{busnm}}_update_can() {
-{% endif %}
+{%- endif %}
   Frame frame;
   read_frame(frame, AbstractBus::{{ busnm }});
   handle_frame(AbstractBus::{{busnm}}, frame);
 }
-{%- endfor %}
+{% endfor %}
+
 void CANlib::update_can(void) {
 {%- for busnm in computer.participation['name']['can'].subscribe.keys() %}
   {{ busnm }}_update_can();
