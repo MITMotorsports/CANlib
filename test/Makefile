@@ -88,6 +88,7 @@ $(BUILD_DIR)/src/src/computers/canlib_testcomp2.cpp.o: $(BUILD_DIR)
 .PHONY: clean build
 clean:
 	python3 ../generator/main.py --clean
+	rm -r build/
 	rm main0 main1 main2
 build: main0 main1 main2
 run: 

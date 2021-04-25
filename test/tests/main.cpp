@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "test.hpp"
 
 std::default_random_engine generator;
@@ -11,5 +12,6 @@ int main() {
   testMessageType();
   testPackUnpack();
   testSend();
+  printf("Success ...");
   return 0;
 }
