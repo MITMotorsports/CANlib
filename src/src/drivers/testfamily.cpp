@@ -9,9 +9,9 @@
 
 using namespace CANlib;
 
-CAN can1;
-CAN can2;
-CAN can3;
+TestCAN can1;
+TestCAN can2;
+TestCAN can3;
 
 Clock::time_point Clock::now() noexcept {
   static const auto start_time = std::chrono::system_clock::now();

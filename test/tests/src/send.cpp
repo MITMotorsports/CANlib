@@ -12,9 +12,9 @@ using namespace J;
 using namespace CC;
 using namespace std::chrono_literals;
 
-extern CAN can1;
-extern CAN can2;
-extern CAN can3;
+extern TestCAN can1;
+extern TestCAN can2;
+extern TestCAN can3;
 
 #define CREATE_TEST(Name, can, BITMASK)                                        \
   static void testSend##Name() {                                               \

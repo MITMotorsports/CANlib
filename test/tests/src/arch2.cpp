@@ -15,9 +15,9 @@ using namespace CANlib;
 using namespace map1;
 using namespace map2;
 
-extern CAN can1;
-extern CAN can2;
-extern CAN can3;
+extern TestCAN can1;
+extern TestCAN can2;
+extern TestCAN can3;
 
 void testArch() {
   assert(get_raw_bus(AbstractBus::map1) == RawBus::CAN_3);
