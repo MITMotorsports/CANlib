@@ -4,7 +4,7 @@
         {{ can_pack_handler(sub_frame, name_prepends + [frame.name], bus_ext, parent_slices + [frame.slice]) }}
     {% endfor -%}
 {%- else -%}
-    {%- set name_prepends = name_prepends + [frame.name + '_T'] -%}
+    {%- set name_prepends = name_prepends + [frame.name] -%}
     {%- set tot_name = '::'.join(name_prepends) -%}
         void {{tot_name}}::unpack(Frame& can_out) {
             uint64_t bitstring = 0;
@@ -32,7 +32,7 @@
     {% endfor -%}
 {%- else -%}
     {%- set tot_name = "::".join(name_prepends) -%}
-    void {{ tot_name }}_T::pack(const Frame& can_in) {
+    void {{ tot_name }}::pack(const Frame& can_in) {
       uint64_t bitstring = 0;
       to_bitstring((uint8_t*)can_in.data, &bitstring);
         {%- for atom in frame.atom %}

@@ -3,7 +3,7 @@
 #include "test.hpp"
 
 namespace CANlib {
-extern Message_T **messages[2];
+extern Message **messages[2];
 }
 
 using namespace CANlib;
@@ -12,29 +12,29 @@ using namespace map2;
 using namespace J;
 using namespace CC;
 
-#define CREATE_TEST0(ID, bus_idx, key)                         \
-  static void test##ID() {                                     \
-    for (int cs = 0; cs < 100; ++cs) {                         \
-      Frame f;                                                 \
-      f.dlc = distribution(generator);                         \
-      for (int i = 0; i < 8; ++i) {                            \
-        f.data[i] = distribution(generator);                   \
-      }                                                        \
-      f.id           = key;                                    \
-      int idx        = identify(AbstractBus::map##bus_idx, f); \
-      Message_T *msg = messages[bus_idx - 1][idx];             \
-      assert((dynamic_cast<ID##_T *>(msg)) != nullptr);        \
-    }                                                          \
+#define CREATE_TEST0(ID, bus_idx, key)                       \
+  static void test##ID() {                                   \
+    for (int cs = 0; cs < 100; ++cs) {                       \
+      Frame f;                                               \
+      f.dlc = distribution(generator);                       \
+      for (int i = 0; i < 8; ++i) {                          \
+        f.data[i] = distribution(generator);                 \
+      }                                                      \
+      f.id         = key;                                    \
+      int idx      = identify(AbstractBus::map##bus_idx, f); \
+      Message *msg = messages[bus_idx - 1][idx];             \
+      assert((dynamic_cast<ID *>(msg)) != nullptr);          \
+    }                                                        \
   }
 
-#define CREATE_TEST1(ID, bus_idx, key)                       \
-  static void test##ID() {                                   \
-    ID##_T ID##_input;                                       \
-    Frame f;                                                 \
-    ID##_input.unpack(f);                                    \
-    int idx        = identify(AbstractBus::map##bus_idx, f); \
-    Message_T *msg = messages[bus_idx - 1][idx];             \
-    assert((dynamic_cast<ID##_T *>(msg)) != nullptr);        \
+#define CREATE_TEST1(ID, bus_idx, key)                     \
+  static void test##ID() {                                 \
+    ID ID##_copy;                                          \
+    Frame f;                                               \
+    ID##_copy.unpack(f);                                   \
+    int idx      = identify(AbstractBus::map##bus_idx, f); \
+    Message *msg = messages[bus_idx - 1][idx];             \
+    assert((dynamic_cast<ID *>(msg)) != nullptr);          \
   }
 
 CREATE_TEST0(A, 1, 0X2FF)

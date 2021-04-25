@@ -17,6 +17,12 @@ extern CAN_HandleTypeDef hcan3;
 
 using namespace CANlib;
 
+Clock::time_point Clock::now() noexcept {
+  static const auto start_time = HAL_GetTick();
+  const auto time_passed       = HAL_GetTick() - start_time;
+  return time_point(std::chrono::milliseconds(time_passed));
+}
+
 TransmitError CANlib::TransmitFrame(const Frame &frame, AbstractBus bus_name) {
   RawBus raw_bus = GetRawBus(bus);
   int bus_num;

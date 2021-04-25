@@ -7,7 +7,7 @@
     }
 
 {% else %}
-    {{msg.name}}_T {{msg.name}}_input;
+    {{msg.name}} {{msg.name}}_input;
 {% endif %}
 {%- endmacro -%}
 
@@ -40,7 +40,7 @@
         {{ get_keys(sub_frame, msg_names + [sub_frame.name]) }}
     {%- endfor -%}
 {%- else -%}
-     {{"::".join(msg_names)}}_T::key,
+     {{"::".join(msg_names)}}::key,
 {%- endif -%}
 {%- endmacro -%}
 
@@ -75,7 +75,7 @@
 
 namespace CANlib {
 
-void send(Clock::time_point &last_sent_, Message_T* msg) {
+void send(Clock::time_point &last_sent_, Message* msg) {
     if (Clock::now() - last_sent_ > msg->get_period()) {
         last_sent_ = Clock::now();
         Frame frame;
@@ -84,7 +84,7 @@ void send(Clock::time_point &last_sent_, Message_T* msg) {
     }
 }
 
-void send(Message_T* msg) {
+void send(Message* msg) {
     Frame frame;
     msg->unpack(frame);
     transmit_frame(frame, msg->get_bus_name());
@@ -105,28 +105,28 @@ extern const MessageType message_types[{{get_msg_len(bus)}}] = {
 
 }
 
-const uint32_t {{bus.name}}_keys[] = {
+static const uint32_t {{bus.name}}_keys[] = {
     0,
     {% for msg in bus.frame -%}
         {{ get_keys(msg, [bus.name, msg.name]) }}
     {%- endfor -%}
 };
 
-const std::pair<uint32_t, uint32_t> {{bus.name}}_frame_id_range[] = {
+static const std::pair<uint32_t, uint32_t> {{bus.name}}_frame_id_range[] = {
     std::make_pair(1,0),
     {% for msg in bus.frame -%}
         {{ get_message_ranges(msg, [bus.name, msg.name]) }}
     {%- endfor -%}
 };
 
-const uint32_t {{bus.name}}_frame_len[] = {
+static const uint32_t {{bus.name}}_frame_len[] = {
     0,
     {% for msg in bus.frame -%}
         {{ get_frame_ranges(msg, [bus.name, msg.name]) }}
     {%- endfor -%}
 };
 
-Message_T* {{bus.name}}_messages[] = {
+static Message* {{bus.name}}_messages[] = {
     nullptr,
     {%- for msg in bus.frame -%}
         {{ get_messages(msg, ['CANlib', bus.name, msg.name]) }}
@@ -158,7 +158,7 @@ extern const size_t can_size[{{ get_len(can) }}] = {
 {%- endfor -%}
 };
 
-Message_T** messages[{{ get_len(can) }}] = {
+Message** messages[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
 {{bus.name}}_messages,
 {%- endfor -%}

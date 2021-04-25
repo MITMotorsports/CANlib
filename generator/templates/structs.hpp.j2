@@ -8,7 +8,7 @@
     } // {{msg_name}}
 
 {% else %}
-    struct {{msg_name}}_T : public Message_T {
+    struct {{msg_name}} : public Message {
         void unpack(Frame&) override;
         void pack(const Frame&) override;
         uint32_t get_key() override {
@@ -61,7 +61,7 @@
         {{ get_keys(sub_frame, msg_names + [sub_frame.name]) }}
     {%- endfor -%}
 {%- else -%}
-     {{"::".join(msg_names)}}_T::key,
+     {{"::".join(msg_names)}}::key,
 {%- endif -%}
 {%- endmacro -%}
 
@@ -95,10 +95,11 @@
 #include "driver.hpp"
 #include "static.hpp"
 #include "clock.hpp"
+#include "bus.hpp"
 
 namespace CANlib {
 
-struct Message_T {
+struct Message {
     virtual void unpack(Frame&) = 0;
     virtual void pack(const Frame&) = 0;
     virtual uint32_t get_key() = 0;
@@ -107,8 +108,8 @@ struct Message_T {
     virtual Clock::duration get_period() = 0;
 };
 
-void send(Clock::time_point &last_sent_, Message_T* msg);
-void send(Message_T* msg);
+void send(Clock::time_point &last_sent_, Message* msg);
+void send(Message* msg);
 
 {%- for bus in can.bus %}
 

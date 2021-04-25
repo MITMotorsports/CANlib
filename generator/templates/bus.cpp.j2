@@ -6,7 +6,7 @@
         {{ last_sent_def(bus, sub_frame, msg_name + '::' + sub_frame.name) }}
     {% endfor %}
 {% else %}
-    Clock::time_point {{msg_name}}_T::last_sent_;
+    Clock::time_point {{msg_name}}::last_sent_;
 {% endif %}
 {%- endmacro -%}
 
@@ -20,7 +20,7 @@ extern const std::pair<uint32_t, uint32_t>* frame_id_range[{{ get_len(can) }}];
 extern const uint32_t* frame_len[{{ get_len(can) }}];
 extern const uint32_t* keys[{{ get_len(can) }}];
 extern const size_t can_size[{{ get_len(can) }}];
-extern Message_T** messages[{{ get_len(can) }}];
+extern Message** messages[{{ get_len(can) }}];
 {%- for bus in can.bus -%}
 {{ last_sent_def(bus, bus, bus.name) }}
 {%- endfor -%}

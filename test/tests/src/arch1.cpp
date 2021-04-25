@@ -4,10 +4,10 @@
 
 namespace CANlib {
 namespace map1 {
-extern A_T A_input;
+extern A A_input;
 }  // namespace map1
 namespace map2 {
-extern F_T F_input;
+extern F F_input;
 }  // namespace map2
 }  // namespace CANlib
 
@@ -39,17 +39,17 @@ void testArch() {
   can2.clear();
   can3.clear();
   Frame f;
-  map1::A_T A_copy;
+  map1::A A_copy;
   A_copy.ARG0 = true;
   A_copy.ARG1 = 69;
   A_copy.ARG2 = 69;
   A_copy.ARG3 = 69;
   A_copy.unpack(f);
   can2.setFrameToSend(f);
-  map1::A_T A_copy2;
+  map1::A A_copy2;
   map1_update_can();
   assert(A_input.ARG0 && A_input.ARG1 == 69 && A_input.ARG2 == 69 && A_input.ARG3 == 69);
-  map2::F_T F_copy;
+  map2::F F_copy;
   F_copy.ARG0 = 69;
   F_copy.ARG1 = 69;
   F_copy.ARG2 = 69;

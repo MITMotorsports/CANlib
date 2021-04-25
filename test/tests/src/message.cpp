@@ -12,7 +12,7 @@ using namespace CC;
 #define CREATE_TEST(ID, BITMASK)                     \
   void test##ID() {                                  \
     for (int cs = 0; cs < 100000; ++cs) {            \
-      ID##_T ID##_input;                             \
+      ID ID##_copy;                                  \
       Frame f0;                                      \
       for (int i = 0; i < 8; ++i) {                  \
         f0.data[i] = distribution(generator);        \
@@ -20,10 +20,10 @@ using namespace CC;
       uint64_t bitstring0;                           \
       to_bitstring((uint8_t *)f0.data, &bitstring0); \
       bitstring0 &= BITMASK;                         \
-      ID##_input.pack(f0);                           \
+      ID##_copy.pack(f0);                            \
       Frame f1;                                      \
       memset(f1.data, 0, sizeof(f1.data));           \
-      ID##_input.unpack(f1);                         \
+      ID##_copy.unpack(f1);                          \
       uint64_t bitstring1;                           \
       to_bitstring((uint8_t *)f1.data, &bitstring1); \
       bitstring1 &= BITMASK;                         \
