@@ -1,14 +1,17 @@
-{%- macro struct_declarations(bus, msg, msg_name=msg.name) -%}
+{%- macro struct_declarations(bus, msg, msg_names = [msg.name]) -%}
 {%- if msg.frame is defined %}
-    namespace {{msg_name}} {
+    namespace {{msg.name}} {
         const uint32_t key = 0x{{ '%0X' % msg.key }};
         {% for sub_frame in msg.frame %}
-            {{ struct_declarations(bus, sub_frame) }}
+            {{ struct_declarations(bus, sub_frame, msg_names + [sub_frame.name]) }}
         {% endfor %}
     } // {{msg_name}}
 
 {% else %}
-    struct {{msg_name}} : public Message {
+    struct {{msg.name}} : public Message_{{ bus.name }} {
+        MessageType get_message_type() override {
+            return MessageType::{{ '_'.join(msg_names) }};
+        }
         void unpack(Frame&) override;
         void pack(const Frame&) override;
         uint32_t get_key() override {
@@ -114,6 +117,9 @@ void send(Message* msg);
 {%- for bus in can.bus %}
 
     namespace {{ bus.name }} {
+        struct Message_{{bus.name}} : public Message {
+            virtual MessageType get_message_type() = 0;
+        };
 
         {% for msg in bus.frame -%}
             {{ struct_declarations(bus, msg) }}
