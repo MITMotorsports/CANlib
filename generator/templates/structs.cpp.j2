@@ -58,7 +58,7 @@
 
 {%- macro get_frame_ranges(msg, msg_names, cnt = 0) -%}
 {%- if msg.frame is defined -%}
-    {{ get_msg_len(msg) }},
+    {{ get_num_msg_types(msg) }},
     {%- for sub_frame in msg.frame -%}
         {{ get_frame_ranges(sub_frame, msg_names + [sub_frame.name], cnt + 1) }}
     {%- endfor -%}
@@ -95,7 +95,7 @@ namespace {{bus.name}} {
 {{ struct_declarations(bus, msg, msg.name) }}
 {%- endfor %}
 
-extern const MessageType message_types[{{get_msg_len(bus)}}] = {
+extern const MessageType message_types[{{get_num_msg_types(bus)}}] = {
     MessageType::UNKNOWN_MSG,
     {% for msg in bus.frame -%}
         {{ get_message_type(bus, msg, [msg.name]) }}
@@ -153,7 +153,7 @@ const uint32_t* frame_len[{{ get_len(can) }}] = {
 
 extern const size_t can_size[{{ get_len(can) }}] = {
 {%- for bus in can.bus -%}
-{{ get_msg_len(bus) }},
+{{ get_num_msg_types(bus) }},
 {%- endfor -%}
 };
 

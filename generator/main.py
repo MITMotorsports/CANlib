@@ -34,9 +34,9 @@ def get_ms(period_str):
     ur = UnitRegistry()
     return (int)(ur[period_str].to('ms').magnitude)
 
-def get_msg_len(msg):
+def get_num_msg_types(msg):
     if hasattr(msg, "frame"):
-       return 1 + sum([get_msg_len(sub_frame) for sub_frame in msg.frame])
+       return 1 + sum([get_num_msg_types(sub_frame) for sub_frame in msg.frame])
     return 1
 
 def get_len(can):
@@ -70,7 +70,7 @@ def render_template_from_to(env, input_path, output_path):
     template = env.get_template(str(input_path))
     with open(output_path, 'w') as f:
         if output_path in [inc_dir.joinpath("structs.hpp"), src_dir.joinpath("structs.cpp")]:
-            f.write(template.render(get_len = get_len, get_ms = get_ms, get_msg_len = get_msg_len))
+            f.write(template.render(get_len = get_len, get_ms = get_ms, get_num_msg_types = get_num_msg_types))
         else:
             f.write(template.render(get_len = get_len))
 
