@@ -1,11 +1,5 @@
 name: MY20
 units:
-  - newtonmeter = N * m = J = Nm
-  - tick = 3 ms
-  - RPM = 360 deg / min
-  - pct = 0.01
-  - halfpct = 0.5 pct
-  - tenthpct = 0.1 pct
 architecture:
   testarch:
     family: testfamily
@@ -248,7 +242,7 @@ protocol:
           H:
             key: 0x0A0
             atom:
-              <<: &rms_temps
+              <<: &temps
                 a_temp:
                   slice: 0 + 16
                   unit: decidegC
@@ -286,7 +280,7 @@ protocol:
             frame:
               AA:
                 key: 0
-                <<: &rms_bool_data
+                <<: &bool_data
                   atom:
                     write_success:
                       slice: 23 + 1
@@ -296,7 +290,7 @@ protocol:
                       type: bool little
               BB:
                 key: 0x14
-                <<: *rms_bool_data
+                <<: *bool_data
                 #Required to correctly parse the data with the script, as this parameter is constantly
                 #being transmitted over the CAN bus.
               CC:
@@ -306,99 +300,99 @@ protocol:
                   AAA:
                     key: 0x69
                     atom:
-                      <<: &rms_c_write_success
+                      <<: &write_success
                         write_success: # whether EEPROM has been re-written
                           slice: 23 + 1
                           type: bool little
                       data:
-                        <<: &rms_c_signed_int_data
+                        <<: &signed_int_data
                           slice: 32 + 16
                           type: int16 little
                   BBB:
                     key: 0x70
                     atom:
-                      <<: *rms_c_write_success
+                      <<: *write_success
                       data:
-                        <<: *rms_c_signed_int_data
+                        <<: *signed_int_data
                   CCC:
                     key: 0x71
                     atom:
-                      <<: *rms_c_write_success
+                      <<: *write_success
                       data:
-                        <<: *rms_c_signed_int_data
+                        <<: *signed_int_data
                   DDD:
                     key: 0x72
                     atom:
-                      <<: *rms_c_write_success
+                      <<: *write_success
                       data:
-                        <<: *rms_c_signed_int_data
+                        <<: *signed_int_data
               DD:
                 key: 0x65
                 atom:
-                  <<: &rms_write_success
+                  <<: &write_success_2
                     write_success: # whether EEPROM has been re-written
                       slice: 23 + 1
                       type: bool little
                   data:
-                    <<: &rms_signed_int_data
+                    <<: &signed_int_data_2
                       slice: 32 + 16
                       type: int16 little
               EE:
                 key: 0x66
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_signed_int_data
+                    <<: *signed_int_data_2
               FF:
                 key: 0x67
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_signed_int_data
+                    <<: *signed_int_data_2
               GG:
                 key: 0x68
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_signed_int_data
+                    <<: *signed_int_data_2
               HH:
                 key: 0x6a
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_signed_int_data
+                    <<: *signed_int_data_2
               II:
                 key: 0x6b
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: &rms_unsigned_int_data
+                    <<: &unsigned_int_data
                       slice: 32 + 16
                       type: uint16 little
               JJ:
                 key: 0x6c
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_unsigned_int_data
+                    <<: *unsigned_int_data
               KK:
                 key: 0x6d
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_unsigned_int_data
+                    <<: *unsigned_int_data
               LL:
                 key: 0x6f
                 atom:
-                  <<: *rms_write_success
+                  <<: *write_success_2
                   data:
-                    <<: *rms_signed_int_data
+                    <<: *signed_int_data
               MM:
                 key: 0xab
-                <<: *rms_bool_data
+                <<: *bool_data
               NN:
                 key: 0x91
-                <<: *rms_bool_data
+                <<: *bool_data
           K:
             key: 0x0BB
             atom:

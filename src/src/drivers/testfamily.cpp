@@ -1,4 +1,3 @@
-//#ifdef CANLIB_ARCH_TESTFAMILY
 #include "static.hpp"
 
 #include <stdint.h>
@@ -54,4 +53,3 @@ void CANlib::read_frame(Frame &frame, AbstractBus bus_name) {
       return;
   }
 }
-//#endif
