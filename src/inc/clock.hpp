@@ -18,5 +18,5 @@ struct Clock {
 
   static constexpr bool is_steady = true;
 };
- 
+
 }  // namespace CANlib

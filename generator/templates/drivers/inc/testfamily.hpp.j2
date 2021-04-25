@@ -28,21 +28,21 @@ protected:
     Frame frame_to_send;
 };
 
-enum class Raw_Bus_T {
+enum class RawBus {
 {%- for bus in architecture.participation['name']['can'].buses -%}
 {%- if bus == 'INVALID_BUS' -%}
   {%- raise "INVALID_BUS is a reserved bus name" -%}
 {%- endif %}
   {{ bus }},
 {%- endfor %}
-	INVALID_BUS
+  INVALID_BUS,
 };
 
-typedef bool Transmit_Error_T;
+typedef bool TransmitError;
 
-Transmit_Error_T TransmitFrame(const Frame& frame, Bus_Names_T bus);
-void ReadFrame(Frame& frame, Bus_Names_T bus);
-Raw_Bus_T GetRawBus(Bus_Names_T);
-Bus_Names_T GetBusName(Raw_Bus_T);
+TransmitError transmit_frame(const Frame& frame, AbstractBus bus_name);
+void read_frame(Frame& frame, AbstractBus bus_name);
+RawBus get_raw_bus(AbstractBus);
+AbstractBus get_bus_name(RawBus);
 
 } // CANlib

@@ -79,33 +79,41 @@ def render_template(env, relative_path):
 
 
 if __name__ == '__main__':
-    specpath = sys.argv[1]
-    specfile = open(specpath, 'r')
-    system = ParseCAN.spec.System.from_yaml(specfile)
-    can = system.protocol['name']['can']
+    if '--clean' in sys.argv:
+        os.system("rm src/inc/computers/*.hpp")
+        os.system("rm src/inc/drivers/*.hpp")
+        os.system("rm src/inc/bus.hpp src/inc/pack_unpack.hpp src/inc/structs.hpp")
+        os.system("rm src/src/computers/*.cpp")
+        os.system("rm src/src/bus.cpp src/src/pack_unpack.cpp src/src/structs.cpp")
+    else:
+        specpath = sys.argv[1]
+        specfile = open(specpath, 'r')
+        system = ParseCAN.spec.System.from_yaml(specfile)
+        can = system.protocol['name']['can']
 
-    script_dir = os.path.dirname(sys.argv[0])
-    if script_dir == '':
-        script_dir = '.'
-    os.chdir(script_dir)
+        script_dir = os.path.dirname(sys.argv[0])
+        if script_dir == '':
+            script_dir = '.'
+        os.chdir(script_dir)
 
-    template_loader = jinja2.FileSystemLoader(searchpath=".")
-    template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True, extensions=[RaiseExtension])
-    template_env.globals["can"] = can
-    template_env.globals["system"] = system
+        template_loader = jinja2.FileSystemLoader(searchpath=".")
+        template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True, extensions=[RaiseExtension])
+        template_env.globals["can"] = can
+        template_env.globals["system"] = system
 
-    for filename in ["pack_unpack.cpp", "pack_unpack.hpp", "structs.hpp", "bus.hpp", "bus.cpp", "structs.cpp"]:
-        render_template(template_env, filename)
+        for filename in ["pack_unpack.cpp", "pack_unpack.hpp", "structs.hpp", "bus.hpp", "bus.cpp", "structs.cpp"]:
+            render_template(template_env, filename)
 
-    testing = '--testing' in sys.argv 
-    computers_hpp.write(template_env, system.computer, computer_hpp_template_path, computer_hpp_dir_path, testing)
-    computers_cpp.write(template_env, system.computer, computer_cpp_template_path, computer_cpp_dir_path, testing)
-    drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path, testing)
-    import os
-    try:
-        os.system('clang-format -i ../src/inc/drivers/* ../src/src/drivers/*')
-        os.system('clang-format -i ../src/inc/computers/* ../src/src/computers/*')
-        os.system('clang-format -i ../src/inc/*')
-        os.system('clang-format -i ../src/src/*')
-    except:
-        print('Error during clang-format, is it installed?')
+        testing = '--testing' in sys.argv 
+        computers_hpp.write(template_env, system.computer, computer_hpp_template_path, computer_hpp_dir_path, testing)
+        computers_cpp.write(template_env, system.computer, computer_cpp_template_path, computer_cpp_dir_path, testing)
+        drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path, testing)
+        pth = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+        try:
+            spth = str(pth)
+            os.system('clang-format -i ' + spth + '/src/inc/drivers/*.hpp ' + spth + '/src/src/drivers/*.cpp')
+            os.system('clang-format -i ' + spth + '/src/inc/computers/*.hpp ' + spth + '/src/src/computers/*.cpp')
+            os.system('clang-format -i ' + spth + '/src/inc/*.hpp')
+            os.system('clang-format -i ' + spth + '/src/src/*.cpp')
+        except:
+            print('Error during clang-format, is it installed?')

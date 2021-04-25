@@ -19,6 +19,6 @@
 #include "bus.hpp"
 
 namespace CANlib {
-Transmit_Error_T TransmitFrame(const Frame &frame, Bus_Names_T bus);
-void ReadFrame(Frame &frame, Raw_Bus_T bus);
+TransmitError transmit_frame(const Frame &frame, AbstractBus bus_name);
+void read_frame(Frame &frame, RawBus bus);
 }  // namespace CANlib

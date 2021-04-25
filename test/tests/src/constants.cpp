@@ -4,10 +4,10 @@
 
 namespace CANlib {
 namespace map1 {
-extern Message_Type_T message_types[6];
+extern MessageType message_types[6];
 }
 namespace map2 {
-extern Message_Type_T message_types[28];
+extern MessageType message_types[28];
 }
 }  // namespace CANlib
 
@@ -207,8 +207,8 @@ void testPeriod() {
     ID##_T ID##_input;                                                             \
     Frame f;                                                                       \
     ID##_input.unpack(f);                                                          \
-    int idx = Identify(Bus_Names_T::map##bus_idx, f);                              \
-    assert(map##bus_idx::message_types[idx] == map##bus_idx::Message_Type_T::msg); \
+    int idx = identify(AbstractBus::map##bus_idx, f);                              \
+    assert(map##bus_idx::message_types[idx] == map##bus_idx::MessageType::msg); \
   }
 CREATE_TEST(A, 1, 0X2FF, A)
 CREATE_TEST(B, 1, 0X305, B)
@@ -305,34 +305,34 @@ void testBusNames() {
   map2::L_T L_input;
   map2::M_T M_input;
   map2::N_T N_input;
-  assert(A_input.get_bus_name() == Bus_Names_T::map1);
-  assert(B_input.get_bus_name() == Bus_Names_T::map1);
-  assert(C_input.get_bus_name() == Bus_Names_T::map1);
-  assert(D_input.get_bus_name() == Bus_Names_T::map1);
-  assert(E_input.get_bus_name() == Bus_Names_T::map1);
-  assert(F_input.get_bus_name() == Bus_Names_T::map2);
-  assert(G_input.get_bus_name() == Bus_Names_T::map2);
-  assert(H_input.get_bus_name() == Bus_Names_T::map2);
-  assert(I_input.get_bus_name() == Bus_Names_T::map2);
-  assert(AA_input.get_bus_name() == Bus_Names_T::map2);
-  assert(BB_input.get_bus_name() == Bus_Names_T::map2);
-  assert(AAA_input.get_bus_name() == Bus_Names_T::map2);
-  assert(BBB_input.get_bus_name() == Bus_Names_T::map2);
-  assert(CCC_input.get_bus_name() == Bus_Names_T::map2);
-  assert(DDD_input.get_bus_name() == Bus_Names_T::map2);
-  assert(DD_input.get_bus_name() == Bus_Names_T::map2);
-  assert(EE_input.get_bus_name() == Bus_Names_T::map2);
-  assert(FF_input.get_bus_name() == Bus_Names_T::map2);
-  assert(GG_input.get_bus_name() == Bus_Names_T::map2);
-  assert(HH_input.get_bus_name() == Bus_Names_T::map2);
-  assert(II_input.get_bus_name() == Bus_Names_T::map2);
-  assert(JJ_input.get_bus_name() == Bus_Names_T::map2);
-  assert(KK_input.get_bus_name() == Bus_Names_T::map2);
-  assert(LL_input.get_bus_name() == Bus_Names_T::map2);
-  assert(MM_input.get_bus_name() == Bus_Names_T::map2);
-  assert(NN_input.get_bus_name() == Bus_Names_T::map2);
-  assert(K_input.get_bus_name() == Bus_Names_T::map2);
-  assert(L_input.get_bus_name() == Bus_Names_T::map2);
-  assert(M_input.get_bus_name() == Bus_Names_T::map2);
-  assert(N_input.get_bus_name() == Bus_Names_T::map2);
+  assert(A_input.get_bus_name() == AbstractBus::map1);
+  assert(B_input.get_bus_name() == AbstractBus::map1);
+  assert(C_input.get_bus_name() == AbstractBus::map1);
+  assert(D_input.get_bus_name() == AbstractBus::map1);
+  assert(E_input.get_bus_name() == AbstractBus::map1);
+  assert(F_input.get_bus_name() == AbstractBus::map2);
+  assert(G_input.get_bus_name() == AbstractBus::map2);
+  assert(H_input.get_bus_name() == AbstractBus::map2);
+  assert(I_input.get_bus_name() == AbstractBus::map2);
+  assert(AA_input.get_bus_name() == AbstractBus::map2);
+  assert(BB_input.get_bus_name() == AbstractBus::map2);
+  assert(AAA_input.get_bus_name() == AbstractBus::map2);
+  assert(BBB_input.get_bus_name() == AbstractBus::map2);
+  assert(CCC_input.get_bus_name() == AbstractBus::map2);
+  assert(DDD_input.get_bus_name() == AbstractBus::map2);
+  assert(DD_input.get_bus_name() == AbstractBus::map2);
+  assert(EE_input.get_bus_name() == AbstractBus::map2);
+  assert(FF_input.get_bus_name() == AbstractBus::map2);
+  assert(GG_input.get_bus_name() == AbstractBus::map2);
+  assert(HH_input.get_bus_name() == AbstractBus::map2);
+  assert(II_input.get_bus_name() == AbstractBus::map2);
+  assert(JJ_input.get_bus_name() == AbstractBus::map2);
+  assert(KK_input.get_bus_name() == AbstractBus::map2);
+  assert(LL_input.get_bus_name() == AbstractBus::map2);
+  assert(MM_input.get_bus_name() == AbstractBus::map2);
+  assert(NN_input.get_bus_name() == AbstractBus::map2);
+  assert(K_input.get_bus_name() == AbstractBus::map2);
+  assert(L_input.get_bus_name() == AbstractBus::map2);
+  assert(M_input.get_bus_name() == AbstractBus::map2);
+  assert(N_input.get_bus_name() == AbstractBus::map2);
 }

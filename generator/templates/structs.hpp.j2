@@ -17,8 +17,8 @@
         void send() override {
             CANlib::send(this->last_sent_, this);
         }
-        Bus_Names_T get_bus_name() override {
-            return Bus_Names_T::{{ bus.name }};
+        AbstractBus get_bus_name() override {
+            return AbstractBus::{{ bus.name }};
         }
         Clock::duration get_period() override {
             {% if msg.period %}
@@ -103,7 +103,7 @@ struct Message_T {
     virtual void pack(const Frame&) = 0;
     virtual uint32_t get_key() = 0;
     virtual void send() = 0;
-    virtual Bus_Names_T get_bus_name() = 0;
+    virtual AbstractBus get_bus_name() = 0;
     virtual Clock::duration get_period() = 0;
 };
 

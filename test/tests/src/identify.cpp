@@ -21,7 +21,7 @@ using namespace CC;
         f.data[i] = distribution(generator);                   \
       }                                                        \
       f.id           = key;                                    \
-      int idx        = Identify(Bus_Names_T::map##bus_idx, f); \
+      int idx        = identify(AbstractBus::map##bus_idx, f); \
       Message_T *msg = messages[bus_idx - 1][idx];             \
       assert((dynamic_cast<ID##_T *>(msg)) != nullptr);        \
     }                                                          \
@@ -32,7 +32,7 @@ using namespace CC;
     ID##_T ID##_input;                                       \
     Frame f;                                                 \
     ID##_input.unpack(f);                                    \
-    int idx        = Identify(Bus_Names_T::map##bus_idx, f); \
+    int idx        = identify(AbstractBus::map##bus_idx, f); \
     Message_T *msg = messages[bus_idx - 1][idx];             \
     assert((dynamic_cast<ID##_T *>(msg)) != nullptr);        \
   }

@@ -21,15 +21,15 @@ Clock::time_point Clock::now() noexcept {
   return time_point(std::chrono::milliseconds(us.count()));
 }
 
-Transmit_Error_T CANlib::TransmitFrame(const Frame &frame, Bus_Names_T bus_name) {
-  switch (GetRawBus(bus_name)) {
-    case Raw_Bus_T::CAN_1:
+TransmitError CANlib::transmit_frame(const Frame &frame, AbstractBus bus_name) {
+  switch (get_raw_bus(bus_name)) {
+    case RawBus::CAN_1:
       can1.receiveFrame(frame);
       break;
-    case Raw_Bus_T::CAN_2:
+    case RawBus::CAN_2:
       can2.receiveFrame(frame);
       break;
-    case Raw_Bus_T::CAN_3:
+    case RawBus::CAN_3:
       can3.receiveFrame(frame);
       break;
     default:
@@ -39,15 +39,15 @@ Transmit_Error_T CANlib::TransmitFrame(const Frame &frame, Bus_Names_T bus_name)
   return false;
 }
 
-void CANlib::ReadFrame(Frame &frame, Bus_Names_T bus_name) {
-  switch (GetRawBus(bus_name)) {
-    case Raw_Bus_T::CAN_1:
+void CANlib::read_frame(Frame &frame, AbstractBus bus_name) {
+  switch (get_raw_bus(bus_name)) {
+    case RawBus::CAN_1:
       frame = can1.frameToSend();
       break;
-    case Raw_Bus_T::CAN_2:
+    case RawBus::CAN_2:
       frame = can2.frameToSend();
       break;
-    case Raw_Bus_T::CAN_3:
+    case RawBus::CAN_3:
       frame = can3.frameToSend();
       break;
     default:

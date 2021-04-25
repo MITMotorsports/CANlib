@@ -21,13 +21,13 @@ extern CAN can2;
 extern CAN can3;
 
 void testArch() {
-  assert(GetRawBus(Bus_Names_T::map1) == Raw_Bus_T::CAN_2);
-  assert(GetRawBus(Bus_Names_T::map2) == Raw_Bus_T::CAN_1);
-  assert(GetRawBus(Bus_Names_T::INVALID_NAME) == Raw_Bus_T::INVALID_BUS);
-  assert(GetBusName(Raw_Bus_T::CAN_2) == Bus_Names_T::map1);
-  assert(GetBusName(Raw_Bus_T::CAN_1) == Bus_Names_T::map2);
-  assert(GetBusName(Raw_Bus_T::CAN_3) == Bus_Names_T::INVALID_NAME);
-  assert(GetBusName(Raw_Bus_T::INVALID_BUS) == Bus_Names_T::INVALID_NAME);
+  assert(get_raw_bus(AbstractBus::map1) == RawBus::CAN_2);
+  assert(get_raw_bus(AbstractBus::map2) == RawBus::CAN_1);
+  assert(get_raw_bus(AbstractBus::INVALID_NAME) == RawBus::INVALID_BUS);
+  assert(get_bus_name(RawBus::CAN_2) == AbstractBus::map1);
+  assert(get_bus_name(RawBus::CAN_1) == AbstractBus::map2);
+  assert(get_bus_name(RawBus::CAN_3) == AbstractBus::INVALID_NAME);
+  assert(get_bus_name(RawBus::INVALID_BUS) == AbstractBus::INVALID_NAME);
   can1.clear();
   can2.clear();
   can3.clear();

@@ -15,20 +15,20 @@
 
 namespace CANlib {
 
-enum class Bus_Names_T {
+enum class AbstractBus {
     {%- for bus in can.bus %}
     {{ bus.name }},
     {%- endfor %}
     INVALID_NAME,
 };
 
-uint32_t Identify(Bus_Names_T, const Frame&);
-void HandleFrame(Bus_Names_T, const Frame&);
+uint32_t identify(AbstractBus, const Frame&);
+void handle_frame(AbstractBus, const Frame&);
 
 {% for bus in can.bus %}
     namespace {{bus.name}} {
         {%- set ns.first_frame = true %}
-        enum class Message_Type_T {
+        enum class MessageType {
             UNKNOWN_MSG = 0,
             {%- for msg in bus.frame -%}
                 {{- enum_name(msg) }}

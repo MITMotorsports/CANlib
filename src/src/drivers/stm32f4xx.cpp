@@ -17,8 +17,8 @@ extern CAN_HandleTypeDef hcan3;
 
 using namespace CANlib;
 
-Transmit_Error_T CANlib::TransmitFrame(const Frame &frame, Bus_Names_T bus_name) {
-  Raw_Bus_T raw_bus = GetRawBus(bus);
+TransmitError CANlib::TransmitFrame(const Frame &frame, AbstractBus bus_name) {
+  RawBus raw_bus = GetRawBus(bus);
   int bus_num;
   CAN_HandleTypeDef *hcan;
   switch (raw_bus) {
@@ -54,8 +54,8 @@ Transmit_Error_T CANlib::TransmitFrame(const Frame &frame, Bus_Names_T bus_name)
   return HAL_CAN_AddTxMessage(hcan, &pHeader, frame.data, &pTxMailbox);
 }
 
-void ReadFrame(Frame &frame, Bus_Names_T bus) {
-  Raw_Bus_T raw_bus = GetRawBus(bus);
+void ReadFrame(Frame &frame, AbstractBus bus_name) {
+  RawBus raw_bus = GetRawBus(bus_name);
   CAN_HandleTypeDef *hcan;
   switch (raw_bus) {
     case CAN_1:
