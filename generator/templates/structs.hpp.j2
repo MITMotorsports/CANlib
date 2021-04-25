@@ -18,7 +18,7 @@
             return key;
         }
         void send() override {
-            CANlib::send(this->last_sent_, this);
+            CANlib::send_period(this->last_sent_, this);
         }
         AbstractBus get_bus_name() override {
             return AbstractBus::{{ bus.name }};
@@ -111,7 +111,7 @@ struct Message {
     virtual Clock::duration get_period() = 0;
 };
 
-void send(Clock::time_point &last_sent_, Message* msg);
+void send_period(Clock::time_point &last_sent_, Message* msg);
 void send(Message* msg);
 
 {%- for bus in can.bus %}

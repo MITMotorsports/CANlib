@@ -32,7 +32,7 @@ extern CAN can3;
       auto starting_time = Clock::now();                                     \
       auto tmp           = starting_time;                                    \
       while (Clock::now() - starting_time <= ID##_copy.get_period() + 5ms) { \
-        send(tmp, &ID##_copy);                                               \
+        send_period(tmp, &ID##_copy);                                               \
       }                                                                      \
     } else {                                                                 \
       send(&ID##_copy);                                                      \

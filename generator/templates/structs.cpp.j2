@@ -75,12 +75,10 @@
 
 namespace CANlib {
 
-void send(Clock::time_point &last_sent_, Message* msg) {
+void send_period(Clock::time_point &last_sent_, Message* msg) {
     if (Clock::now() - last_sent_ > msg->get_period()) {
         last_sent_ = Clock::now();
-        Frame frame;
-        msg->unpack(frame);
-        transmit_frame(frame, msg->get_bus_name());
+        send(msg);
     }
 }
 

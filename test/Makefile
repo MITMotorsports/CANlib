@@ -14,8 +14,6 @@ COMP_SRC := ../src/src/computers/*.cpp
 # As an example, ./build/hello.cpp.o turns into ./build/hello.cpp.d
 #DEPS := $(OBJS:.o=.d)
 
-# Every folder in ./src will need to be passed to GCC so that it can find header files
-INC_DIRS := $(shell find ../src/inc tests/inc -type d)
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := -I../src/inc -Itests/inc
 COMPUTER_FLAGS := -I../src/inc/drivers -I../src/inc/computers
