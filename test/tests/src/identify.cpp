@@ -12,8 +12,8 @@ using namespace map2;
 using namespace J;
 using namespace CC;
 
-#define CREATE_TEST0(ID, bus_idx, key)                       \
-  static void test##ID() {                                   \
+#define CREATE_TEST0(Name, bus_idx, key)                     \
+  static void test##Name() {                                 \
     for (int cs = 0; cs < 100; ++cs) {                       \
       Frame f;                                               \
       f.dlc = distribution(generator);                       \
@@ -23,18 +23,18 @@ using namespace CC;
       f.id         = key;                                    \
       int idx      = identify(AbstractBus::map##bus_idx, f); \
       Message *msg = messages[bus_idx - 1][idx];             \
-      assert((dynamic_cast<ID *>(msg)) != nullptr);          \
+      assert((dynamic_cast<Name *>(msg)) != nullptr);        \
     }                                                        \
   }
 
-#define CREATE_TEST1(ID, bus_idx, key)                     \
-  static void test##ID() {                                 \
-    ID ID##_copy;                                          \
+#define CREATE_TEST1(Name, bus_idx, key)                   \
+  static void test##Name() {                               \
+    Name Name##_copy;                                      \
     Frame f;                                               \
-    ID##_copy.unpack(f);                                   \
+    Name##_copy.unpack(f);                                 \
     int idx      = identify(AbstractBus::map##bus_idx, f); \
     Message *msg = messages[bus_idx - 1][idx];             \
-    assert((dynamic_cast<ID *>(msg)) != nullptr);          \
+    assert((dynamic_cast<Name *>(msg)) != nullptr);        \
   }
 
 CREATE_TEST0(A, 1, 0X2FF)

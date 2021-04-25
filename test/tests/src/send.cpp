@@ -16,33 +16,33 @@ extern CAN can1;
 extern CAN can2;
 extern CAN can3;
 
-#define CREATE_TEST(ID, can, BITMASK)                                        \
-  static void testSend##ID() {                                               \
-    ID ID##_copy;                                                            \
-    Frame f0;                                                                \
-    for (int i = 0; i < 8; ++i) {                                            \
-      f0.data[i] = distribution(generator);                                  \
-    }                                                                        \
-    uint64_t bitstring0;                                                     \
-    to_bitstring((uint8_t *)f0.data, &bitstring0);                           \
-    bitstring0 &= BITMASK;                                                   \
-    ID##_copy.pack(f0);                                                      \
-    can.clear();                                                             \
-    if (ID##_copy.get_period() != 0ms) {                                     \
-      auto starting_time = Clock::now();                                     \
-      auto tmp           = starting_time;                                    \
-      while (Clock::now() - starting_time <= ID##_copy.get_period() + 5ms) { \
-        send_period(tmp, &ID##_copy);                                               \
-      }                                                                      \
-    } else {                                                                 \
-      send(&ID##_copy);                                                      \
-    }                                                                        \
-    uint64_t bitstring1;                                                     \
-    assert(can.framesReceived() == 1);                                       \
-    Frame f1 = can.topFrame();                                               \
-    to_bitstring((uint8_t *)f1.data, &bitstring1);                           \
-    bitstring1 &= BITMASK;                                                   \
-    assert(bitstring0 == bitstring1);                                        \
+#define CREATE_TEST(Name, can, BITMASK)                                        \
+  static void testSend##Name() {                                               \
+    Name Name##_copy;                                                          \
+    Frame f0;                                                                  \
+    for (int i = 0; i < 8; ++i) {                                              \
+      f0.data[i] = distribution(generator);                                    \
+    }                                                                          \
+    uint64_t bitstring0;                                                       \
+    to_bitstring((uint8_t *)f0.data, &bitstring0);                             \
+    bitstring0 &= BITMASK;                                                     \
+    Name##_copy.pack(f0);                                                      \
+    can.clear();                                                               \
+    if (Name##_copy.get_period() != 0ms) {                                     \
+      auto starting_time = Clock::now();                                       \
+      auto tmp           = starting_time;                                      \
+      while (Clock::now() - starting_time <= Name##_copy.get_period() + 5ms) { \
+        send_period(tmp, &Name##_copy);                                        \
+      }                                                                        \
+    } else {                                                                   \
+      send(&Name##_copy);                                                      \
+    }                                                                          \
+    uint64_t bitstring1;                                                       \
+    assert(can.framesReceived() == 1);                                         \
+    Frame f1 = can.topFrame();                                                 \
+    to_bitstring((uint8_t *)f1.data, &bitstring1);                             \
+    bitstring1 &= BITMASK;                                                     \
+    assert(bitstring0 == bitstring1);                                          \
   }
 
 CREATE_TEST(A, MAP1_CAN, (~ZEROES_MASK(7, 49)))

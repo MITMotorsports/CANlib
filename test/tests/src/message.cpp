@@ -9,10 +9,10 @@ using namespace map2;
 using namespace J;
 using namespace CC;
 
-#define CREATE_TEST(ID, BITMASK)                     \
-  void test##ID() {                                  \
+#define CREATE_TEST(Name, BITMASK)                   \
+  void test##Name() {                                \
     for (int cs = 0; cs < 100000; ++cs) {            \
-      ID ID##_copy;                                  \
+      Name Name##_copy;                              \
       Frame f0;                                      \
       for (int i = 0; i < 8; ++i) {                  \
         f0.data[i] = distribution(generator);        \
@@ -20,10 +20,10 @@ using namespace CC;
       uint64_t bitstring0;                           \
       to_bitstring((uint8_t *)f0.data, &bitstring0); \
       bitstring0 &= BITMASK;                         \
-      ID##_copy.pack(f0);                            \
+      Name##_copy.pack(f0);                          \
       Frame f1;                                      \
       memset(f1.data, 0, sizeof(f1.data));           \
-      ID##_copy.unpack(f1);                          \
+      Name##_copy.unpack(f1);                        \
       uint64_t bitstring1;                           \
       to_bitstring((uint8_t *)f1.data, &bitstring1); \
       bitstring1 &= BITMASK;                         \

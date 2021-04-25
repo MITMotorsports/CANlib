@@ -202,11 +202,11 @@ void testPeriod() {
   assert(N_copy.get_period() == 0ms);
 }
 
-#define CREATE_TEST(ID, bus_idx, key, msg)                                      \
-  static void testMessageType##ID() {                                           \
-    ID ID##_copy;                                                               \
+#define CREATE_TEST(Name, bus_idx, key, msg)                                    \
+  static void testMessageType##Name() {                                         \
+    Name Name##_copy;                                                           \
     Frame f;                                                                    \
-    ID##_copy.unpack(f);                                                        \
+    Name##_copy.unpack(f);                                                      \
     int idx = identify(AbstractBus::map##bus_idx, f);                           \
     assert(map##bus_idx::message_types[idx] == map##bus_idx::MessageType::msg); \
   }
