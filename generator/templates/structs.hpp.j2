@@ -1,6 +1,7 @@
 {%- macro struct_declarations(bus, msg, msg_names = [msg.name]) -%}
 {%- if msg.frame is defined %}
     namespace {{msg.name}} {
+
         const uint32_t key = 0x{{ '%0X' % msg.key }};
         {% for sub_frame in msg.frame %}
             {{ struct_declarations(bus, sub_frame, msg_names + [sub_frame.name]) }}
@@ -9,6 +10,7 @@
 
 {% else %}
     struct {{msg.name}} : public Message_{{ bus.name }} {
+        static {{msg.name}} * get_input();
         MessageType get_message_type() override {
             return MessageType::{{ '_'.join(msg_names) }};
         }

@@ -1,15 +1,20 @@
-{%- macro struct_declarations(bus, msg, msg_name) -%}
+{%- macro struct_declarations(bus, msg, msg_names = [msg.name]) -%}
 {%- if msg.frame is defined %}
 
     namespace {{msg.name}} {
     {% for sub_frame in msg.frame -%}
-        {{ struct_declarations(bus, sub_frame, msg_name + '::' + sub_frame.name) }}
+        {{ struct_declarations(bus, sub_frame, msg_names + [sub_frame.name]) }}
     {%- endfor %}
 
     }
 {% else %}
     {{msg.name}} {{msg.name}}_input;
-{%- endif -%}
+
+    {{ msg.name }}* CANlib::{{bus.name}}::{{'::'.join(msg_names)}}::get_input() {
+        return &{{msg.name}}_input;
+    }
+
+{% endif -%}
 {%- endmacro -%}
 
 {%- macro get_message_type(bus, msg, msg_names) -%}
@@ -76,9 +81,9 @@
 
 namespace CANlib {
 
-void send_period(Clock::time_point &last_sent_, Message* msg) {
-    if (Clock::now() - last_sent_ > msg->get_period()) {
-        last_sent_ = Clock::now();
+void send_period(Clock::time_point &last_sent, Message* msg) {
+    if (Clock::now() - last_sent > msg->get_period()) {
+        last_sent = Clock::now();
         send(msg);
     }
 }
@@ -92,7 +97,7 @@ void send(Message* msg) {
 {% for bus in can.bus %}
 namespace {{bus.name}} {
 {% for msg in bus.frame -%}
-{{ struct_declarations(bus, msg, msg.name) }}
+{{ struct_declarations(bus, msg) }}
 {%- endfor %}
 
 extern const MessageType message_types[{{get_num_msg_types(bus)}}] = {
