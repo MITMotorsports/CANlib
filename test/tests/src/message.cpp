@@ -11,7 +11,7 @@ using namespace CC;
 
 #define CREATE_TEST(Name, BITMASK)                   \
   void test##Name() {                                \
-    for (int cs = 0; cs < 100000; ++cs) {            \
+    for (int cs = 0; cs < 10000; ++cs) {             \
       Name Name##_copy;                              \
       Frame f0;                                      \
       for (int i = 0; i < 8; ++i) {                  \
@@ -27,6 +27,10 @@ using namespace CC;
       uint64_t bitstring1;                           \
       to_bitstring((uint8_t *)f1.data, &bitstring1); \
       bitstring1 &= BITMASK;                         \
+      /**                                            \
+       * The frame should be the same before         \
+       * and after we pack and unpack it             \
+       **/                                           \
       assert(bitstring0 == bitstring1);              \
     }                                                \
   }

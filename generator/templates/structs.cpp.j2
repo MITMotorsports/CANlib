@@ -116,6 +116,11 @@ static const uint32_t {{bus.name}}_keys[] = {
     {%- endfor -%}
 };
 
+/**
+ * In case the some index represents a frame, the first element represents the lower bound
+ * of the frame inside the array and the second element represents the upper bound of the 
+ * frame inside the array.
+ **/
 static const std::pair<uint32_t, uint32_t> {{bus.name}}_frame_id_range[] = {
     std::make_pair(1,0),
     {% for msg in bus.frame -%}
@@ -123,6 +128,7 @@ static const std::pair<uint32_t, uint32_t> {{bus.name}}_frame_id_range[] = {
     {%- endfor -%}
 };
 
+// In case some index represents a frame, it will contain number of messages inside the frame
 static const uint32_t {{bus.name}}_frame_len[] = {
     0,
     {% for msg in bus.frame -%}

@@ -13,12 +13,6 @@ namespace CANlib {
     {%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
     void {{busnm}}_update_can();
     {%- endfor %}
-    {% else %}
-    {%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
-    static void {{busnm}}_update_can();
-    {%- endfor %}
     {% endif %}
     void update_can();
-    RawBus get_raw_bus(AbstractBus bus_name);
-    AbstractBus get_bus_name(RawBus bus);
 }

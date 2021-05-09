@@ -1,11 +1,9 @@
-#ifdef CANLIB_ARCH_STM32F4XX
-#include "static.h"
+#include "static.hpp"
 
 #include <stdint.h>
 #include <string.h>
-#include "bus.h"
-#include "driver.h"
-#include "drivers/inc/stm32f4xx.hpp"
+#include "bus.hpp"
+#include "driver.hpp"
 #include "stm32f4xx_hal.h"
 #ifdef USING_LOGGING_CALLBACK
 #include "log.h"
@@ -23,20 +21,20 @@ Clock::time_point Clock::now() noexcept {
   return time_point(std::chrono::milliseconds(time_passed));
 }
 
-TransmitError CANlib::TransmitFrame(const Frame &frame, AbstractBus bus_name) {
-  RawBus raw_bus = GetRawBus(bus);
+TransmitError CANlib::transmit_frame(const Frame &frame, AbstractBus bus_name) {
+  RawBus raw_bus = get_raw_bus(bus_name);
   int bus_num;
   CAN_HandleTypeDef *hcan;
   switch (raw_bus) {
-    case CAN_1:
+    case RawBus::CAN_1:
       hcan    = &hcan1;
       bus_num = 1;
       break;
-    case CAN_2:
+    case RawBus::CAN_2:
       hcan    = &hcan2;
       bus_num = 2;
       break;
-    case CAN_3:
+    case RawBus::CAN_3:
       hcan    = &hcan3;
       bus_num = 3;
       break;
@@ -57,20 +55,20 @@ TransmitError CANlib::TransmitFrame(const Frame &frame, AbstractBus bus_name) {
 #else
   UNUSED(bus_num);
 #endif
-  return HAL_CAN_AddTxMessage(hcan, &pHeader, frame.data, &pTxMailbox);
+  return HAL_CAN_AddTxMessage(hcan, &pHeader, (uint8_t *)frame.data, &pTxMailbox);
 }
 
-void ReadFrame(Frame &frame, AbstractBus bus_name) {
-  RawBus raw_bus = GetRawBus(bus_name);
+void read_frame(Frame &frame, AbstractBus bus_name) {
+  RawBus raw_bus = get_raw_bus(bus_name);
   CAN_HandleTypeDef *hcan;
   switch (raw_bus) {
-    case CAN_1:
+    case RawBus::CAN_1:
       hcan = &hcan1;
       break;
-    case CAN_2:
+    case RawBus::CAN_2:
       hcan = &hcan2;
       break;
-    case CAN_3:
+    case RawBus::CAN_3:
       hcan = &hcan3;
       break;
     default:
@@ -91,4 +89,3 @@ void ReadFrame(Frame &frame, AbstractBus bus_name) {
     }
   }
 }
-#endif

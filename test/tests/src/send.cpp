@@ -38,6 +38,7 @@ extern TestCAN can3;
       send(&Name##_copy);                                                      \
     }                                                                          \
     uint64_t bitstring1;                                                       \
+    /* Expecting to receive the message exactly once */                        \
     assert(can.framesReceived() == 1);                                         \
     Frame f1 = can.topFrame();                                                 \
     to_bitstring((uint8_t *)f1.data, &bitstring1);                             \

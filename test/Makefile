@@ -3,8 +3,6 @@ TARGET_EXEC := canlib-tests
 BUILD_DIR := ./build
 SRCS_DIR := ../src/src tests/src
 
-SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c)
-
 COMP_SRC := ../src/src/computers/*.cpp
 
 # String substitution for every C/C++ file.

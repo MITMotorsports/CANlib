@@ -11,6 +11,7 @@ extern TestCAN can2;
 extern TestCAN can3;
 
 void testArch() {
+  // AbstractBus/RawBus mapping is correct
   assert(get_raw_bus(AbstractBus::map1) == RawBus::CAN_2);
   assert(get_raw_bus(AbstractBus::map2) == RawBus::CAN_3);
   assert(get_raw_bus(AbstractBus::INVALID_NAME) == RawBus::INVALID_BUS);
@@ -21,6 +22,7 @@ void testArch() {
   can1.clear();
   can2.clear();
   can3.clear();
+  // Correct cans receive the messages
   send(map1::A::get_input());
   send(map2::F::get_input());
   assert(0 == can1.framesReceived());
@@ -36,10 +38,12 @@ void testArch() {
   A_copy.ARG2 = 69;
   A_copy.ARG3 = 69;
   A_copy.unpack(f);
+  // can2 will send A_copy
   can2.setFrameToSend(f);
   map1::A A_copy2;
   map1_update_can();
-  map1::A* A_input = map1::A::get_input();
+  map1::A *A_input = map1::A::get_input();
+  // The received message is the same as A_copy
   assert(A_input->ARG0 && A_input->ARG1 == 69 && A_input->ARG2 == 69 && A_input->ARG3 == 69);
   map2::F F_copy;
   F_copy.ARG0 = 69;
@@ -49,9 +53,11 @@ void testArch() {
   F_copy.ARG4 = 69;
   F_copy.ARG5 = 69;
   F_copy.unpack(f);
+  // can3 will send F_copy
   can3.setFrameToSend(f);
   map2_update_can();
-  map2::F* F_input = map2::F::get_input();
+  map2::F *F_input = map2::F::get_input();
+  // The received message is the same as F_copy
   assert(F_input->ARG0 == 69 && F_input->ARG1 == 69 && F_input->ARG2 == 69 && F_input->ARG3 == 69 &&
          F_input->ARG4 == 69 && F_input->ARG5 == 69);
 }

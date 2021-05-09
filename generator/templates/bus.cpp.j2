@@ -36,6 +36,7 @@ static uint32_t identify_internal(const uint32_t key, const Frame& frame, int l,
         if (keys[bus_idx][i] == key) {
             int left_bound = frame_id_range[bus_idx][i].first;
             int right_bound = frame_id_range[bus_idx][i].second;
+            // If this is a frame search inside the frame, otherwise return the index of the message
             if (left_bound <= right_bound) {
                 uint64_t bitstring;
                 to_bitstring((uint8_t*)frame.data, &bitstring);

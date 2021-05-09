@@ -113,10 +113,14 @@ if __name__ == '__main__':
         computers_hpp.write(template_env, system.computer, computer_hpp_template_path, computer_hpp_dir_path, testing)
         computers_cpp.write(template_env, system.computer, computer_cpp_template_path, computer_cpp_dir_path, testing)
         drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path, testing)
+        clang_style = ""
+        styles = [arg for arg in sys.argv if arg.startswith('style=')]
+        if len(styles) > 0:
+            clang_style = styles[0]
         try:
-            os.system('clang-format -i ' + spth + '/src/inc/drivers/*.hpp ' + spth + '/src/src/drivers/*.cpp')
-            os.system('clang-format -i ' + spth + '/src/inc/computers/*.hpp ' + spth + '/src/src/computers/*.cpp')
-            os.system('clang-format -i ' + spth + '/src/inc/*.hpp')
-            os.system('clang-format -i ' + spth + '/src/src/*.cpp')
+            os.system('clang-format -i ' + clang_style + ' ' + spth + '/src/inc/drivers/*.hpp ' + spth + '/src/src/drivers/*.cpp')
+            os.system('clang-format -i ' + clang_style + ' ' + spth + '/src/inc/computers/*.hpp ' + spth + '/src/src/computers/*.cpp')
+            os.system('clang-format -i ' + clang_style + ' ' + spth + '/src/inc/*.hpp')
+            os.system('clang-format -i ' + clang_style + ' ' + spth + '/src/src/*.cpp')
         except:
             print('Error during clang-format, is it installed?')
