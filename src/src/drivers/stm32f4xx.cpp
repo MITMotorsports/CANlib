@@ -58,7 +58,7 @@ TransmitError CANlib::transmit_frame(const Frame &frame, AbstractBus bus_name) {
   return HAL_CAN_AddTxMessage(hcan, &pHeader, (uint8_t *)frame.data, &pTxMailbox);
 }
 
-void read_frame(Frame &frame, AbstractBus bus_name) {
+void CANlib::read_frame(Frame &frame, AbstractBus bus_name) {
   RawBus raw_bus = get_raw_bus(bus_name);
   CAN_HandleTypeDef *hcan;
   switch (raw_bus) {
