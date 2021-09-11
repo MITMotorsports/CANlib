@@ -1,0 +1,135 @@
+{%- macro struct_declarations(bus, msg, msg_names = [msg.name]) -%}
+{%- if msg.frame is defined %}
+    namespace {{msg.name}} {
+
+        const uint32_t key = 0x{{ '%0X' % msg.key }};
+        {% for sub_frame in msg.frame %}
+            {{ struct_declarations(bus, sub_frame, msg_names + [sub_frame.name]) }}
+        {% endfor %}
+    } // {{msg_name}}
+
+{% else %}
+    struct {{msg.name}} : public Message_{{ bus.name }} {
+        static {{msg.name}} * get_input();
+        MessageType get_message_type() override {
+            return MessageType::{{ '_'.join(msg_names) }};
+        }
+        void unpack(Frame&) override;
+        void pack(const Frame&) override;
+        uint32_t get_key() override {
+            return key;
+        }
+        void send() override {
+            CANlib::send_period(this->last_sent_, this);
+        }
+        AbstractBus get_bus_name() override {
+            return AbstractBus::{{ bus.name }};
+        }
+        Clock::duration get_period() override {
+            {% if msg.period %}
+            return std::chrono::milliseconds({{ get_ms(msg.period) }});
+            {% else %}
+            return std::chrono::milliseconds(0);
+            {% endif %}
+        }
+        {% for atom in msg.atom %}
+            {%- if atom.type.isenum() -%}
+                enum class {{ atom.name }}_T {                                                                 
+                 {%- for enum in atom.type.enum -%}
+                     {%- if enum.name == 'NUM_FIELDS' -%}                   
+                        {%- raise "Enum name for {{ atom.name }} cannot be NUM_FIELDS" -%}
+                       {%- else %}                                                 
+                          {{ enum.name }} = {{ enum.value }},
+                         {%- endif -%}
+                      {%- endfor %}
+                     NUM_FIELDS = {{ atom.type.enum | length }}
+                 };
+            {% endif -%}
+        {% endfor %}
+        {%- for atom in msg.atom %}
+            {%- if atom.type.isenum() %}
+                {{ atom.name }}_T {{ atom.name }};
+            {%- else %}
+                {{ atom.type.ctype() }} {{ atom.name }};
+            {%- endif -%}
+        {% endfor %}
+        static Clock::time_point last_sent_;
+        static const uint32_t key = 0x{{ '%0X' % msg.key }};
+    };
+{% endif %}
+{%- endmacro -%}
+
+{%- macro get_keys(msg, msg_names) -%}
+{%- if msg.frame is defined -%}
+    {{ "::".join(msg_names) }}::key,
+    {%- for sub_frame in msg.frame -%}
+        {{ get_keys(sub_frame, msg_names + [sub_frame.name]) }}
+    {%- endfor -%}
+{%- else -%}
+     {{"::".join(msg_names)}}::key,
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_message_ranges(msg, msg_names) -%}
+{%- if msg.frame is defined -%}
+    std::make_pair({{ msg.slice.start }}, {{ msg.slice.length }}),
+    {%- for sub_frame in msg.frame -%}
+        {{ get_message_ranges(sub_frame, msg_names + [sub_frame.name]) }}
+    {%- endfor -%}
+{%- else -%}
+     std::make_pair(1, 0),
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_frame_ranges(msg, msg_names, cnt = 0) -%}
+{%- if msg.frame is defined -%}
+    {{ get_msg_len(msg) }},
+    {%- for sub_frame in msg.frame -%}
+        {{ get_frame_ranges(sub_frame, msg_names + [sub_frame.name], cnt + 1) }}
+    {%- endfor -%}
+{%- else -%}
+     0,
+{%- endif -%}
+{%- endmacro -%}
+
+#pragma once
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <utility>
+#include "driver.hpp"
+#include "static.hpp"
+#include "clock.hpp"
+#include "bus.hpp"
+
+namespace CANlib {
+
+struct Message {
+    virtual void unpack(Frame&) = 0;
+    virtual void pack(const Frame&) = 0;
+    virtual uint32_t get_key() = 0;
+    virtual void send() = 0;
+    virtual AbstractBus get_bus_name() = 0;
+    virtual Clock::duration get_period() = 0;
+};
+
+void send_period(Clock::time_point &last_sent_, Message* msg);
+void send(Message* msg);
+
+{%- for bus in can.bus %}
+
+    namespace {{ bus.name }} {
+        struct Message_{{bus.name}} : public Message {
+            virtual MessageType get_message_type() = 0;
+        };
+
+        {% for msg in bus.frame -%}
+            {{ struct_declarations(bus, msg) }}
+        {%- endfor %}
+
+    } // {{ bus.name }}
+
+{% endfor %}
+
+
+} // CANlib

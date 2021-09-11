@@ -1,0 +1,48 @@
+#pragma once
+
+#include "static.hpp"
+#include "bus.hpp"
+
+#include <stdint.h>
+#include <ctime>
+#include <chrono>
+#include <vector>
+#include <cstring>
+#include "clock.hpp"
+
+
+namespace CANlib {
+
+
+class TestCAN {
+public:
+    void setFrameToSend(const Frame& f) {frame_to_send = f;}
+    void receiveFrame(const Frame& f) {frames_received.push_back(f);}
+    size_t framesReceived() {return frames_received.size();}
+    void popFrame() {frames_received.pop_back();}
+    Frame topFrame() {return frames_received.back();}
+    Frame frameToSend() {return frame_to_send;}
+    void clear() {frames_received.clear(); memset(&frame_to_send, 0, sizeof(frame_to_send));}
+protected:
+    std::vector<Frame> frames_received;
+    Frame frame_to_send;
+};
+
+enum class RawBus {
+{%- for bus in architecture.participation['name']['can'].buses -%}
+{%- if bus == 'INVALID_BUS' -%}
+  {%- raise "INVALID_BUS is a reserved bus name" -%}
+{%- endif %}
+  {{ bus }},
+{%- endfor %}
+  INVALID_BUS,
+};
+
+typedef bool TransmitError;
+
+TransmitError transmit_frame(const Frame& frame, AbstractBus bus_name);
+void read_frame(Frame& frame, AbstractBus bus_name);
+RawBus get_raw_bus(AbstractBus);
+AbstractBus get_bus_name(RawBus);
+
+} // CANlib

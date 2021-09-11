@@ -1,0 +1,136 @@
+{%- macro can_pack_handler(frame, name_prepends, bus_ext, parent_slices = []) -%}
+{%- if frame.frame is defined -%}
+    {% for sub_frame in frame.frame %}
+        {{ can_pack_handler(sub_frame, name_prepends + [frame.name], bus_ext, parent_slices + [frame.slice]) }}
+    {% endfor -%}
+
+{% else -%}
+    {%- set name_prepends = name_prepends + [frame.name] -%}
+    {%- set tot_name = '::'.join(name_prepends) -%}
+        void {{tot_name}}::unpack(Frame& can_out) {
+            uint64_t bitstring = 0;
+            {%- for i in range(parent_slices | length) -%}
+            {%- set part_name = '::'.join(name_prepends[:i + 3]) %}
+            bitstring = INSERT(CANlib::{{ part_name }}::key, bitstring, {{ parent_slices[i].start }}, {{ parent_slices[i].length }});
+            {% endfor -%}
+            {%- set ns = namespace(length=0) -%}
+            {%- for atom in frame.atom %}
+            bitstring = INSERT({%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}swap_{{ atom.type.type }}(static_cast<{{atom.type.type}}_t>(this->{{ atom.name }})) {% else %} (static_cast<uint64_t>(this->{{ atom.name }})) {%- endif -%}, bitstring, {{ atom.slice.start }}, {{ atom.slice.length }});
+            {%- set ns.length = [ns.length, atom.slice.start + atom.slice.length] | max -%}
+            {%- endfor %}
+            from_bitstring(&bitstring, can_out.data);
+            can_out.id = CANlib::{{ "::".join(name_prepends[:2]) }}::key;
+            can_out.dlc = {{ (ns.length / 8) | round(method='ceil') | int }};
+            can_out.extended = {{ bus_ext | lower }};
+        }
+{% endif %}
+{%- endmacro -%}
+
+{%- macro can_unpack_handler(frame, name_prepends) -%}
+{%- if frame.frame is defined -%}
+    {% for sub_frame in frame.frame -%}
+        {{ can_unpack_handler(sub_frame, name_prepends + [sub_frame.name]) }}
+    {% endfor -%}
+
+{% else -%}
+    {%- set tot_name = "::".join(name_prepends) -%}
+    void {{ tot_name }}::pack(const Frame& can_in) {
+      uint64_t bitstring = 0;
+      to_bitstring((uint8_t*)can_in.data, &bitstring);
+        {%- for atom in frame.atom %}
+          this->{{ atom.name }} = {% if 0 %}{% endif %}
+          {%- if atom.type.isenum() -%}
+          ({{ atom.name }}_T)
+          {%- endif -%}
+          {%- if atom.type.issigned() -%}
+          SIGN(
+          {%- endif -%}
+          {%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}
+          swap_{{ atom.type.type }}(
+          {%- endif -%}
+          EXTRACT(bitstring, {{ atom.slice.start }}, {{ atom.slice.length }})
+          {%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}
+          )
+          {%- endif -%}
+          {%- if atom.type.issigned() -%}
+          , {{ atom.slice.length }})
+          {%- endif -%}
+          ;
+        {%- endfor %}
+    }
+{% endif %}
+{%- endmacro -%}
+#include "structs.hpp"
+#include "pack_unpack.hpp"
+
+using namespace CANlib;
+
+// utility functions
+void data_transfer(DATA_T *in, DATA_T *out) {
+  uint8_t i;
+  for (i = 0; i < 8; i++) {
+    (*out).byte[7 - i] = (*in).byte[i];
+  }
+}
+
+void to_bitstring(uint8_t in[], uint64_t *out) {
+  data_transfer((DATA_T*)in, (DATA_T*)out);
+}
+
+void from_bitstring(uint64_t *in, uint8_t out[]) {
+  data_transfer((DATA_T*)in, (DATA_T*)out);
+}
+
+// Shameless copypasta-ing from Stack Overflow for trivial endian swap.
+// https://stackoverflow.com/a/2637138
+uint8_t swap_uint8(uint8_t val) {
+  return val;
+}
+
+int8_t swap_int8(int8_t val) {
+  return val;
+}
+
+uint16_t swap_uint16(uint16_t val) {
+  return (val << 8) | (val >> 8);
+}
+
+int16_t swap_int16(int16_t val) {
+  return (val << 8) | ((val >> 8) & 0xFF);
+}
+
+uint32_t swap_uint32(uint32_t val) {
+  val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+  return (val << 16) | (val >> 16);
+}
+
+int32_t swap_int32(int32_t val) {
+  val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+  return (val << 16) | ((val >> 16) & 0xFFFF);
+}
+
+int64_t swap_int64(int64_t val) {
+  val = ((val << 8) & 0xFF00FF00FF00FF00ULL) |
+        ((val >> 8) & 0x00FF00FF00FF00FFULL);
+  val = ((val << 16) & 0xFFFF0000FFFF0000ULL) |
+        ((val >> 16) & 0x0000FFFF0000FFFFULL);
+  return (val << 32) | ((val >> 32) & 0xFFFFFFFFULL);
+}
+
+uint64_t swap_uint64(uint64_t val) {
+  val = ((val << 8) & 0xFF00FF00FF00FF00ULL) |
+        ((val >> 8) & 0x00FF00FF00FF00FFULL);
+  val = ((val << 16) & 0xFFFF0000FFFF0000ULL) |
+        ((val >> 16) & 0x0000FFFF0000FFFFULL);
+  return (val << 32) | (val >> 32);
+}
+
+// Pack+Unpack functions
+{% for bus in can.bus %}
+{%- for msg in bus.frame -%}
+{{ can_pack_handler(msg, [bus.name], bus.extended) }}
+
+{{ can_unpack_handler(msg, [bus.name, msg.name]) }}
+
+{% endfor %}
+{% endfor %}

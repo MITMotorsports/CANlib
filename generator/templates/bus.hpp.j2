@@ -1,0 +1,40 @@
+{%- set ns = namespace(first_frame=true) -%}
+
+{%- macro enum_name(msg, msg_name=msg.name) -%}
+    {%- if msg.frame is defined -%}
+        {% for sub_frame in msg.frame -%}
+            {{ enum_name(sub_frame, msg_name + '_' + sub_frame.name) }}
+        {%- endfor -%}
+    {%- else %}
+        {{ msg_name }},
+    {%- endif -%}
+{%- endmacro -%}
+#pragma once
+
+#include "static.hpp"
+
+namespace CANlib {
+
+enum class AbstractBus {
+    {%- for bus in can.bus %}
+    {{ bus.name }},
+    {%- endfor %}
+    INVALID_NAME,
+};
+
+uint32_t identify(AbstractBus, const Frame&);
+void handle_frame(AbstractBus, const Frame&);
+
+{% for bus in can.bus %}
+    namespace {{bus.name}} {
+        {%- set ns.first_frame = true %}
+        enum class MessageType {
+            UNKNOWN_MSG = 0,
+            {%- for msg in bus.frame -%}
+                {{- enum_name(msg) }}
+            {%- endfor %}
+        };
+    } // {{bus.name}}
+{% endfor -%}
+
+} // CANlib

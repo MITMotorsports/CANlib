@@ -1,0 +1,498 @@
+name: MY20
+units:
+architecture:
+  testarch:
+    family: testfamily
+    participation:
+      can:
+        buses:
+          - CAN_1
+          - CAN_2
+          - CAN_3
+computer:
+  testcomp0:
+    architecture: testarch
+    participation:
+      can:
+        mapping:
+          map1: CAN_2
+          map2: CAN_1
+        publish:
+          map1:
+            - B
+            - E
+        subscribe:
+          map2:
+            - F
+            - M
+            - N
+          map1:
+            - A
+            - C
+            - D
+  testcomp1:
+    architecture: testarch
+    participation:
+      can:
+        mapping:
+          map1: CAN_2
+          map2: CAN_3
+        publish:
+          map2:
+            - F
+            - H
+            - J
+          map1:
+            - A
+            - D
+        subscribe:
+          map1:
+            - B
+          map2:
+            - I
+            - K
+            - L
+            - M
+  testcomp2:
+    architecture: testarch
+    participation:
+      can:
+        mapping:
+          map1: CAN_3
+          map2: CAN_1
+        publish:
+          map1:
+            - A
+            - B
+            - C
+          map2:
+            - G
+            - I
+            - L
+        subscribe:
+          map1:
+            - D
+            - E
+          map2:
+            - F
+            - H
+            - J
+            - K
+            - M
+            - N
+protocol:
+  can:
+    bus:
+      map1:
+        version: 2.0B
+        baudrate: 500000
+        extended: false
+        frame:
+          A:
+            key: 0x2FF
+            period: 50ms
+            atom:
+              ARG0:
+                slice: 7 + 1
+                type: bool little
+              ARG1:
+                slice: 8 + 16
+                type: uint16 little
+              ARG2:
+                slice: 24 + 16
+                type: uint16 little
+              ARG3:
+                slice: 40 + 16
+                type: uint16 little
+          B:
+            key: 0x305
+            period: 200ms
+            atom:
+              ARG0:
+                slice: 5 + 3
+                type:
+                  endianness: big
+                  enum:
+                    IDLE: 1
+                    CHARGE: 2
+                    RECOVERABLE_ERROR: 3
+                    NONRECOVERABLE_ERROR: 4
+              ARG1:
+                slice: 8 + 16
+                type: uint16 little
+              ARG2:
+                slice: 24 + 16
+                type: uint16 little
+              ARG3:
+                slice: 40 + 16
+                type: uint16 little
+              ARG4:
+                slice: 56 + 8
+                type: uint8 little
+          C:
+            key: 0x306
+            period: 200ms
+            atom:
+              ARG0:
+                slice: 0 + 8
+                type: int8 little
+              ARG1:
+                slice: 8 + 8
+                type: int8 little
+              ARG2:
+                slice: 16 + 16
+                type: uint16 little
+              ARG3:
+                slice: 32 + 16
+                type: uint16 little
+              ARG4:
+                slice: 48 + 8
+                type: uint8 little
+          D:
+            key: 0x307
+            period: 200ms
+            atom:
+              ARG0:
+                slice: 0 + 1
+                type: &bit_type
+                  endianness: big
+                  enum:
+                    LO: 0
+                    HI: 1
+              ARG1:
+                slice: 2 + 1
+                type: *bit_type
+              ARG2:
+                slice: 3 + 1
+                type: *bit_type
+              ARG3:
+                slice: 4 + 1
+                type: *bit_type
+              ARG4:
+                slice: 5 + 1
+                type: *bit_type
+              ARG5:
+                slice: 6 + 1
+                type: *bit_type
+              ARG6:
+                slice: 7 + 1
+                type: *bit_type
+              ARG7:
+                slice: 9 + 1
+                type: *bit_type
+              ARG8:
+                slice: 16 + 1
+                type: *bit_type
+              ARG9:
+                slice: 17 + 1
+                type: *bit_type
+          E:
+            key: 0x308
+            period: 1000ms
+            atom:
+              ARG0:
+                slice: 0 + 48
+                type: uint64 little
+              ARG1:
+                slice: 48 + 16
+                type: uint16 little
+      map2:
+        version: 2.0B
+        baudrate: 1000000
+        extended: false
+        frame:
+          F:
+            key: 0x016
+            period: 101ms
+            atom:
+              ARG0:
+                slice: 0 + 10
+                type: int16 big
+              ARG1:
+                slice: 10 + 8
+                type: uint8 big
+              ARG2:
+                slice: 18 + 10
+                type: int16 big
+              ARG3:
+                slice: 28 + 8
+                type: uint8 big
+              ARG4:
+                slice: 36 + 10
+                type: int16 big
+              ARG5:
+                slice: 46 + 8
+                type: uint8 big
+              ARG6:
+                slice: 54 + 10
+                type: int16 big
+          G:
+            key: 0x017
+            period: 31ms
+            atom:
+              ARG0:
+                slice: 0 + 14
+                type: uint16 big
+              ARG1:
+                slice: 14 + 14
+                type: uint16 big
+              ARG2:
+                slice: 28 + 32
+                type: uint32 big
+          H:
+            key: 0x0A0
+            atom:
+              <<: &temps
+                a_temp:
+                  slice: 0 + 16
+                  unit: decidegC
+                  type: int16 little
+                b_temp:
+                  slice: 16 + 16
+                  unit: decidegC
+                  type: int16 little
+                c_temp:
+                  slice: 32 + 16
+                  unit: decidegC
+                  type: int16 little
+                d_temp:
+                  slice: 48 + 16
+                  unit: decidegC
+                  type: int16 little
+          I:
+            key: 0xA2
+            atom:
+              ARG0:
+                slice: 0 + 16
+                type: int16 little
+              ARG1:
+                slice: 16 + 16
+                type: int16 little
+              ARG2:
+                slice: 32 + 16
+                type: int16 little
+              ARG3:
+                slice: 48 + 16
+                type: int16 little
+          J:
+            key: 0x0C2
+            slice: 0 + 8
+            frame:
+              AA:
+                key: 0
+                <<: &bool_data
+                  atom:
+                    write_success:
+                      slice: 23 + 1
+                      type: bool little
+                    data:
+                      slice: 39 + 1
+                      type: bool little
+              BB:
+                key: 0x14
+                <<: *bool_data
+                #Required to correctly parse the data with the script, as this parameter is constantly
+                #being transmitted over the CAN bus.
+              CC:
+                key: 0x64
+                slice: 8 + 8
+                frame:
+                  AAA:
+                    key: 0x69
+                    atom:
+                      <<: &write_success
+                        write_success: # whether EEPROM has been re-written
+                          slice: 23 + 1
+                          type: bool little
+                      data:
+                        <<: &signed_int_data
+                          slice: 32 + 16
+                          type: int16 little
+                  BBB:
+                    key: 0x70
+                    atom:
+                      <<: *write_success
+                      data:
+                        <<: *signed_int_data
+                  CCC:
+                    key: 0x71
+                    atom:
+                      <<: *write_success
+                      data:
+                        <<: *signed_int_data
+                  DDD:
+                    key: 0x72
+                    atom:
+                      <<: *write_success
+                      data:
+                        <<: *signed_int_data
+              DD:
+                key: 0x65
+                atom:
+                  <<: &write_success_2
+                    write_success: # whether EEPROM has been re-written
+                      slice: 23 + 1
+                      type: bool little
+                  data:
+                    <<: &signed_int_data_2
+                      slice: 32 + 16
+                      type: int16 little
+              EE:
+                key: 0x66
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *signed_int_data_2
+              FF:
+                key: 0x67
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *signed_int_data_2
+              GG:
+                key: 0x68
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *signed_int_data_2
+              HH:
+                key: 0x6a
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *signed_int_data_2
+              II:
+                key: 0x6b
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: &unsigned_int_data
+                      slice: 32 + 16
+                      type: uint16 little
+              JJ:
+                key: 0x6c
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *unsigned_int_data
+              KK:
+                key: 0x6d
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *unsigned_int_data
+              LL:
+                key: 0x6f
+                atom:
+                  <<: *write_success_2
+                  data:
+                    <<: *signed_int_data
+              MM:
+                key: 0xab
+                <<: *bool_data
+              NN:
+                key: 0x91
+                <<: *bool_data
+          K:
+            key: 0x0BB
+            atom:
+              ARG0:
+                slice: 0 + 16
+                type: uint16 big
+              ARG1:
+                slice: 16 + 16
+                type: uint16 big
+          L:
+            key: 0x0DF
+            period: 103ms
+            atom:
+              ARG0:
+                slice: 0 + 1
+                type: bool big
+              ARG1:
+                slice: 1  + 1
+                type: bool big
+              ARG2:
+                slice: 2 + 1
+                type: bool big
+              ARG3:
+                slice: 3 + 1
+                type: bool big
+              ARG4:
+                slice: 4 + 1
+                type: bool big
+              ARG5:
+                slice: 5 + 1
+                type: bool big
+              ARG6:
+                slice: 6 + 1
+                type: bool big
+              ARG7:
+                slice: 7 + 1
+                type: bool big
+              ARG8:
+                slice: 8 + 1
+                type: bool big
+              ARG9:
+                slice: 9 + 1
+                type: bool big
+              ARG10:
+                slice: 10 + 1
+                type: bool big
+              ARG11:
+                slice: 11 + 1
+                type: bool big
+              ARG12:
+                slice: 12 + 1
+                type: bool big
+              ARG13:
+                slice: 13 + 1
+                type: bool big
+              ARG14:
+                slice: 14 + 1
+                type: bool big
+              ARG15:
+                slice: 15 + 1
+                type: bool big
+              ARG16:
+                slice: 16 + 1
+                type: bool big
+              ARG17:
+                slice: 17 + 8
+                type: uint8 big
+          M:
+            key: 0x0F0
+            period: 103ms
+            atom:
+              ARG0:
+                slice: 0 + 10
+                type: int16 big
+              ARG1:
+                slice: 10 + 16
+                type: uint16 big
+          N:
+            key: 0x400
+            atom:
+              ARG0:
+                slice: 3 + 1
+                type: bool big
+              ARG1:
+                slice: 4 + 3
+                type:
+                  endianness: big
+                  enum:
+                    x1: 0
+                    x2: 1
+                    x4: 2
+                    x8: 3
+                    x16: 4
+                    x32: 5
+              ARG2:
+                slice: 8 + 1
+                type: bool big
+              ARG3:
+                slice: 9 + 1
+                type: bool big
+              ARG4:
+                slice: 10 + 1
+                type: bool big

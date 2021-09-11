@@ -1,0 +1,28 @@
+#pragma once
+
+#include "static.hpp"
+#include "stm32f4xx_hal.h"
+#include "bus.hpp"
+#include "clock.hpp"
+
+#include <stdint.h>
+
+namespace CANlib {
+
+enum class RawBus {
+{%- for bus in architecture.participation['name']['can'].buses -%}
+{%- if bus == 'INVALID_BUS' -%}
+  {%- raise "INVALID_BUS is a reserved bus name" -%}
+{%- endif %}
+  {{ bus }},
+{%- endfor %}
+  INVALID_BUS,
+};
+
+typedef HAL_StatusTypeDef TransmitError;
+typedef HAL_StatusTypeDef InitError;
+
+TransmitError transmit_frame(const Frame& frame, AbstractBus bus_name);
+void read_frame(Frame& frame, AbstractBus bus_name);
+
+} // CANlib
