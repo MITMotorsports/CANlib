@@ -4,7 +4,7 @@
 
 #ifdef CANLIB_ARCH_STM32F4xx
 #include "drivers/inc/stm32f4xx.h"
-#elif defined(CANLIB_ARCH_STM32F2XX)
+#elif defined(CANLIB_ARCH_STM32F2xx)
 #include "drivers/inc/stm32f2xx.h"
 #error "No valid architecture specified!"
 #endif
