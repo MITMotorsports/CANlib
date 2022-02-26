@@ -6,6 +6,7 @@
 #include "drivers/inc/stm32f4xx.h"
 #elif defined(CANLIB_ARCH_STM32F2xx)
 #include "drivers/inc/stm32f2xx.h"
+#else
 #error "No valid architecture specified!"
 #endif
 
