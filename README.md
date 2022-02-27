@@ -5,7 +5,7 @@ If you're cloning this for the first time, use `git clone --recursive` to pull a
 
 To generate this library, run `main.py` in the `generator` directory with the path to your CAN spec as an argument (e.g. `python main.py ../../../can_spec_my18.yml` if you're running this from the `lib` directory in MY18). Make sure to use Python 3. This generates all of the necessary source files that are listed in `.gitignore`. These files are dependent on the CAN spec. If you want to change one of these files, don't edit them directly, but instead figure out what needs to change in the CAN spec. (If that still doesn't work, edit the generator scripts in `generator` rather than the generated files.) Source files that aren't ignored aren't generated from the CAN spec, so they can be edited directly.
 
-When compiling, you need to compile with the appropriate `CANLIB_ARCH` defined in order to use the appropriate driver.
+When compiling, you need to compile with the appropriate `CANLIB_ARCH_` defined in order to use the appropriate driver.  Included drivers are listed in `driver.h`.
 
 ## Writing a CAN spec
 The CAN spec should be a YAML file with the following structure:
