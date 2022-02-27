@@ -80,17 +80,14 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) { CAN_Raw_Bus_T raw_bus = 
 
   // There are 2 receive FIFOs
   // note that the macros are not equal to 0 and 1
-  uint8_t data[8] = {};
   FDCAN_RxHeaderTypeDef pHeader;
   uint32_t fifos[] = {FDCAN_RX_FIFO0, FDCAN_RX_FIFO1};
   for (unsigned int i = 0; i < sizeof(fifos) / sizeof(fifos[0]); i++) {
     uint32_t fifo = fifos[i];
     if (HAL_FDCAN_GetRxFifoFillLevel(hfdcan, fifo) > 0) {
-      HAL_FDCAN_GetRxMessage(hfdcan, fifo, &pHeader, data);
+      HAL_FDCAN_GetRxMessage(hfdcan, fifo, &pHeader, frame->data);
       frame->id = pHeader.Identifier;
       FDCAN_def_to_size(pHeader.DataLength, &(frame->dlc));
-
-      memcpy(frame->data, data, sizeof(data));
       frame->extended = pHeader.IdType == FDCAN_EXTENDED_ID;
       return;
     }

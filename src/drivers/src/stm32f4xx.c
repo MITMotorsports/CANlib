@@ -68,15 +68,12 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
       return;
   }
 
-  uint8_t data[8] = {};
   CAN_RxHeaderTypeDef pHeader;
   for (int fifo = 0; fifo < 2; fifo++) {  // There are 2 receive FIFOs
     if (HAL_CAN_GetRxFifoFillLevel(hcan, fifo) > 0) {
-      HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, data);
+      HAL_CAN_GetRxMessage(hcan, fifo, &pHeader, frame->data);
       frame->id  = pHeader.IDE == CAN_ID_STD ? pHeader.StdId : pHeader.ExtId;
       frame->dlc = pHeader.DLC;
-
-      memcpy(frame->data, data, sizeof(data));
       frame->extended = pHeader.IDE == CAN_ID_EXT;
       return;
     }
