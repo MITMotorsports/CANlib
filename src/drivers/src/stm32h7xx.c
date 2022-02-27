@@ -87,7 +87,7 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) { CAN_Raw_Bus_T raw_bus = 
     uint32_t fifo = fifos[i];
     if (HAL_FDCAN_GetRxFifoFillLevel(hfdcan, fifo) > 0) {
       HAL_FDCAN_GetRxMessage(hfdcan, fifo, &pHeader, data);
-      frame->id = pHeader.IdType == FDCAN_STANDARD_ID ? pHeader.Identifier: pHeader.Identifier;
+      frame->id = pHeader.Identifier;
       FDCAN_def_to_size(pHeader.DataLength, &(frame->dlc));
 
       memcpy(frame->data, data, sizeof(data));
