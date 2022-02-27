@@ -43,8 +43,8 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 
   FDCAN_TxHeaderTypeDef pHeader;
 
-  pHeader.ErrorStateIndicator = 0;
-  pHeader.BitRateSwitch = 0;
+  pHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+  pHeader.BitRateSwitch = FDCAN_BRS_OFF;
   pHeader.Identifier= frame->id;
   pHeader.IdType = frame->extended ? FDCAN_EXTENDED_ID: FDCAN_STANDARD_ID;
   pHeader.FDFormat =  FDCAN_CLASSIC_CAN;
