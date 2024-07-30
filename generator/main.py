@@ -21,7 +21,7 @@ computer_h_dir_path = src_dir.joinpath('computers/inc')
 computer_c_dir_path = src_dir.joinpath('computers/src')
 
 template_dir = Path('./templates/')
-computer_c_template_path = template_dir.joinpath('computer.c.j2')
+computer_c_template_path = template_dir.joinpath('computer.cpp.j2')
 computer_h_template_path = template_dir.joinpath('computer.h.j2')
 constants_template_path = template_dir.joinpath('constants.h.j2')
 drivers_inc_template_dir_path = template_dir.joinpath('drivers/inc')
@@ -77,8 +77,9 @@ if __name__ == '__main__':
     template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True, extensions=[RaiseExtension])
     template_env.globals["can"] = can
     template_env.globals["system"] = system
+    template_env.globals["unit_types"] = system.unit_types
 
-    for filename in ["pack_unpack.c", "pack_unpack.h", "enum_atom.h", "send_receive.c", "structs.h", "bus.h"]:
+    for filename in ["pack_unpack.cpp", "pack_unpack.h", "enum_atom.h", "send_receive.cpp", "structs.h", "bus.h"]:
         render_template(template_env, filename)
 
     constants.write(template_env, constants_template_path, constants_path)

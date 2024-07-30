@@ -33,9 +33,6 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 #include "bus.h"
 #include "pack_unpack.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 {% for bus_name, bus in computer.participation['name']['can'].publish.items() %}
 {% for frame in bus -%}
 {{ send_declaration(bus_name, frame) -}}
@@ -49,7 +46,3 @@ extern "C" {
 {% endfor %}
 void CANlib_update_can(void);
 void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus, Frame* frame);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus

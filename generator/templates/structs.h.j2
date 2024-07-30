@@ -9,7 +9,7 @@ typedef struct {
 {%- if atom.type.isenum() %}
   CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T {{ atom.name }};
 {%- else %}
-  {{ atom.type.ctype() }} {{ atom.name }};
+  {{ ('units::'+unit_types[atom.unit]) if atom.unit in unit_types else atom.type.ctype() }} {{ atom.name }};
 {%- endif -%}
 {% endfor %}
 } CANlib_{{ bus.name }}_{{ msg_name }}_T;
@@ -22,6 +22,7 @@ typedef struct {
 #include <stdbool.h>
 
 #include "enum_atom.h"
+#include "units.h"
 
 {% for bus in can.bus -%}
 // {{ bus.name }}
