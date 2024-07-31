@@ -9,7 +9,11 @@ typedef struct {
 {%- if atom.type.isenum() %}
   CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T {{ atom.name }};
 {%- else %}
-  {{ ('units::'+unit_types[atom.unit]) if (using_units and atom.unit in unit_types) else atom.type.ctype() }} {{ atom.name }};
+  {%- if all_unit_files is not none and atom.unit in unit_types -%}
+  au::QuantityD<{{ unit_types[atom.unit] }}> {{ atom.name }};
+  {%- else -%}
+  {{ atom.type.ctype() }} {{ atom.name }};
+  {%- endif -%}
 {%- endif -%}
 {% endfor %}
 } CANlib_{{ bus.name }}_{{ msg_name }}_T;
@@ -22,7 +26,11 @@ typedef struct {
 #include <stdbool.h>
 
 #include "enum_atom.h"
-{% if using_units %}#include "units.h"{% endif %}
+{% if all_unit_files is not none -%}
+{%- for filename in all_unit_files -%}
+#include "{{ filename }}"
+{% endfor -%}
+{%- endif %}
 
 {% for bus in can.bus -%}
 // {{ bus.name }}
