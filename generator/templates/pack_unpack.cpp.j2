@@ -1,5 +1,5 @@
 {%- macro get_atom_value(atom) -%}
-{%- if atom.unit in unit_types -%}
+{%- if using_units and atom.unit in unit_types -%}
 type_in->{{ atom.name }}.to<{{ atom.type.ctype() }}>()
 {%- else -%}
 type_in->{{ atom.name }}
@@ -46,7 +46,7 @@ void CANlib_Unpack_{{ tot_name }}(Frame *can_in, CANlib_{{ tot_name }}_T *type_o
   uint64_t bitstring = 0;
   to_bitstring(can_in->data, &bitstring);
 {%- for atom in frame.atom %}
-  type_out->{{ atom.name }} = {% if atom.unit in unit_types %}units::{{ unit_types[atom.unit] }}({% endif %}
+  type_out->{{ atom.name }} = {% if using_units and atom.unit in unit_types %}units::{{ unit_types[atom.unit] }}({% endif %}
   {%- if atom.type.isenum() -%}
     (CANlib_{{ tot_name }}_{{ atom.name }}_T)
   {%- endif -%}
@@ -63,14 +63,14 @@ void CANlib_Unpack_{{ tot_name }}(Frame *can_in, CANlib_{{ tot_name }}_T *type_o
   {%- if atom.type.issigned() -%}
     , {{ atom.slice.length }})
   {%- endif -%}
-  {% if atom.unit in unit_types %}){% endif %};
+  {% if using_units and atom.unit in unit_types %}){% endif %};
 {%- endfor %}
 }
 {%- endif %}
 {%- endmacro -%}
 #include "pack_unpack.h"
 #include "evil_macros.h"
-#include "units.h"
+{% if using_units %}#include "units.h"{% endif %}
 
 typedef union {
   uint8_t byte[8];

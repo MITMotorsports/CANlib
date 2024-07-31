@@ -64,6 +64,7 @@ def render_template(env, relative_path):
 
 if __name__ == '__main__':
     specpath = sys.argv[1]
+    using_units = len(sys.argv) > 2 and sys.argv[2] == 'ENABLED'
     specfile = open(specpath, 'r')
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
@@ -78,6 +79,7 @@ if __name__ == '__main__':
     template_env.globals["can"] = can
     template_env.globals["system"] = system
     template_env.globals["unit_types"] = system.unit_types
+    template_env.globals["using_units"] = using_units
 
     for filename in ["pack_unpack.cpp", "pack_unpack.h", "enum_atom.h", "send_receive.cpp", "structs.h", "bus.h"]:
         render_template(template_env, filename)
