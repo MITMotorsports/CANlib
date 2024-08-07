@@ -6,12 +6,12 @@
 {%- else %}
 typedef struct {
 {%- for atom in msg.atom %}
-{%- if atom.type.isenum() %}
+{%- if atom.type.isenum() -%}
   CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T {{ atom.name }};
-{%- else %}
-  {%- if all_unit_files is not none and atom.unit in unit_types -%}
+{%- else -%}
+  {%- if all_unit_files is not none and atom.unit in unit_types %}
   au::QuantityD<{{ unit_types[atom.unit] }}> {{ atom.name }};
-  {%- else -%}
+  {%- else %}
   {{ atom.type.ctype() }} {{ atom.name }};
   {%- endif -%}
 {%- endif -%}
@@ -30,6 +30,7 @@ typedef struct {
 {%- for filename in all_unit_files -%}
 #include "{{ filename }}"
 {% endfor -%}
+#include "custom_units.h"
 {%- endif %}
 
 {% for bus in can.bus -%}
