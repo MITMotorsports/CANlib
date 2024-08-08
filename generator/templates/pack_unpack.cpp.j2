@@ -46,7 +46,7 @@ void CANlib_Unpack_{{ tot_name }}(Frame *can_in, CANlib_{{ tot_name }}_T *type_o
   uint64_t bitstring = 0;
   to_bitstring(can_in->data, &bitstring);
 {%- for atom in frame.atom %}
-  type_out->{{ atom.name }} = {% if all_unit_files is not none and atom.unit in unit_types %}au::SymbolFor<{{ unit_types[atom.unit] }}> * {% endif %}
+  type_out->{{ atom.name }} = {% if all_unit_files is not none and atom.unit in unit_types %}au::SymbolFor<{{ unit_types[atom.unit] }}>{} * {% endif %}
   {%- if atom.type.isenum() -%}
     (CANlib_{{ tot_name }}_{{ atom.name }}_T)
   {%- endif -%}
