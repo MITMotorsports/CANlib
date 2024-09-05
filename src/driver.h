@@ -7,9 +7,9 @@
 #endif
 
 #if CANLIB_ARCH == STM32F4xx
-#include "drivers/inc/stm32f4xx.h"
+#include "drivers/inc/stm32f4xx/stm32f4xx.h"
 #elif CANLIB_ARCH == STM32F2xx
-#include "drivers/inc/stm32f2xx.h"
+#include "drivers/inc/stm32f2xx/stm32f2xx.h"
 #else
 #error "Architecture not supported!"
 #endif
