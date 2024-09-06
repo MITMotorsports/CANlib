@@ -4,9 +4,10 @@
 {{ struct_declarations(bus, sub_frame, msg_name + '_' + sub_frame.name) }}
 {%- endfor -%}
 {%- else %}
-typedef struct {
+typedef {%- if msg.mirror_frame is not none and msg.mirror_bus is not none %} CANlib_{{ msg.mirror_bus }}_{{ msg.mirror_frame }}_T
+{%- else %} struct {
 {%- for atom in msg.atom %}
-{%- if atom.type.isenum() -%}
+{%- if atom.type.isenum() %}
   CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T {{ atom.name }};
 {%- else -%}
   {%- if all_unit_files is not none and atom.unit in unit_types %}
@@ -16,7 +17,7 @@ typedef struct {
   {%- endif -%}
 {%- endif -%}
 {% endfor %}
-} CANlib_{{ bus.name }}_{{ msg_name }}_T;
+} {%- endif %} CANlib_{{ bus.name }}_{{ msg_name }}_T;
 {% endif %}
 {%- endmacro -%}
 
