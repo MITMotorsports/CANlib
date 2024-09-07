@@ -23,6 +23,6 @@ def write(env, system, input_path, output_path):
         architecture = find_architecture(system, architecture_name)
         output_file = output_path.joinpath(template_path.stem)
 
-        template = env.get_template(str(template_path))
+        template = env.get_template(f'drivers/inc/{template_path.name}')
         with open(output_file, 'w') as f:
             f.write(template.render(architecture=architecture))
