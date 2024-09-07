@@ -1,4 +1,1 @@
-[submodule "generator/ParseCAN"]
-	path = generator/ParseCAN
-	url = https://github.com/MITMotorsports/ParseCAN.git
-	branch = new
+
