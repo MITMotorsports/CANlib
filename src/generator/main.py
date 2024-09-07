@@ -60,9 +60,9 @@ def render_template(env, relative_path, output_dir=None):
 
 
 def main():
-    specpath = Path(sys.argv[1])
-    specpath = specpath.resolve()
-    specfile = open(os.path.join(os.getcwd(), specpath), 'r')
+    specpath = Path(os.getcwd()).joinpath(sys.argv[1]).resolve()
+    print(specpath)
+    specfile = open(specpath, 'r')
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
 
