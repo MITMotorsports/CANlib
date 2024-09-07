@@ -1,3 +1,11 @@
+{%- macro get_atom_value(atom) -%}
+{%- if all_unit_files is not none and atom.unit in unit_types -%}
+type_in->{{ atom.name }}.in<{{ atom.type.ctype() }}>({{ unit_types[atom.unit] }}{})
+{%- else -%}
+type_in->{{ atom.name }}
+{%- endif -%}
+{%- endmacro -%}
+
 {%- macro can_pack_handler(frame, name_prepends, bus_ext, parent_slices = []) -%}
 {%- if frame.frame is defined -%}
 {% for sub_frame in frame.frame -%}
@@ -15,7 +23,7 @@ void CANlib_Pack_{{ tot_name }}(CANlib_{{ tot_name }}_T *type_in, Frame *can_out
 {% endfor -%}
 {%- set ns = namespace(length=0) -%}
 {%- for atom in frame.atom %}
-  bitstring = INSERT({%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}swap_{{ atom.type.type }}{%- endif -%}(type_in->{{ atom.name }}), bitstring, {{ atom.slice.start }}, {{ atom.slice.length }});
+  bitstring = INSERT({%- if atom.type.endianness.islittle() and not atom.type.isbool() -%}swap_{{ atom.type.type }}{%- endif -%}({{ get_atom_value(atom) }}), bitstring, {{ atom.slice.start }}, {{ atom.slice.length }});
 {%- set ns.length = [ns.length, atom.slice.start + atom.slice.length] | max -%}
 {%- endfor %}
   from_bitstring(&bitstring, can_out->data);
@@ -38,7 +46,7 @@ void CANlib_Unpack_{{ tot_name }}(Frame *can_in, CANlib_{{ tot_name }}_T *type_o
   uint64_t bitstring = 0;
   to_bitstring(can_in->data, &bitstring);
 {%- for atom in frame.atom %}
-  type_out->{{ atom.name }} = {% if 0 %}{% endif %}
+  type_out->{{ atom.name }} = {% if all_unit_files is not none and atom.unit in unit_types %}au::SymbolFor<{{ unit_types[atom.unit] }}>{} * {% endif %}
   {%- if atom.type.isenum() -%}
     (CANlib_{{ tot_name }}_{{ atom.name }}_T)
   {%- endif -%}
@@ -62,6 +70,12 @@ void CANlib_Unpack_{{ tot_name }}(Frame *can_in, CANlib_{{ tot_name }}_T *type_o
 {%- endmacro -%}
 #include "pack_unpack.h"
 #include "evil_macros.h"
+{% if all_unit_files is not none -%}
+{%- for filename in all_unit_files -%}
+#include "{{ filename }}"
+{% endfor -%}
+#include "custom_units.h"
+{%- endif %}
 
 typedef union {
   uint8_t byte[8];

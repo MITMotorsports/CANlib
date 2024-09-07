@@ -33,7 +33,7 @@ case CANlib_{{ busnm }}_{{ msg_name }}_key: {
     {{ identify_case(busnm, sub_frame, msg_name + '_' + sub_frame.name, indent + 2) | indent(indent + 2) }}
   {%- endfor %}
     default:
-      return CANlib_UNKNOWN_MSG;
+      return CANlib_{{ busnm }}_UNKNOWN_MSG;
       break;
   }
   break;
@@ -50,7 +50,7 @@ case CANlib_{{ busnm }}_{{ msg_name }}_key:
 #include "bus.h"
 #include "pack_unpack.h"
 #include "evil_macros.h"
-#include "drivers/inc/{{ system.architecture['name'][computer.architecture].family }}.h"
+#include "drivers/inc/{{ system.architecture['name'][computer.architecture].family }}/{{ system.architecture['name'][computer.architecture].family }}.h"
 
 #ifndef UNUSED
 #define UNUSED(X) (void)X
@@ -86,7 +86,7 @@ CANlib_{{ busnm }}_T CANlib_Identify_{{ busnm }}(Frame* frame) {
     {{ identify_case(busnm, frame) | indent(4) }}
   {%- endfor %}
     default:
-      return CANlib_UNKNOWN_MSG;
+      return CANlib_{{ busnm }}_UNKNOWN_MSG;
       break;
   }
 }

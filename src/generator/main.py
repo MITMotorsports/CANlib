@@ -16,7 +16,7 @@ import generator.drivers_inc as drivers_inc
 
 
 template_dir = Path(pkg_resources.resource_filename('generator', 'templates'))
-computer_c_template_path = template_dir.joinpath('computer.c.j2')
+computer_c_template_path = template_dir.joinpath('computer.cpp.j2')
 computer_h_template_path = template_dir.joinpath('computer.h.j2')
 constants_template_path = template_dir.joinpath('constants.h.j2')
 drivers_inc_template_dir_path = template_dir.joinpath('drivers/inc')
@@ -74,6 +74,21 @@ def main():
     computer_h_dir_path = output_dir.joinpath('computers/inc')
     computer_c_dir_path = output_dir.joinpath('computers/src')
 
+    units_path = None if len(sys.argv) < 3 else sys.argv[2]
+    print(units_path)
+    if units_path is not None:
+        units_path = os.path.join(units_path, 'au', 'code', 'au', 'units')
+   
+    specfile = open(specpath, 'r')
+    system = ParseCAN.spec.System.from_yaml(specfile)
+    can = system.protocol['name']['can']
+
+    print(units_path)
+    all_unit_files = None
+    if units_path is not None and os.path.exists(units_path):
+        print('units!')
+        all_unit_files = ['au.hh'] + [header for header in os.listdir(units_path) if header.endswith('.hh')]
+
     script_dir = os.path.dirname(sys.argv[0])
     if script_dir == '':
         script_dir = '.'
@@ -87,8 +102,10 @@ def main():
     template_env = jinja2.Environment(loader=template_loader, keep_trailing_newline=True, extensions=[RaiseExtension])
     template_env.globals["can"] = can
     template_env.globals["system"] = system
+    template_env.globals["unit_types"] = system.unit_types
+    template_env.globals["all_unit_files"] = all_unit_files
 
-    for filename in ["pack_unpack.c", "pack_unpack.h", "enum_atom.h", "send_receive.c", "structs.h", "bus.h"]:
+    for filename in ["pack_unpack.cpp", "pack_unpack.h", "enum_atom.h", "send_receive.cpp", "structs.h", "bus.h"]:
         render_template(template_env, filename)
 
     constants.write(template_env, constants_template_path, constants_path)

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "bus.h"
 #include "driver.h"
-#include "drivers/inc/stm32f4xx.h"
+#include "drivers/inc/stm32f4xx/stm32f4xx.h"
 #include "stm32f4xx_hal.h"
 #ifdef USING_LOGGING_CALLBACK
 #include "log.h"

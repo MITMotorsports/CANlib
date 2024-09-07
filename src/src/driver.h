@@ -2,10 +2,14 @@
 
 // INCLUDE THIS AFTER YOUR DRIVER
 
-#ifdef CANLIB_ARCH_STM32F4xx
-#include "drivers/inc/stm32f4xx.h"
-#elif defined(CANLIB_ARCH_STM32F2xx)
-#include "drivers/inc/stm32f2xx.h"
+#ifndef CANLIB_ARCH
+#error "No architecture specified!"
+#endif
+
+#if CANLIB_ARCH == STM32F4xx
+#include "drivers/inc/stm32f4xx/stm32f4xx.h"
+#elif CANLIB_ARCH == STM32F2xx
+#include "drivers/inc/stm32f2xx/stm32f2xx.h"
 #else
 #error "No valid architecture specified!"
 #endif
