@@ -61,7 +61,6 @@ def render_template(env, relative_path, output_dir=None):
 
 def main():
     specpath = Path(os.getcwd()).joinpath(sys.argv[1]).resolve()
-    print(specpath)
     specfile = open(specpath, 'r')
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
@@ -75,7 +74,6 @@ def main():
     computer_c_dir_path = output_dir.joinpath('computers/src')
 
     units_path = None if len(sys.argv) < 4 else sys.argv[3]
-    print(units_path)
     if units_path is not None:
         units_path = os.path.join(units_path, 'au', 'code', 'au', 'units')
    
@@ -83,7 +81,6 @@ def main():
     system = ParseCAN.spec.System.from_yaml(specfile)
     can = system.protocol['name']['can']
 
-    print(units_path)
     all_unit_files = None
     if units_path is not None and os.path.exists(units_path):
         print('units!')
@@ -116,12 +113,15 @@ def main():
     drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path)
 
     # Copies over the static source files for the drivers.
-    src_dir = Path(pkg_resources.resource_filename('src'))
+    src_dir = Path(__file__).parent.parent.joinpath('src')
     for src_file in src_dir.iterdir():
         if src_file.is_file():
             src_file_path = src_file.resolve()
             dst_file_path = output_dir.joinpath(f"src/{src_file.name}")
             with open(src_file_path, 'r') as src_file:
+                # Creates the destination directory if it doesn't exist.
+                dst_file_dir = dst_file_path.parent
+                dst_file_dir.mkdir(parents=True, exist_ok=True)
                 with open(dst_file_path, 'w') as dst_file:
                     dst_file.write(src_file.read())
 
