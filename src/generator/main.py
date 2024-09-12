@@ -74,7 +74,7 @@ def main():
     computer_h_dir_path = output_dir.joinpath('computers/inc')
     computer_c_dir_path = output_dir.joinpath('computers/src')
 
-    units_path = None if len(sys.argv) < 3 else sys.argv[2]
+    units_path = None if len(sys.argv) < 4 else sys.argv[3]
     print(units_path)
     if units_path is not None:
         units_path = os.path.join(units_path, 'au', 'code', 'au', 'units')
