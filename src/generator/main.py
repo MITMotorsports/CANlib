@@ -105,13 +105,25 @@ def main():
     template_env.globals["unit_types"] = system.unit_types
     template_env.globals["all_unit_files"] = all_unit_files
 
+    # Renders the templates to the output directory.
     for filename in ["pack_unpack.cpp", "pack_unpack.h", "enum_atom.h", "send_receive.cpp", "structs.h", "bus.h"]:
         render_template(template_env, filename)
 
+    # Writes the constants, computer, and drivers files.
     constants.write(template_env, constants_template_path, constants_path)
     computers_h.write(template_env, system.computer, computer_h_template_path, computer_h_dir_path)
     computers_c.write(template_env, system.computer, computer_c_template_path, computer_c_dir_path)
     drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path)
+
+    # Copies over the static source files for the drivers.
+    src_dir = Path(pkg_resources.resource_filename('src'))
+    for src_file in src_dir.iterdir():
+        if src_file.is_file():
+            src_file_path = src_file.resolve()
+            dst_file_path = output_dir.joinpath(f"src/{src_file.name}")
+            with open(src_file_path, 'r') as src_file:
+                with open(dst_file_path, 'w') as dst_file:
+                    dst_file.write(src_file.read())
 
 if __name__ == "__main__":
     main()
