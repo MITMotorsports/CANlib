@@ -6,13 +6,16 @@
 #error "No architecture specified!"
 #endif
 
-#if CANLIB_ARCH == STM32F4xx
-#include "drivers/inc/stm32f4xx/stm32f4xx.h"
-#elif CANLIB_ARCH == STM32F2xx
-#include "drivers/inc/stm32f2xx/stm32f2xx.h"
-#else
-#error "Architecture not supported!"
-#endif
+// theo-todo: for some reason we were hitting the first if statement even when canlib_arch has set to h7
+// #if CANLIB_ARCH == STM32F4xx
+// #include "drivers/inc/stm32f4xx/stm32f4xx.h"
+// #elif CANLIB_ARCH == STM32F2xx
+// #include "drivers/inc/stm32f2xx/stm32f2xx.h"
+// #elif CANLIB_ARCH == STM32H7xx
+#include "drivers/inc/stm32h7xx/stm32h7xx.h"
+// #else
+// #error "Architecture not supported!"
+// #endif
 
 #include "bus.h"
 
