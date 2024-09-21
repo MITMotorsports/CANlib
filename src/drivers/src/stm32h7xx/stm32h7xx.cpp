@@ -26,7 +26,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.DataLength = frame->dlc;
   pHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
   pHeader.BitRateSwitch = 0;
-  pHeader.FDFormat = FDCAN_FD_CAN;
+  pHeader.FDFormat = FDCAN_CLASSIC_CAN;
   pHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
   pHeader.MessageMarker = 0;      // Don't replace last 2 bytes of data with TX time.
 #ifdef USING_LOGGING_CALLBACK
