@@ -6,6 +6,7 @@
 #include "driver.h"
 #include "drivers/inc/stm32h7xx/stm32h7xx.h"
 #include "stm32h7xx_hal.h"
+#include "logger.h"
 #ifdef USING_LOGGING_CALLBACK
 #include "log.h"
 #endif
@@ -34,7 +35,14 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 #else
   UNUSED(bus_num);
 #endif
-  return HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
+  SLO_LOG_INFO("sending");
+  SLO_LOG_DEBUG("%d %d %d %d %d %d %d %d", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
+  HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
+  if(res != HAL_OK) {
+    LOG_INFO("%d", res);
+    LOG_INFO(" err %lu", hfdcan1.ErrorCode);
+  }
+  return res;
 }
 
 void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
