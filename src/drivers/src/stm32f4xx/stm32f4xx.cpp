@@ -35,7 +35,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
       return HAL_ERROR;
   }
 
-  FDCAN_TxHeaderTypeDef pHeader;
+  CAN_TxHeaderTypeDef pHeader;
   uint32_t pTxMailbox = 0;
 
   pHeader.DLC                = frame->dlc;
