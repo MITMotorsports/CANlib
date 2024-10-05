@@ -7,11 +7,15 @@
 #include "drivers/inc/stm32h7xx/stm32h7xx.h"
 #include "stm32h7xx_hal.h"
 #include "logger.h"
+#include "clock.h"
 #ifdef USING_LOGGING_CALLBACK
 #include "log.h"
 #endif
 
 extern FDCAN_HandleTypeDef hfdcan1;
+
+common::Clock::time_point last_send_time;
+uint32_t num_sent;
 
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   UNUSED(bus);
@@ -35,9 +39,24 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
 #else
   UNUSED(bus_num);
 #endif
-  SLO_LOG_INFO("sending");
-  SLO_LOG_DEBUG("%d %d %d %d %d %d %d %d", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
+  // SLO_LOG_INFO("sending");
+  // frame->data[0] = 0x1;
+  // frame->data[1] = 0x2;
+  // frame->data[2] = 0x3;
+  // frame->data[3] = 0x4;
+  // frame->data[4] = 0x5;
+  // frame->data[5] = 0x6;
+  // frame->data[6] = 0x7;
+  // frame->data[7] = 0x8;
+  // SLO_LOG_DEBUG("%d %d %d %d %d %d %d %d", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
+  common::Clock::time_point now = common::Clock::now();
+  num_sent++;
+  if(now - last_send_time > std::chrono::milliseconds(1000)) {
+    LOG_INFO("sent %lu messages", num_sent);
+    last_send_time = now;
+    num_sent = 0;
+  }
   if(res != HAL_OK) {
     LOG_INFO("%d", res);
     LOG_INFO(" err %lu", hfdcan1.ErrorCode);
