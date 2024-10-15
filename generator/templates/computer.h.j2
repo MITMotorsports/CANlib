@@ -4,7 +4,7 @@
 {{ send_declaration(bus_name, sub_frame, msg_name + '_' + sub_frame.name) }}
 {%- endfor -%}
 {%- else -%}
-void CANlib_Send_{{ bus_name }}_{{ msg_name }}(CANlib_{{ bus_name }}_{{ msg_name }}_T *inp);
+void CANlib_Send_{{ bus_name }}_{{ msg_name }}(const CANlib_{{ bus_name }}_{{ msg_name }}_T *inp);
 {% endif -%}
 {%- endmacro -%}
 

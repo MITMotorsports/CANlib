@@ -15,7 +15,7 @@ type_in->{{ atom.name }}
 {%- else -%}
 {%- set name_prepends = name_prepends + [frame.name] -%}
 {%- set tot_name = '_'.join(name_prepends) -%}
-void CANlib_Pack_{{ tot_name }}(CANlib_{{ tot_name }}_T *type_in, Frame *can_out) {
+void CANlib_Pack_{{ tot_name }}(const CANlib_{{ tot_name }}_T *type_in, Frame *can_out) {
   uint64_t bitstring = 0;
 {%- for i in range(parent_slices | length) -%}
 {%- set part_name = '_'.join(name_prepends[:i + 3]) %}
