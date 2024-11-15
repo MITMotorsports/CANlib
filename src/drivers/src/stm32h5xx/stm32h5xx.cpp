@@ -4,31 +4,23 @@
 #include <string.h>
 #include "bus.h"
 #include "driver.h"
-#include "drivers/inc/stm32h7xx/stm32h7xx.h"
-#include "stm32h7xx_hal.h"
+#include "drivers/inc/stm32h5xx/stm32h5xx.h"
+#include "stm32h5xx_hal.h"
 #include "logger.h"
 #include "clock.h"
-#ifdef USING_LOGGING_CALLBACK
-#include "log.h"
-#endif
 
-extern FDCAN_HandleTypeDef hfdcan1; // control
-extern FDCAN_HandleTypeDef hfdcan2; // sensor
-extern FDCAN_HandleTypeDef hfdcan3; // critical
-
-common::Clock::time_point last_send_time;
-uint32_t num_sent;
+extern FDCAN_HandleTypeDef hfdcan1; // critical
 
 FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus) {
   switch(bus) {
     case charger:
       return nullptr;
     case control:
-      return &hfdcan1;
+      return nullptr;
     case critical:
-      return &hfdcan3;
+      return &hfdcan1;
     case sensor:
-      return &hfdcan2;
+      return nullptr;
   }
   return nullptr;
 }
@@ -84,34 +76,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.FDFormat = FDCAN_CLASSIC_CAN;
   pHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
   pHeader.MessageMarker = 0;      // Don't replace last 2 bytes of data with TX time.
-// #ifdef USING_LOGGING_CALLBACK
-//   log_frame(frame, bus_num);
-// #else
-//   UNUSED(bus_num);
-// #endif
-  // SLO_LOG_INFO("sending");
-  // frame->data[0] = 0x1;
-  // frame->data[1] = 0x2;
-  // frame->data[2] = 0x3;
-  // frame->data[3] = 0x4;
-  // frame->data[4] = 0x5;
-  // frame->data[5] = 0x6;
-  // frame->data[6] = 0x7;
-  // frame->data[7] = 0x8;
-  // SLO_LOG_DEBUG("%d %d %d %d %d %d %d %d", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
-  common::Clock::time_point now = common::Clock::now();
-  num_sent++;
-  if(now - last_send_time > std::chrono::milliseconds(1000)) {
-    LOG_INFO("sent %lu messages", num_sent);
-    last_send_time = now;
-    num_sent = 0;
-  }
-  if(res != HAL_OK) {
-    LOG_INFO("%d", hcan == &hfdcan1);
-    LOG_INFO("%d", res);
-    LOG_INFO(" err %lu", hcan->ErrorCode);
-  }
   return res;
 }
 
@@ -123,7 +88,7 @@ void CANlib_ReadFrame(Frame *frame, CANlib_Bus_T bus) {
   FDCAN_RxHeaderTypeDef pHeader;
   uint32_t fifo_address = FDCAN_RX_FIFO0;
   for (int fifo = 0; fifo < 2; fifo++) {  // There are 2 receive FIFOs
-    if (HAL_FDCAN_IsRxBufferMessageAvailable(hcan, fifo_address)) {
+    if (HAL_FDCAN_GetRxFifoFillLevel(hcan, fifo_address) != 0) {
       HAL_FDCAN_GetRxMessage(hcan, fifo_address, &pHeader, data);
       frame->id  = pHeader.Identifier;
       frame->dlc = pHeader.DataLength;
