@@ -19,6 +19,8 @@ extern FDCAN_HandleTypeDef hfdcan3; // critical
 common::Clock::time_point last_send_time;
 uint32_t num_sent;
 
+uint32_t next_can_buffers[4];
+
 FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus) {
   switch(bus) {
     case charger:
@@ -99,6 +101,16 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   // frame->data[6] = 0x7;
   // frame->data[7] = 0x8;
   // SLO_LOG_DEBUG("%d %d %d %d %d %d %d %d", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
+  
+  // uint32_t buffer_nbr = next_can_buffers[bus]++;
+  // if(next_can_buffers[bus] >= hcan->Init.TxBuffersNbr) {
+  //   next_can_buffers[bus] = 0;
+  // }
+  // if(hcan == &hfdcan3) {
+  //   // LOG_INFO("Sent on buffer %lu", buffer_nbr);
+  // }
+  // HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxBuffer(hcan, &pHeader,
+  //                                                frame->data, buffer_nbr);
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
   common::Clock::time_point now = common::Clock::now();
   num_sent++;
@@ -108,7 +120,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
     num_sent = 0;
   }
   if(res != HAL_OK) {
-    LOG_INFO("%d", hcan == &hfdcan2);
+    LOG_INFO("%d", hcan == &hfdcan3);
     LOG_INFO("%d", res);
     LOG_INFO(" err %lu", hcan->ErrorCode);
   }
