@@ -1,0 +1,168 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+
+
+BO_ 643 Inverter1_ActualValues1: 8 Vector__XXX
+ SG_ AMK_bReserve : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bSystemReady : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bError : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bWarn : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitDcOn : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitInverterOn : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDerating : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ActualVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueCurrent : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_MagnetizingCurrent : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 645 Inverter1_ActualValues2: 8 Vector__XXX
+ SG_ AMK_TempMotor : 0|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempInverter : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ErrorInfo : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempIGBT : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 388 Inverter1_Setpoints1: 8 Vector__XXX
+ SG_ AMK_bReserve_1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bEnable : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bErrorReset : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bReserve_2 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TargetVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitPositiv : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitNegativ : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 644 Inverter2_ActualValues1: 8 Vector__XXX
+ SG_ AMK_bReserve : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bSystemReady : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bError : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bWarn : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitDcOn : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitInverterOn : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDerating : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ActualVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueCurrent : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_MagnetizingCurrent : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 646 Inverter2_ActualValues2: 8 Vector__XXX
+ SG_ AMK_TempMotor : 0|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempInverter : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ErrorInfo : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempIGBT : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 389 Inverter2_Setpoints1: 8 Vector__XXX
+ SG_ AMK_bReserve_1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bEnable : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bErrorReset : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bReserve_2 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TargetVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitPositiv : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitNegativ : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 647 Inverter5_ActualValues1: 8 Vector__XXX
+ SG_ AMK_bReserve : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bSystemReady : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bError : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bWarn : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitDcOn : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitInverterOn : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDerating : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ActualVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueCurrent : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_MagnetizingCurrent : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 649 Inverter5_ActualValues2: 8 Vector__XXX
+ SG_ AMK_TempMotor : 0|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempInverter : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ErrorInfo : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempIGBT : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 392 Inverter5_Setpoints1: 8 Vector__XXX
+ SG_ AMK_bReserve_1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bEnable : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bErrorReset : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bReserve_2 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TargetVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitPositiv : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitNegativ : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 648 Inverter6_ActualValues1: 8 Vector__XXX
+ SG_ AMK_bReserve : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bSystemReady : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bError : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bWarn : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitDcOn : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 11|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bQuitInverterOn : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDerating : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ActualVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueCurrent : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_MagnetizingCurrent : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 656 Inverter6_ActualValues2: 8 Vector__XXX
+ SG_ AMK_TempMotor : 0|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempInverter : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_ErrorInfo : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TempIGBT : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 393 Inverter6_Setpoints1: 8 Vector__XXX
+ SG_ AMK_bReserve_1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bInverterOn : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bDcOn : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bEnable : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bErrorReset : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_bReserve_2 : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TargetVelocity : 16|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitPositiv : 32|16@1- (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_TorqueLimitNegativ : 48|16@1- (1,0) [0|0] "" Vector__XXX
+
+
+
+BA_DEF_  "MultiplexExtEnabled" ENUM  "No","Yes";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "MultiplexExtEnabled" "No";
+BA_DEF_DEF_  "BusType" "CAN";

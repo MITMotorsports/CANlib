@@ -1,0 +1,259 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+VAL_TABLE_ RequestedControlMode_mode 1 "DO_NOTHING" 2 "STANDARD_RWD" ;
+VAL_TABLE_ VCUToDashStatsPacket_state 1 "ROOT" 2 "LV" 3 "DRIVER_RESET_LOW" 4 "PRECOOLING" 5 "PRECHARGE" 6 "RTD" 7 "ZERO_TORQUE" 8 "DRIVING" ;
+VAL_TABLE_ VCUToDashErrorPacket_imd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_bms 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_contactor_mismatch 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_bspd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_throttle_implausibility 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_sensor_implausibility 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_brake_throttle_conflict 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_tsms 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_shutdown_loop_sense 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_shutdown_loop_latch 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_hvlv_interlock 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_heartbeat 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_vcu_sd_not_present 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_vcu_sd_write_failure 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_lside_cmd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_lside_act 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_hside_cmd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_hside_act 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_bms_sd_not_present 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_bms_sd_write_failure 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ VCUToDashErrorPacket_inverter_fault 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_TABLE_ CanSpecHash_board 0 "VCU" 1 "BMS" 2 "LVBMS" 3 "DASH" ;
+VAL_TABLE_ GitHash_board 0 "VCU" 1 "BMS" 2 "LVBMS" 3 "DASH" ;
+VAL_TABLE_ SrcHash_board 0 "VCU" 1 "BMS" 2 "LVBMS" 3 "DASH" ;
+
+
+BO_ 21 RequestedControlMode: 1 Vector__XXX
+ SG_ mode : 0|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 258 VCULogfileID: 2 Vector__XXX
+ SG_ ID : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 272 DashRequest: 1 Vector__XXX
+ SG_ driver_reset_pressed : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ rtd_pressed : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 288 BMSHeartbeat: 2 Vector__XXX
+ SG_ l_contactor_detect : 0|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ h_contactor_detect : 1|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ l_contactor_interlock : 2|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ h_contactor_interlock : 3|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ voltage_error : 4|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ temperature_error : 5|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pec_error : 6|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ chip_error : 7|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ ow_error : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ sd_init_error : 9|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ sd_write_error : 10|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 261 CellVoltageRange: 8 Vector__XXX
+ SG_ min : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ max : 23|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ sum : 39|32@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 262 CellTemperatureRange: 6 Vector__XXX
+ SG_ min : 7|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ max : 23|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ avg : 39|16@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 259 VCUToDashStatsPacket: 5 Vector__XXX
+ SG_ state : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ car_speed : 3|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 260 VCUToDashErrorPacket: 6 Vector__XXX
+ SG_ imd : 0|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bms : 2|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ contactor_mismatch : 4|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bspd : 6|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ throttle_implausibility : 8|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ sensor_implausibility : 10|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ brake_throttle_conflict : 12|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ tsms : 14|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_loop_sense : 16|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ shutdown_loop_latch : 18|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hvlv_interlock : 20|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ heartbeat : 22|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ vcu_sd_not_present : 24|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ vcu_sd_write_failure : 26|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ lside_cmd : 28|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ lside_act : 30|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hside_cmd : 32|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hside_act : 34|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bms_sd_not_present : 36|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ bms_sd_write_failure : 38|2@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ inverter_fault : 40|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1313 CurrentSensor_Current: 6 Vector__XXX
+ SG_ mux_id : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ msg_count : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ over_current_signal : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ channel_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ measurement_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ result : 23|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1314 CurrentSensor_Voltage1: 6 Vector__XXX
+ SG_ mux_id : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ msg_count : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ over_current_signal : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ channel_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ measurement_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ result : 23|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1315 CurrentSensor_Voltage2: 6 Vector__XXX
+ SG_ mux_id : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ msg_count : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ over_current_signal : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ channel_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ measurement_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ result : 23|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1316 CurrentSensor_Voltage3: 6 Vector__XXX
+ SG_ mux_id : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ msg_count : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ over_current_signal : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ channel_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ measurement_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ result : 23|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1318 CurrentSensor_Power: 6 Vector__XXX
+ SG_ mux_id : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ msg_count : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ over_current_signal : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ channel_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ measurement_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ result : 23|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1320 CurrentSensor_Energy: 6 Vector__XXX
+ SG_ mux_id : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ msg_count : 8|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ over_current_signal : 12|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ channel_error : 13|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ measurement_error : 14|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ system_error : 15|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ result : 23|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 266 WheelSpeed_FrontLeft: 8 Vector__XXX
+ SG_ filtered_speed : 7|32@0- (1,0) [0|0] "" Vector__XXX
+ SG_ raw_speed : 39|32@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1793 PowLim_LnchCtrl_TrqFac_Settings: 8 Vector__XXX
+ SG_ lambda : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ power_lim : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ no_slip_speed_th : 23|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ min_kappa : 31|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ torque_factor : 39|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ requested_next_driving_autom : 56|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pl_enabled : 57|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ account_for_kappa : 58|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ lc_enabled : 59|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1794 Regen_TempLim_VoltLim_Settings: 8 Vector__XXX
+ SG_ regen_bias : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ volt_lim_min_gain : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ temp_lim_min_gain : 23|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ volt_lim_max_voltage : 31|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ temp_lim_min_temp : 39|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ volt_lim_min_voltage : 47|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ temp_lim_max_temp : 55|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ temp_lim_enable : 56|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ volt_lim_enable : 57|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ regen_enable : 58|1@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2044 RTCInfo: 7 Vector__XXX
+ SG_ year : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ month : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ day : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ hour : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ minute : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ second : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ centisecond : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2045 CanSpecHash: 5 Vector__XXX
+ SG_ hash : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ board : 32|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2046 GitHash: 5 Vector__XXX
+ SG_ hash : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ working_tree_dirty : 32|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ board : 33|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2047 SrcHash: 5 Vector__XXX
+ SG_ hash : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ board : 32|2@1+ (1,0) [0|0] "" Vector__XXX
+
+
+
+BA_DEF_  "MultiplexExtEnabled" ENUM  "No","Yes";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "MultiplexExtEnabled" "No";
+BA_DEF_DEF_  "BusType" "CAN";
+VAL_ 21 mode 1 "DO_NOTHING" 2 "STANDARD_RWD" ;
+VAL_ 259 state 1 "ROOT" 2 "LV" 3 "DRIVER_RESET_LOW" 4 "PRECOOLING" 5 "PRECHARGE" 6 "RTD" 7 "ZERO_TORQUE" 8 "DRIVING" ;
+VAL_ 260 imd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 bms 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 contactor_mismatch 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 bspd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 throttle_implausibility 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 sensor_implausibility 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 brake_throttle_conflict 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 tsms 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 shutdown_loop_sense 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 shutdown_loop_latch 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 hvlv_interlock 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 heartbeat 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 vcu_sd_not_present 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 vcu_sd_write_failure 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 lside_cmd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 lside_act 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 hside_cmd 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 hside_act 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 bms_sd_not_present 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 bms_sd_write_failure 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 260 inverter_fault 0 "NO_ERROR" 1 "ERROR_DETECTED" 2 "ERROR_UNKNOWABLE" ;
+VAL_ 2045 board 0 "VCU" 1 "BMS" 2 "LVBMS" 3 "DASH" ;
+VAL_ 2046 board 0 "VCU" 1 "BMS" 2 "LVBMS" 3 "DASH" ;
+VAL_ 2047 board 0 "VCU" 1 "BMS" 2 "LVBMS" 3 "DASH" ;

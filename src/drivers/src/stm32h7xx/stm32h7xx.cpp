@@ -108,7 +108,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
     num_sent = 0;
   }
   if(res != HAL_OK) {
-    LOG_INFO("%d", hcan == &hfdcan1);
+    LOG_INFO("%d", hcan == &hfdcan2);
     LOG_INFO("%d", res);
     LOG_INFO(" err %lu", hcan->ErrorCode);
   }

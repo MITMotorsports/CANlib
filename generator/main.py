@@ -26,6 +26,8 @@ computer_h_template_path = template_dir.joinpath('computer.h.j2')
 constants_template_path = template_dir.joinpath('constants.h.j2')
 drivers_inc_template_dir_path = template_dir.joinpath('drivers/inc')
 
+dbc_dir = Path('../dbc/')
+
 
 # FROM: https://github.com/duelafn/python-jinja2-apci/blob/master/jinja2_apci/error.py
 class RaiseExtension(Extension):
@@ -90,6 +92,10 @@ if __name__ == '__main__':
     template_env.globals["system"] = system
     template_env.globals["unit_types"] = system.unit_types
     template_env.globals["all_unit_files"] = all_unit_files
+    
+    for bus in can.bus:
+        template_env.globals["canalyzer_bus"] = bus
+        render_template_from_to(template_env, template_dir.joinpath(f"canalyzer_db.dbc.j2"), dbc_dir.joinpath(f"{bus.name}_db.dbc"))
 
     for filename in ["pack_unpack.cpp", "pack_unpack.h", "enum_atom.h", "send_receive.cpp", "structs.h", "bus.h"]:
         render_template(template_env, filename)
