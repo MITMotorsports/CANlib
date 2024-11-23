@@ -32,6 +32,7 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 #include "evil_macros.h"
 #include "bus.h"
 #include "pack_unpack.h"
+#include HAL_INCLUDE
 
 {% for bus_name, bus in computer.participation['name']['can'].publish.items() %}
 {% for frame in bus -%}
@@ -46,3 +47,4 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 {% endfor %}
 void CANlib_update_can(void);
 void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus, Frame* frame);
+FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus);

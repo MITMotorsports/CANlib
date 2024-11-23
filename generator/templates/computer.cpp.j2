@@ -56,6 +56,21 @@ case CANlib_{{ busnm }}_{{ msg_name }}_key:
 #define UNUSED(X) (void)X
 #endif
 
+{%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+extern FDCAN_HandleTypeDef hfdcan{{ rawnm[-1] }};
+{%- endfor %}
+
+FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus) {
+  switch (bus) {
+{%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}
+    case {{ busnm }}:
+      return &hfdcan{{ rawnm[-1] }};
+{%- endfor %}
+    default:
+      return nullptr;
+  }
+}
+
 CAN_Raw_Bus_T CANlib_GetRawBus(CANlib_Bus_T bus) {
   switch (bus) {
 {%- for busnm, rawnm in computer.participation['name']['can'].mapping.items() %}

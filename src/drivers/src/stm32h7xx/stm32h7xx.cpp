@@ -8,32 +8,16 @@
 #include "stm32h7xx_hal.h"
 #include "logger.h"
 #include "clock.h"
+#include CANLIB_INCLUDE
 #ifdef USING_LOGGING_CALLBACK
 #include "log.h"
 #endif
 
-extern FDCAN_HandleTypeDef hfdcan1; // control
-extern FDCAN_HandleTypeDef hfdcan2; // sensor
-extern FDCAN_HandleTypeDef hfdcan3; // critical
 
 common::Clock::time_point last_send_time;
 uint32_t num_sent;
 
 uint8_t next_can_buffers[4];
-
-FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus) {
-  switch(bus) {
-    case charger:
-      return nullptr;
-    case control:
-      return &hfdcan1;
-    case critical:
-      return &hfdcan3;
-    case sensor:
-      return &hfdcan2;
-  }
-  return nullptr;
-}
 
 uint32_t CANlib_Get_DLC_Code(uint8_t num_bytes) {
   switch(num_bytes) {
