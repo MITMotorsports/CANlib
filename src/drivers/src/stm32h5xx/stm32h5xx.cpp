@@ -8,22 +8,9 @@
 #include "stm32h5xx_hal.h"
 #include "logger.h"
 #include "clock.h"
+#include CANLIB_INCLUDE
 
 extern FDCAN_HandleTypeDef hfdcan1; // critical
-
-FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus) {
-  switch(bus) {
-    case charger:
-      return nullptr;
-    case control:
-      return nullptr;
-    case critical:
-      return &hfdcan1;
-    case sensor:
-      return nullptr;
-  }
-  return nullptr;
-}
 
 uint32_t CANlib_Get_DLC_Code(uint8_t num_bytes) {
   switch(num_bytes) {
