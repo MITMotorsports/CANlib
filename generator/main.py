@@ -56,7 +56,7 @@ class RaiseExtension(Extension):
 
 def render_template_from_to(env, input_path, output_path):
     template = env.get_template(str(input_path))
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w+') as f:
         f.write(template.render())
 
 
@@ -93,6 +93,8 @@ if __name__ == '__main__':
     template_env.globals["unit_types"] = system.unit_types
     template_env.globals["all_unit_files"] = all_unit_files
     
+    if not os.path.exists(dbc_dir):
+        os.mkdir(dbc_dir)
     for bus in can.bus:
         template_env.globals["canalyzer_bus"] = bus
         render_template_from_to(template_env, template_dir.joinpath(f"canalyzer_db.dbc.j2"), dbc_dir.joinpath(f"{bus.name}_db.dbc"))
