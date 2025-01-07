@@ -10,8 +10,6 @@
 #include "clock.h"
 #include CANLIB_INCLUDE
 
-extern FDCAN_HandleTypeDef hfdcan1; // critical
-
 uint32_t CANlib_Get_DLC_Code(uint8_t num_bytes) {
   switch(num_bytes) {
     case 0:
