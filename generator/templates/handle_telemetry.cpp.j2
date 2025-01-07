@@ -1,0 +1,41 @@
+{%- macro get_atom_value(atom) -%}
+{%- if all_unit_files is not none and atom.unit in unit_types -%}
+type_in->{{ atom.name }}.in<{{ atom.type.ctype() }}>({{ unit_types[atom.unit] }}{})
+{%- else -%}
+type_in->{{ atom.name }}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro telemetry_handler(frame, name_prepends, bus_ext, parent_slices = []) -%}
+{%- if frame.frame is defined -%}
+{% for sub_frame in frame.frame -%}
+{{ telemetry_handler(sub_frame, name_prepends + [frame.name], bus_ext, parent_slices + [frame.slice]) }}
+
+{% endfor -%}
+{%- else -%}
+{%- set name_prepends = name_prepends + [frame.name] -%}
+{%- set tot_name = '_'.join(name_prepends) -%}
+
+void CANlib_Handle_Telemetry_{{ tot_name }}(const CANlib_{{ tot_name }}_T *type_in) {
+  influxdb->write(influxdb::Point{"{{tot_name}}"}
+  {% for atom in frame.atom -%}
+  .addField("{{ atom.name }}", {{ get_atom_value(atom) }})
+  {% endfor -%}
+  );
+}
+{%- endif %}
+{%- endmacro -%}
+
+#include "handle_telemetry.h"
+#include "structs.h"
+#include "InfluxDB/InfluxDB.h"
+
+extern InfluxDB* influxdb;
+
+// Telemetry handle functions
+{% for bus in can.bus %}
+{%- for msg in bus.frame -%}
+{{ telemetry_handler(msg, [bus.name], bus.extended) }}
+
+{% endfor %}
+{% endfor %}
