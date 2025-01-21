@@ -180,7 +180,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
   if(res != HAL_OK) {
     uint32_t free_level = HAL_FDCAN_GetTxFifoFreeLevel(hcan);
-    LOG_INFO("CAN TX ERROR %d, Error code %lu, free level %lu", res, hcan->ErrorCode, free_level);
+    SLO_LOG_ERROR("CAN TX ERROR %d, Error code %lu, free level %lu", res, hcan->ErrorCode, free_level);
   }
   return res;
 }
