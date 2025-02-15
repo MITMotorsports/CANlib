@@ -23,7 +23,7 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 
 #include <stdint.h>
 #include <stdbool.h>
-
+#include "canlib_handlers_{{ computer.name }}.h"
 #include "driver.h"
 #include "constants.h"
 #include "enum_atom.h"
@@ -40,11 +40,5 @@ void CANlib_Handle_{{ bus_name }}_{{ msg_name }}(Frame *frame);
 {%- endfor -%}
 {% endfor -%}
 
-{% for bus_name, bus in computer.participation['name']['can'].subscribe.items() %}
-{% for frame in bus -%}
-{{ handle_stuff(bus_name, frame) -}}
-{%- endfor -%}
-{% endfor %}
 void CANlib_update_can(void);
-void CANlib_HandleFrame(CAN_Raw_Bus_T raw_bus, Frame* frame);
 FDCAN_HandleTypeDef* CANTypeDef_From_BusT(CANlib_Bus_T bus);

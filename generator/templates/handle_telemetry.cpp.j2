@@ -28,9 +28,9 @@ void CANlib_Handle_Telemetry_{{ tot_name }}(const CANlib_{{ tot_name }}_T *type_
 
 #include "handle_telemetry.h"
 #include "structs.h"
-#include "InfluxDB/InfluxDB.h"
+#include "Point.h"
 
-extern InfluxDB* influxdb;
+using namespace influxdb;
 
 // Telemetry handle functions
 {% for bus in can.bus %}
