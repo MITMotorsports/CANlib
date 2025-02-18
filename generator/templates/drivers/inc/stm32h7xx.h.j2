@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 typedef enum {
-{%- for bus in architecture.participation['name']['can'].buses -%}
+{%- for bus in architecture.participation['name']['can'].buses | sort -%}
 {%- if bus == 'INVALID_BUS' -%}
   {%- raise "INVALID_BUS is a reserved bus name" -%}
 {%- endif %}

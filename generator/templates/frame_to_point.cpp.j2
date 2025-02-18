@@ -30,6 +30,7 @@ case CANlib_{{ busnm }}_{{ msg_name }}_key:
 #include "evil_macros.h"
 #include "drivers/inc/{{ system.architecture['name'][computer.architecture].family }}/{{ system.architecture['name'][computer.architecture].family }}.h"
 #include "Point.h"
+
 using namespace influxdb;
 
 {%- for busnm, bus in computer.participation['name']['can'].subscribe.items() %}
