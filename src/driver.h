@@ -3,6 +3,7 @@
 #define STM32F2xx 1
 #define STM32F4xx 2
 #define STM32H5xx 3
+#define STM32U5xx 4
 
 // INCLUDE THIS AFTER YOUR DRIVER
 #ifndef CANLIB_ARCH
@@ -18,6 +19,8 @@
 #include "drivers/inc/stm32h7xx/stm32h7xx.h"
 #elif CANLIB_ARCH == STM32H5xx
 #include "drivers/inc/stm32h5xx/stm32h5xx.h"
+#elif CANLIB_ARCH == STM32U5xx
+#include "drivers/inc/stm32u5xx/stm32u5xx.h"
 #else
 #error "Architecture not supported!"
 #endif
