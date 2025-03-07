@@ -154,7 +154,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   uint32_t buffer_nbr_enum = CANlib_TxBufferLocation_From_BufferNumber(buffer_nbr);
   
   if(HAL_FDCAN_IsTxBufferMessagePending(hcan, buffer_nbr_enum) == 1) {
-    LOG_INFO("Trying to send can messages too fast on buffer %u!", buffer_nbr);
+    SLO_LOG_INFO("Trying to send can messages too fast on buffer %u!", buffer_nbr);
     return HAL_BUSY; // busy processing other request
   }
 
@@ -167,13 +167,13 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   // HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
   common::Clock::time_point now = common::Clock::now();
   num_sent++;
-  if(now - last_send_time > std::chrono::milliseconds(1000)) {
-    LOG_INFO("sent %lu messages", num_sent);
+  if(now - last_send_time > std::chrono::milliseconds(10000)) {
+    LOG_INFO("sent %lu messages over CAN in last 10 seconds", num_sent);
     last_send_time = now;
     num_sent = 0;
   }
   if(res != HAL_OK || res2 != HAL_OK) {
-    LOG_INFO("CAN TX ERROR %lu", hcan->ErrorCode);
+    SLO_LOG_INFO("CAN TX ERROR %lu", hcan->ErrorCode);
   }
   return res2;
 }
