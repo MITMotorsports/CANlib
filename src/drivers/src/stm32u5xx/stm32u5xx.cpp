@@ -165,7 +165,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
   pHeader.MessageMarker = 0;      // Don't replace last 2 bytes of data with TX time.
 
-  LOG_INFO("%x %x %x %x %x %x %x %x", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
+  // LOG_INFO("%x %x %x %x %x %x %x %x", frame->data[0], frame->data[1], frame->data[2], frame->data[3], frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
   
   common::Clock::time_point now = common::Clock::now();
   num_sent++;
@@ -174,7 +174,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
     last_send_time = now;
     num_sent = 0;
   }
-  print_can_info(hcan);
+  // print_can_info(hcan);
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
   if(res != HAL_OK) {
     uint32_t free_level = HAL_FDCAN_GetTxFifoFreeLevel(hcan);
