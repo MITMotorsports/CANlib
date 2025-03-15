@@ -13,9 +13,9 @@ parsed_frame.{{ atom.name }}
 {%- endfor -%}
 {%- else %}
 void CANlib_FrameToPoint_{{ bus.name }}_{{ msg_name }}(Point* point_addr, Frame *frame) {
-  *point_addr = Point();
   CANlib_{{ bus.name }}_{{ msg_name }}_T parsed_frame;
   CANlib_Unpack_{{ bus.name }}_{{ msg_name }}(frame, &parsed_frame);
+  point_addr->clear();
   point_addr->setMeasurement("{{ bus.name }}_{{ msg_name }}");
   {% for atom in msg.atom -%}
   point_addr->addField("{{ atom.name }}", {{ get_atom_value(atom) }});
