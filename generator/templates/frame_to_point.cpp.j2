@@ -32,11 +32,11 @@ case CANlib_{{ busnm }}_{{ msg_name }}_key:
 #include "Point.h"
 using namespace influxdb;
 
-{%- for busnm, bus in computer.participation['name']['can'].subscribe.items() %}
+{%- for busnm, bus in can.bus.items() %}
 
 void CANlib_FrameToPoint_{{ busnm }}(Point* point_addr, Frame *frame) {
   switch (frame->id) {
-{%- for frame in bus %}
+{%- for frame in bus.frame %}
     {{ handle_case(busnm, frame) | indent(4) }}
 {%- endfor %}
     default:

@@ -24,8 +24,8 @@ void CANlib_FrameToPoint_{{ bus_name }}_{{ msg_name }}(Point* point_addr, Frame 
 #include "Point.h"
 using namespace influxdb;
 
-{% for bus_name, bus in computer.participation['name']['can'].subscribe.items() %}
-{% for frame in bus -%}
+{% for bus_name, bus in can.bus.items() %}
+{% for frame in bus.frame -%}
 {{ handle_stuff(bus_name, frame) -}}
 {%- endfor -%}
 {% endfor %}
