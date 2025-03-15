@@ -5,7 +5,7 @@
 {{ function_definitions(bus, sub_frame, msg_name + '_' + sub_frame.name) }}
 {%- endfor -%}
 {%- else %}
-Point CANlib_FrameToPoint_{{ bus.name }}_{{ msg_name }}(Frame *frame);
+void CANlib_FrameToPoint_{{ bus.name }}_{{ msg_name }}(Point* point_addr, Frame *frame);
 {% endif -%}
 {%- endmacro -%}
 
