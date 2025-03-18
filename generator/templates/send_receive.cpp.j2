@@ -14,13 +14,14 @@ CANlib_{{ bus.name }}_{{ msg_name }}_T CANlib_{{ bus.name }}_{{ msg_name }}_Inpu
 {{ function_definitions(bus, sub_frame, msg_name + '_' + sub_frame.name) }}
 {%- endfor -%}
 {%- else %}
-void CANlib_Send_{{ bus.name }}_{{ msg_name }}(const CANlib_{{ bus.name }}_{{ msg_name }}_T *inp) {
+bool CANlib_Send_{{ bus.name }}_{{ msg_name }}(const CANlib_{{ bus.name }}_{{ msg_name }}_T *inp) {
 {%- if msg.period is not none %}
   LIMIT(CANlib_{{ bus.name }}_{{ msg_name }});
 {%- endif %}
 	Frame frame;
 	CANlib_Pack_{{ bus.name }}_{{ msg_name }}(inp, &frame);
 	CANlib_TransmitFrame(&frame, {{ bus.name }});
+  return true;
 }
 
 void CANlib_Handle_{{ bus.name }}_{{ msg_name }}(Frame *frame) {
@@ -35,7 +36,7 @@ void CANlib_Handle_{{ bus.name }}_{{ msg_name }}(Frame *frame) {
 
 #define LIMIT(name)                                         \
   static Time_T last_sent = 0;                              \
-  if (CANlib_GetTick() - last_sent < name##_period) return; \
+  if (CANlib_GetTick() - last_sent < name##_period) return false; \
   last_sent = CANlib_GetTick();
 
 // Input Structs
