@@ -16,6 +16,7 @@
 
 common::Clock::time_point last_send_time;
 uint32_t num_sent;
+uint32_t num_dropped;
 
 uint8_t next_can_buffers[4];
 
@@ -170,17 +171,21 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.MessageMarker = 0;      // Don't replace last 2 bytes of data with TX time.
   
   common::Clock::time_point now = common::Clock::now();
-  num_sent++;
-  if(now - last_send_time > std::chrono::seconds(10)) {
-    LOG_INFO("CAN sent %lu messages in %lums", num_sent, (now - last_send_time).count());
-    last_send_time = now;
-    num_sent = 0;
-  }
+  
   // print_can_info(hcan);
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
   if(res != HAL_OK) {
+    num_dropped++;
     uint32_t free_level = HAL_FDCAN_GetTxFifoFreeLevel(hcan);
     SLO_LOG_ERROR("CAN TX ERROR %d, Error code %lu, free level %lu", res, hcan->ErrorCode, free_level);
+  } else {
+    num_sent++;
+  }
+  if(now - last_send_time > std::chrono::seconds(10)) {
+    LOG_INFO("CAN sent %lu messages, dropped %lu, in %lums", num_sent, num_dropped, (now - last_send_time).count());
+    last_send_time = now;
+    num_sent = 0;
+    num_dropped = 0;
   }
   return res;
 }
