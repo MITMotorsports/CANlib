@@ -10,10 +10,6 @@ import ParseCAN.ParseCAN as ParseCAN
 
 import constants
 import computers_h
-import frame_to_point_c
-import frame_to_point_h
-import unpack_frame_to_point_c
-import unpack_frame_to_point_h
 import computers_c
 import drivers_inc
 import handlers_c
@@ -24,20 +20,10 @@ constants_path = src_dir.joinpath('constants.h')
 drivers_inc_dir_path = src_dir.joinpath('drivers/inc')
 computer_h_dir_path = src_dir.joinpath('computers/inc')
 computer_c_dir_path = src_dir.joinpath('computers/src')
-
-frame_to_point_h_dir_path = computer_h_dir_path
-frame_to_point_c_dir_path = computer_c_dir_path
-unpack_frame_to_point_c_dir_path = computer_c_dir_path
-unpack_frame_to_point_h_dir_path = computer_h_dir_path
 computer_handlers_c_dir_path = computer_c_dir_path
 computer_handlers_h_dir_path = computer_h_dir_path
 
 template_dir = Path('./templates/')
-# Telemetry specfic frame to point generated CANLib
-unpack_frame_to_point_c_template_path = template_dir.joinpath('unpack_frame_to_point.cpp.j2')
-unpack_frame_to_point_h_template_path = template_dir.joinpath('unpack_frame_to_point.h.j2')
-frame_to_point_c_template_path = template_dir.joinpath('frame_to_point.cpp.j2')
-frame_to_point_h_template_path = template_dir.joinpath('frame_to_point.h.j2')
 computer_handlers_c_template_path = template_dir.joinpath('computer_handlers.cpp.j2')
 computer_handlers_h_template_path = template_dir.joinpath('computer_handlers.h.j2')
 computer_c_template_path = template_dir.joinpath('computer.cpp.j2')
@@ -125,14 +111,6 @@ if __name__ == '__main__':
     handlers_c.write(template_env, system.computer, 
                      computer_handlers_c_template_path, computer_handlers_c_dir_path)
     handlers_h.write(template_env, system.computer, computer_handlers_h_template_path, computer_handlers_h_dir_path)
-    frame_to_point_h.write(template_env, system.computer, frame_to_point_h_template_path, 
-                     frame_to_point_h_dir_path)
-    frame_to_point_c.write(template_env, system.computer, frame_to_point_c_template_path, 
-                     frame_to_point_c_dir_path)
-    unpack_frame_to_point_h.write(template_env, system.computer, 
-                            unpack_frame_to_point_h_template_path, unpack_frame_to_point_h_dir_path)
-    unpack_frame_to_point_c.write(template_env, system.computer, 
-                            unpack_frame_to_point_c_template_path, unpack_frame_to_point_c_dir_path)
     computers_h.write(template_env, system.computer, computer_h_template_path, computer_h_dir_path)
     computers_c.write(template_env, system.computer, computer_c_template_path, computer_c_dir_path)
     drivers_inc.write(template_env, system, drivers_inc_template_dir_path, drivers_inc_dir_path)
