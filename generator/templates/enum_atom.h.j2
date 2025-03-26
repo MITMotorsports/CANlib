@@ -6,7 +6,10 @@
 {%- else -%}
 {%- for atom in msg.atom -%}
 {%- if atom.type.isenum() -%}
-typedef enum {
+typedef 
+{%- if atom.mirror_frame is not none and atom.mirror_bus is not none and atom.mirror_atom is not none %} CANlib_{{ atom.mirror_bus }}_{{atom.mirror_frame }}_{{ atom.mirror_atom }}_T CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T;
+{%- elif msg.mirror_frame is not none and msg.mirror_bus is not none %} CANlib_{{ msg.mirror_bus }}_{{ msg.mirror_frame }}_{{ atom.name }}_T CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T;
+{%- else %} enum {
 {%- for enum in atom.type.enum -%}
 {%- if enum.name == 'NUM_FIELDS' -%}
   {%- raise "Enum name for {{ atom.name }} cannot be NUM_FIELDS" -%}
@@ -15,7 +18,7 @@ typedef enum {
 {%- endif -%}
 {%- endfor %}
   CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_NUM_FIELDS = {{ atom.type.enum | length }}
-} CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T;
+} CANlib_{{ bus.name }}_{{ msg_name }}_{{ atom.name }}_T; {% endif %}
 
 {% endif -%}
 {%- endfor -%}
