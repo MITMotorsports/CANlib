@@ -128,6 +128,8 @@ uint32_t CANlib_TxBufferLocation_From_BufferNumber(uint8_t buffer_nbr) {
   return 0;
 }
 
+uint32_t last_success_send_time = 0;
+
 void print_can_info(FDCAN_HandleTypeDef* hcan) {
   FDCAN_ProtocolStatusTypeDef protocol_status;
   HAL_StatusTypeDef res2 = HAL_FDCAN_GetProtocolStatus(hcan, &protocol_status);
@@ -180,8 +182,12 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
     SLO_LOG_ERROR("CAN TX ERROR %d, Error code %lu, free level %lu", res, hcan->ErrorCode, free_level);
   } else {
     num_sent++;
+    if(HAL_GetTick() - last_success_send_time > 30) {
+      LOG_INFO("Took %lu to send a message!", HAL_GetTick() -last_success_send_time);
+    }
+    last_success_send_time = HAL_GetTick();
   }
-  if(now - last_send_time > std::chrono::seconds(10)) {
+  if(now - last_send_time > std::chrono::seconds(1)) {
     LOG_INFO("CAN sent %lu messages, dropped %lu, in %lums", num_sent, num_dropped, (now - last_send_time).count());
     last_send_time = now;
     num_sent = 0;
