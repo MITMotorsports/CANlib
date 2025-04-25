@@ -131,6 +131,8 @@ uint32_t CANlib_TxBufferLocation_From_BufferNumber(uint8_t buffer_nbr) {
   return 0;
 }
 
+HAL_StatusTypeDef latest_can_result;
+
 HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   // UNUSED(frame);
   // UNUSED(bus);
@@ -175,6 +177,7 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   if(res != HAL_OK || res2 != HAL_OK) {
     SLO_LOG_INFO("CAN TX ERROR %lu", hcan->ErrorCode);
   }
+  latest_can_result = res;
   return res2;
 }
 
