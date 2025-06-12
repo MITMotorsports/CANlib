@@ -66,64 +66,6 @@ uint32_t CANlib_TxBufferLocation_From_BufferNumber(uint8_t buffer_nbr) {
       return FDCAN_TX_BUFFER1;
     case 2:
       return FDCAN_TX_BUFFER2;
-    // case 3:
-    //   return FDCAN_TX_BUFFER3;
-    // case 4:
-    //   return FDCAN_TX_BUFFER4;
-    // case 5:
-    //   return FDCAN_TX_BUFFER5;
-    // case 6:
-    //   return FDCAN_TX_BUFFER6;
-    // case 7:
-    //   return FDCAN_TX_BUFFER7;
-    // case 8:
-    //   return FDCAN_TX_BUFFER8;
-    // case 9:
-    //   return FDCAN_TX_BUFFER9;
-    // case 10:
-    //   return FDCAN_TX_BUFFER10;
-    // case 11:
-    //   return FDCAN_TX_BUFFER11;
-    // case 12:
-    //   return FDCAN_TX_BUFFER12;
-    // case 13:
-    //   return FDCAN_TX_BUFFER13;
-    // case 14:
-    //   return FDCAN_TX_BUFFER14;
-    // case 15:
-    //   return FDCAN_TX_BUFFER15;
-    // case 16:
-    //   return FDCAN_TX_BUFFER16;
-    // case 17:
-    //   return FDCAN_TX_BUFFER17;
-    // case 18:
-    //   return FDCAN_TX_BUFFER18;
-    // case 19:
-    //   return FDCAN_TX_BUFFER19;
-    // case 20:
-    //   return FDCAN_TX_BUFFER20;
-    // case 21:
-    //   return FDCAN_TX_BUFFER21;
-    // case 22:
-    //   return FDCAN_TX_BUFFER22;
-    // case 23:
-    //   return FDCAN_TX_BUFFER23;
-    // case 24:
-    //   return FDCAN_TX_BUFFER24;
-    // case 25:
-    //   return FDCAN_TX_BUFFER25;
-    // case 26:
-    //   return FDCAN_TX_BUFFER26;
-    // case 27:
-    //   return FDCAN_TX_BUFFER27;
-    // case 28:
-    //   return FDCAN_TX_BUFFER28;
-    // case 29:
-    //   return FDCAN_TX_BUFFER29;
-    // case 30:
-    //   return FDCAN_TX_BUFFER30;
-    // case 31:
-    //   return FDCAN_TX_BUFFER31;
   }
   return 0;
 }
@@ -173,13 +115,14 @@ HAL_StatusTypeDef CANlib_TransmitFrame(Frame *frame, CANlib_Bus_T bus) {
   pHeader.MessageMarker = 0;      // Don't replace last 2 bytes of data with TX time.
   
   common::Clock::time_point now = common::Clock::now();
-  
+
   // print_can_info(hcan);
   HAL_StatusTypeDef res = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &pHeader, frame->data);
+  
   if(res != HAL_OK) {
     num_dropped++;
-    uint32_t free_level = HAL_FDCAN_GetTxFifoFreeLevel(hcan);
-    SLO_LOG_ERROR("CAN TX ERROR %d, Error code %lu, free level %lu", res, hcan->ErrorCode, free_level);
+    // uint32_t free_level = HAL_FDCAN_GetTxFifoFreeLevel(hcan);
+    SLO_LOG_ERROR("CAN TX ERROR %d, Error code %lu", res, hcan->ErrorCode);
   } else {
     num_sent++;
     // if(HAL_GetTick() - last_success_send_time > 30) {
